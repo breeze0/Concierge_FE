@@ -19,7 +19,9 @@
           <div class="el-input">
             <input type="number" class="el-input__inner" v-model="inputNum" placeholder="请输入6位短信验证码">
           </div>
-          <el-button type="primary" round>获取验证码</el-button>
+          <el-button type="primary" round
+          @click="setTime"
+          :disabled="disabled">{{ btnVal }}</el-button>
         </div>
         <el-button type="primary" class="login-btn">登录</el-button>
       </div>
@@ -34,7 +36,10 @@
         inputTel: null,
         inputNum: null,
         isShowError: false,
-        numErrorMsg: '请输入正确的手机号'
+        disabled: false,
+        coutdown: 5,
+        numErrorMsg: '请输入正确的手机号',
+        btnVal: '获取验证码'
       }
     },
     methods: {
@@ -46,8 +51,26 @@
           return true;
         }
       },
+
       handleBlur() {
         this.isShowError = !this.isAvailable(this.inputTel)
+      },
+
+      setTime() {
+        if(this.coutdown == 0) {
+          this.disabled = false;
+          this.btnVal = '获取验证码';
+          this.coutdown = 5;
+          return;
+        } else {
+          this.disabled = true;
+          this.btnVal = this.coutdown+'秒后重新发送';
+          this.coutdown--;
+        }
+        var _this = this;
+        setTimeout(function() {
+          _this.setTime()
+        },1000);
       }
 
     },
