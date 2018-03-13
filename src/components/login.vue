@@ -5,25 +5,28 @@
         <span>手机登录</span>
       </div>
       <div class="login-content">
-        <div class="el-input">
-          <input type="text" class="el-input__inner"
+        <div class="input-container">
+          <input type="text" class="login-input"
           v-model="inputTel"
           placeholder="请输入手机号码"
-          @blur="handleBlur"
           >
         </div>
         <div class="error-msg">
-          <span v-show='isShowError'>{{ numErrorMsg }}</span>
+          <span v-show='isShowTelError'>{{ telErrorMsg }}</span>
         </div>
         <div class="input-wrapper">
-          <div class="el-input">
-            <input type="number" class="el-input__inner" v-model="inputNum" placeholder="请输入6位短信验证码">
+          <div class="input-msg-container">
+            <input type="number" class="login-input" v-model="inputNum" placeholder="请输入6位短信验证码">
           </div>
-          <el-button type="primary" round
-          @click="setTime"
+          <el-button type="text"
+          @click="countDown"
           :disabled="disabled">{{ btnVal }}</el-button>
         </div>
-        <el-button type="primary" class="login-btn">登录</el-button>
+        <div class="error-msg">
+          <span v-show="isShowNumError">{{ numErrorMsg }}</span>
+        </div>
+        <el-button type="primary" class="login-btn"
+        @click="login">登录</el-button>
       </div>
     </el-card>
   </div>
@@ -33,13 +36,15 @@
   export default {
     data () {
       return {
-        inputTel: null,
-        inputNum: null,
-        isShowError: false,
+        inputTel: '',
+        inputNum: '',
+        isShowTelError: false,
+        isShowNumError: false,
         disabled: false,
-        coutdown: 5,
-        numErrorMsg: '请输入正确的手机号',
-        btnVal: '获取验证码'
+        countdown: 5,
+        telErrorMsg: '请输入正确的手机号',
+        numErrorMsg: '请输入正确的短信验证码',
+        btnVal: '获取短信验证码'
       }
     },
     methods: {
@@ -52,25 +57,33 @@
         }
       },
 
-      handleBlur() {
-        this.isShowError = !this.isAvailable(this.inputTel)
+      login() {
+        if(this.inputTel == '') {
+          this.isShowTelError = true;
+        }
+        if(this.inputNum == '') {
+          this.isShowNumError = true;
+        }
       },
 
-      setTime() {
-        if(this.coutdown == 0) {
-          this.disabled = false;
-          this.btnVal = '获取验证码';
-          this.coutdown = 5;
-          return;
-        } else {
-          this.disabled = true;
-          this.btnVal = this.coutdown+'秒后重新发送';
-          this.coutdown--;
+      countDown() {
+        this.isShowTelError = !this.isAvailable(this.inputTel)
+        if(!this.isShowTelError) {
+          if(this.countdown == 0) {
+            this.disabled = false;
+            this.btnVal = '获取短信验证码';
+            this.countdown = 5;
+            return;
+          } else {
+            this.disabled = true;
+            this.btnVal = this.countdown+'秒后重新获取';
+            this.countdown--;
+          }
+          var _this = this;
+          setTimeout(function() {
+            _this.countDown()
+          },1000);
         }
-        var _this = this;
-        setTimeout(function() {
-          _this.setTime()
-        },1000);
       }
 
     },
@@ -110,12 +123,30 @@ input[type="number"]::-webkit-inner-spin-button {
   }
 
   .login-content {
-    .el-input {
-      text-align: center;
+    .login-input {
+      border: none;
+      width: 100%;
+      -webkit-appearance: none;
+      background-color: #fff;
+      background-image: none;
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box;
+      color: #606266;
+      display: inline-block;
+      font-size: inherit;
+      height: 40px;
+      line-height: 1;
+      outline: 0;
+      transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+    }
 
-      .el-input__inner {
-        width: 80%;
-      }
+    .input-container {
+      position: relative;
+      font-size: 14px;
+      display: inline-block;
+      width: 80%;
+      margin: 0 10%;
+      border-bottom: 1px solid #ebebeb;
     }
     .error-msg {
       margin-left: 10%;
@@ -125,21 +156,17 @@ input[type="number"]::-webkit-inner-spin-button {
     }
 
     .input-wrapper {
-      margin-top: 20px;
+      margin: 20px 10% 0 10%;
       display: flex;
-      width: 80%;
-      margin-left: 10%;
+      justify-content: space-between;
+      border-bottom: 1px solid #ebebeb;
 
-      .el-input__inner {
-        width: 90%!important;
-        margin-right: 10%;
-      }
     }
 
     .login-btn {
       margin-left: 10%;
       width: 80%;
-      margin-top: 40px;
+      margin-top: 20px;
     }
   }
 
