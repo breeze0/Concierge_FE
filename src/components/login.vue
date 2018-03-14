@@ -8,6 +8,7 @@
         <div class="input-container">
           <input type="text" class="login-input"
           v-model="inputTel"
+          @blur="handleBlur"
           placeholder="请输入手机号码"
           >
         </div>
@@ -19,7 +20,7 @@
             <input type="number" class="login-input" v-model="inputNum" placeholder="请输入6位短信验证码">
           </div>
           <el-button type="text"
-          @click="countDown"
+          @click="getCode"
           :disabled="disabled">{{ btnVal }}</el-button>
         </div>
         <div class="error-msg">
@@ -57,12 +58,20 @@
         }
       },
 
+      handleBlur() {
+        this.isShowTelError = !this.isAvailable(this.inputTel)
+      },
+
       login() {
         if(this.inputTel == '') {
           this.isShowTelError = true;
         }
-        if(this.inputNum == '') {
+        if(this.inputNum.length != 6 ) {
           this.isShowNumError = true;
+        }
+        if(this.inputTel && this.inputNum.length == 6) {
+          console.log(1)
+          //向后台发送数据验证手机号和验证码
         }
       },
 
@@ -83,6 +92,14 @@
           setTimeout(function() {
             _this.countDown()
           },1000);
+        }
+      },
+
+      getCode() {
+        this.countDown();
+        if(this.isAvailable(this.inputTel)) {
+          console.log(2)
+          //向后台请求发送验证码
         }
       }
 
