@@ -28,6 +28,7 @@ function getCookie(name) {
 
 Vue.prototype.getCookie = getCookie;
 
+
 Vue.prototype.delCookie = (name) => {
   var exp = new Date();
   exp.setTime(exp.getTime() - 1);
@@ -41,7 +42,43 @@ new Vue({
   router,
   components: { App },
   template: '<App/>',
+  data: {
+    token: ''
+  },
+
+  created() {
+    var _this = this;
+    this.$http.get('http://192.168.31.208').then((response)=>{
+      _this.token = response.data.token;
+    })
+    setTimeout(function() {
+      _this.checkLogin()
+    },2000)
+  },
   mounted() {
 
+  },
+  watch: {
+    $route(to, from) {
+      this.checkLogin();
+    }
+  },
+
+  methods: {
+    checkLogin() {
+      var cookie = document.cookie.split(';');
+      var tokenInCookie = cookie[2].trim().slice(6);
+      if(!tokenInCookie) {
+        this.$router.push('/login')
+      } else if(tokenInCookie == this.token) {
+        if(this.$route.path == '/login') {
+          this.$router.push('/admin')
+        } else {
+          this.$router.push(this.$route.path)
+        }
+      } else {
+        this.$router.push('/login')
+      }
+    }
   }
-})
+ })
