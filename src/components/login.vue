@@ -59,7 +59,7 @@
       },
 
       handleBlur() {
-        this.isShowTelError = !this.isAvailable(this.inputTel)
+        this.isShowTelError = !this.isAvailable(this.inputTel);
       },
 
       login() {
@@ -69,9 +69,17 @@
         if(this.inputNum.length != 6 ) {
           this.isShowNumError = true;
         }
-        if(this.inputTel && this.inputNum.length == 6) {
-          console.log(1)
-          //向后台发送数据验证手机号和验证码
+        if(this.isAvailable(this.inputTel) && this.inputNum.length == 6) {
+          this.$http.get('http://192.168.31.208/login?tel='+this.inputTel+'&code='+this.inputNum).then((res)=>{
+            if(res.data.state == 'success') {
+              var expire = 1000 * 60 * 60 * 24 * 7;
+              this.setCookie('tel', this.inputTel, expire);
+              this.setCookie('token', res.data.token, expire);
+              this.$router.push('/admin');
+            } else {
+              this.isShowNumError = true
+            }
+          })
         }
       },
 
@@ -98,8 +106,11 @@
       getCode() {
         this.countDown();
         if(this.isAvailable(this.inputTel)) {
-          console.log(2)
-          //向后台请求发送验证码
+          this.$http.get('http://192.168.31.208/login?tel='+this.inputTel).then((response)=>{
+            if(response.data.state == 'fail') {
+              this.isShowTelError = true;
+            }
+          })
         }
       }
 

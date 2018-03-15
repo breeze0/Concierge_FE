@@ -47,13 +47,13 @@ new Vue({
   },
 
   created() {
-    var _this = this;
-    this.$http.get('http://192.168.31.208').then((response)=>{
-      _this.token = response.data.token;
-    })
-    setTimeout(function() {
-      _this.checkLogin()
-    },2000)
+    // var _this = this;
+    // this.$http.get('http://192.168.31.208').then((response)=>{
+    //   _this.token = response.data.token;
+    // })
+    // setTimeout(function() {
+    //   _this.checkLogin()
+    // },2000)
   },
   mounted() {
 
@@ -66,19 +66,26 @@ new Vue({
 
   methods: {
     checkLogin() {
-      var cookie = document.cookie.split(';');
-      var tokenInCookie = cookie[2].trim().slice(6);
-      if(!tokenInCookie) {
+      if(!document.cookie) {
         this.$router.push('/login')
-      } else if(tokenInCookie == this.token) {
-        if(this.$route.path == '/login') {
-          this.$router.push('/admin')
-        } else {
-          this.$router.push(this.$route.path)
-        }
       } else {
-        this.$router.push('/login')
+        var cookie = document.cookie.split(';');
+        var tokenInCookie = cookie[1].trim().slice(6);
+        
       }
+
+
+      // if(!tokenInCookie) {
+      //   this.$router.push('/login')
+      // } else if(tokenInCookie == this.token) {
+      //   if(this.$route.path == '/login') {
+      //     this.$router.push('/admin')
+      //   } else {
+      //     this.$router.push(this.$route.path)
+      //   }
+      // } else {
+      //   this.$router.push('/login')
+      // }
     }
   }
  })
