@@ -42,22 +42,11 @@ new Vue({
   router,
   components: { App },
   template: '<App/>',
-  data: {
-    token: ''
-  },
 
   created() {
-    // var _this = this;
-    // this.$http.get('http://192.168.31.208').then((response)=>{
-    //   _this.token = response.data.token;
-    // })
-    // setTimeout(function() {
-    //   _this.checkLogin()
-    // },2000)
+    this.checkLogin();
   },
-  mounted() {
 
-  },
   watch: {
     $route(to, from) {
       this.checkLogin();
@@ -70,22 +59,20 @@ new Vue({
         this.$router.push('/login')
       } else {
         var cookie = document.cookie.split(';');
+        var telInCookie = cookie[0].trim().slice(4);
         var tokenInCookie = cookie[1].trim().slice(6);
-        
+        this.$http.get('http://192.168.31.208/test?tel='+ telInCookie + '&token=' + tokenInCookie).then((res)=> {
+          if(res.data.state == 'success') {
+            if(this.$route.path == '/login') {
+              this.$router.push('/admin');
+            } else {
+              this.$router.push(this.$route.path);
+            }
+          } else {
+            this.$router.push('/login');
+          }
+        })
       }
-
-
-      // if(!tokenInCookie) {
-      //   this.$router.push('/login')
-      // } else if(tokenInCookie == this.token) {
-      //   if(this.$route.path == '/login') {
-      //     this.$router.push('/admin')
-      //   } else {
-      //     this.$router.push(this.$route.path)
-      //   }
-      // } else {
-      //   this.$router.push('/login')
-      // }
     }
   }
  })
