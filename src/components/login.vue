@@ -72,7 +72,7 @@
         if(this.isAvailable(this.inputTel) && this.inputNum.length == 6) {
           this.$http.get('http://192.168.31.208/login?tel='+this.inputTel+'&code='+this.inputNum).then((res)=>{
             if(res.data.state == 'success') {
-              var expire = 1000 * 60 * 60 * 24 * 7;
+              var expire = 1000 * 60 * 60 * 36;
               this.setCookie('tel', this.inputTel, expire);
               this.setCookie('token', res.data.token, expire);
               this.$router.push('/admin');

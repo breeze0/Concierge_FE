@@ -50,28 +50,28 @@ new Vue({
   watch: {
     $route(to, from) {
       this.checkLogin();
+      if(!document.cookie) {
+        var cookie = document.cookie.split(';');
+        var telInCookie = cookie[0].trim().slice(4);
+        var tokenInCookie = cookie[1].trim().slice(6);
+        var expire = 1000 * 60 * 60 * 36;
+        this.setCookie('tel', telInCookie, expire);
+        this.setCookie('token', tokenInCookie, expire);
+      }
     }
   },
 
   methods: {
     checkLogin() {
+
       if(!document.cookie) {
         this.$router.push('/login')
       } else {
-        var cookie = document.cookie.split(';');
-        var telInCookie = cookie[0].trim().slice(4);
-        var tokenInCookie = cookie[1].trim().slice(6);
-        this.$http.get('http://192.168.31.208/test?tel='+ telInCookie + '&token=' + tokenInCookie).then((res)=> {
-          if(res.data.state == 'success') {
-            if(this.$route.path == '/login') {
-              this.$router.push('/admin');
-            } else {
-              this.$router.push(this.$route.path);
-            }
-          } else {
-            this.$router.push('/login');
-          }
-        })
+        if(this.$route.path == '/login') {
+          this.$router.push('/admin');
+        } else {
+          this.$router.push(this.$route.path);
+        }
       }
     }
   }
