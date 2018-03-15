@@ -1,8 +1,7 @@
 <template>
   <div id="app">
-    <transition>
-      <router-view/>
-    </transition>
+    <router-view name="nav"/>
+    <router-view name="content"/>
   </div>
 </template>
 

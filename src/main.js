@@ -50,13 +50,10 @@ new Vue({
   watch: {
     $route(to, from) {
       this.checkLogin();
-      if(!document.cookie) {
-        var cookie = document.cookie.split(';');
-        var telInCookie = cookie[0].trim().slice(4);
-        var tokenInCookie = cookie[1].trim().slice(6);
+      if(document.cookie) {
         var expire = 1000 * 60 * 60 * 36;
-        this.setCookie('tel', telInCookie, expire);
-        this.setCookie('token', tokenInCookie, expire);
+        this.setCookie('tel', this.getCookie('tel'), expire);
+        this.setCookie('token', this.getCookie('token'), expire);
       }
     }
   },
