@@ -1,0 +1,32 @@
+.admin-com-container {
+  margin: 0 10%;
+
+  .card-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+
+    .card-item {
+      flex: 23.5% 0 0;
+      margin-bottom: 2%;
+      margin-right: 2%;
+
+      .card-content {
+        .card-icon {
+          text-align: center;
+          font-size: 45px;
+        }
+        p {
+          text-align: center;
+        }
+      }
+
+      &:nth-child(4n) {
+        margin-right: 0;
+      }
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+}
