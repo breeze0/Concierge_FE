@@ -70,7 +70,7 @@
           this.isShowNumError = true;
         }
         if(this.isAvailable(this.inputTel) && this.inputNum.length == 6) {
-          this.$http.get('http://192.168.31.208/login?tel='+this.inputTel+'&code='+this.inputNum).then((res)=>{
+          this.$http.get(this,server + '/login?tel='+this.inputTel+'&code='+this.inputNum).then((res)=>{
             if(res.data.state == 'success') {
               var expire = 1000 * 60 * 60 * 36;
               this.setCookie('tel', this.inputTel, expire);
@@ -106,20 +106,13 @@
       getCode() {
         this.countDown();
         if(this.isAvailable(this.inputTel)) {
-          this.$http.get('http://192.168.31.208/login?tel='+this.inputTel).then((response)=>{
+          this.$http.get(this.server+ '/login?tel='+this.inputTel).then((response)=>{
             if(response.data.state == 'fail') {
               this.isShowTelError = true;
             }
           })
         }
       }
-
-    },
-    watch: {
-
-    },
-    mounted () {
-
     }
   }
 </script>

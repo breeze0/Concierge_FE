@@ -37,6 +37,8 @@ Vue.prototype.delCookie = (name) => {
     document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
 }
 
+Vue.prototype.server = 'http://192.168.31.208';
+
 new Vue({
   el: '#app',
   router,
@@ -60,7 +62,6 @@ new Vue({
 
   methods: {
     checkLogin() {
-
       if(!document.cookie) {
         this.$router.push('/login')
       } else {

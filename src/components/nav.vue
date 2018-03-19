@@ -34,6 +34,7 @@
           if(res.data.state == 'success') {
             this.delCookie('tel');
             this.delCookie('token');
+            this.$router.push('/login');
           }
         })
       }
