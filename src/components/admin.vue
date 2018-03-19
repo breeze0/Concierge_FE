@@ -4,7 +4,7 @@
       <el-tabs v-model="activeName" @tab-click="handleClick">
         <el-tab-pane label="我拥有的预约项目" name="first">
           <div class="card-wrapper">
-            <div class="card-item add-card">
+            <div class="card-item add-card" @click="addNew">
               <el-card class="box-card">
                 <div class="card-content">
                   <div class="card-icon">
@@ -33,6 +33,9 @@
     methods: {
       handleClick(tab, event) {
         console.log(tab, event);
+      },
+      addNew() {
+        this.$router.push('/admin/new');
       }
     }
   }

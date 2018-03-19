@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import login from '@/components/login'
 import admin from '@/components/admin'
 import nav from '@/components/nav'
+import form from '@/components/form'
 
 Vue.use(Router)
 
@@ -27,6 +28,13 @@ export default new Router({
       components: {
         nav: nav,
         content: admin
+      }
+    },
+    {
+      path: '/admin/new',
+      components: {
+        nav: nav,
+        content: form
       }
     }
   ]
