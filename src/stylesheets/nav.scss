@@ -1,0 +1,24 @@
+.nav-com-container {
+  background-color: $primary;
+  height: 50px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 3%;
+  margin-bottom: 30px;
+  .nav-title {
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 50px;
+  }
+  .drop-wrapper {
+    line-height: 50px;
+    cursor: pointer;
+    &:focus {
+      outline: none;
+    }
+    .nick-name {
+      color: #fff;
+    }
+  }
+}

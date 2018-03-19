@@ -1,17 +1,19 @@
 <template>
-  <div>
-    <el-dropdown trigger="click" @command="handleCommand">
-      <span class="el-dropdown-link">
-        下拉菜单<i class="el-icon-arrow-down el-icon--right"></i>
-      </span>
-      <el-dropdown-menu slot="dropdown">
-        <el-dropdown-item>黄金糕</el-dropdown-item>
-        <el-dropdown-item>狮子头</el-dropdown-item>
-        <el-dropdown-item>螺蛳粉</el-dropdown-item>
-        <el-dropdown-item>双皮奶</el-dropdown-item>
-        <el-dropdown-item command="logout">退出</el-dropdown-item>
-      </el-dropdown-menu>
-    </el-dropdown>
+  <div class="nav-com-container">
+    <span class="nav-title">预约系统</span>
+    <div class="drop-wrapper">
+      <el-dropdown trigger="click" @command="handleCommand">
+        <span class="el-dropdown-link nick-name">
+          {{ nickeName }}<i class="el-icon-arrow-down el-icon--right"></i>
+        </span>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item>修改个人消息</el-dropdown-item>
+          <el-dropdown-item>查看回收站</el-dropdown-item>
+          <el-dropdown-item>我的邀请</el-dropdown-item>
+          <el-dropdown-item command="logout">退出</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
+    </div>
   </div>
 </template>
 
@@ -19,7 +21,7 @@
   export default {
     data() {
       return {
-
+        nickeName: '晨晨'
       }
     },
     methods: {
@@ -29,7 +31,7 @@
         }
       },
       logout() {
-        this.$http.get('http://192.168.31.208/logout?tel='+ this.getCookie('tel') +'&token='+ this.getCookie('token')).then((res) => {
+        this.$http.get(this.server + '/logout?tel='+ this.getCookie('tel') +'&token='+ this.getCookie('token')).then((res) => {
           console.log(res.data)
           if(res.data.state == 'success') {
             this.delCookie('tel');

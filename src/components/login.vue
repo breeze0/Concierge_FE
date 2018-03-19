@@ -1,5 +1,5 @@
 <template>
-  <div class="login-container">
+  <div class="login-com-container">
     <el-card class="box-card">
       <div slot="header" class="login-title">
         <span>手机登录</span>
@@ -116,80 +116,3 @@
     }
   }
 </script>
-
-<style scoped lang="scss">
-
-input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button {
-  -webkit-appearance: none !important;
-  margin: 0;
-}
-
-
-.login-container {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-
-  .box-card {
-    width: 480px;
-    height: 300px;
-
-    .login-title {
-      text-align: center;
-    }
-  }
-
-  .login-content {
-    .login-input {
-      border: none;
-      width: 100%;
-      -webkit-appearance: none;
-      background-color: #fff;
-      background-image: none;
-      -webkit-box-sizing: border-box;
-      box-sizing: border-box;
-      color: #606266;
-      display: inline-block;
-      font-size: inherit;
-      height: 40px;
-      line-height: 1;
-      outline: 0;
-      transition: border-color .2s cubic-bezier(.645,.045,.355,1);
-    }
-
-    .input-container {
-      position: relative;
-      font-size: 14px;
-      display: inline-block;
-      width: 80%;
-      margin: 0 10%;
-      border-bottom: 1px solid #ebebeb;
-    }
-    .error-msg {
-      margin-left: 10%;
-      color: #F56C6C;
-      font-size: 12px;
-      min-height: 20px;
-    }
-
-    .input-wrapper {
-      margin: 20px 10% 0 10%;
-      display: flex;
-      justify-content: space-between;
-      border-bottom: 1px solid #ebebeb;
-
-    }
-
-    .login-btn {
-      margin-left: 10%;
-      width: 80%;
-      margin-top: 20px;
-    }
-  }
-
-}
-</style>
