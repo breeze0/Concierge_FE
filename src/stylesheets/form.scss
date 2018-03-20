@@ -13,16 +13,48 @@
       padding: 0 2%;
     }
     .img-wrapper {
-      max-height: 300px;
-      width: 90%;
       margin: 10px 5%;
       position: relative;
       text-align: center;
 
+      .form-cover {
+        max-height: 300px;
+        width: 100%;
+      }
       .change-cover-btn {
         position: absolute;
         top: 3px;
         right: 5px;
+      }
+      .imgs-list {
+        display: flex;
+        flex-wrap: wrap;
+
+        .imgs-item {
+          flex: 18% 0 0;
+          height: 72px;
+        }
+
+        .upload {
+          position: relative;
+          cursor: pointer;
+          border: 1px solid;
+          text-align: center;
+
+          label {
+            display: block;
+            cursor: pointer;
+          }
+
+          .el-icon-upload {
+            font-size: 45px;
+          }
+
+          input {
+            position: absolute;
+            clip:rect(0 0 0 0);
+          }
+        }
       }
     }
   }

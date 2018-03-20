@@ -15,13 +15,20 @@
               <el-dialog
                 title="更换封面"
                 :visible.sync="modalVisible"
-                width="700px"
+                width="800px"
                 center>
-                <span>需要注意的是内容是默认不居中的</span>
-                <span slot="footer" class="dialog-footer">
-                  <el-button @click="modalVisible = false">取 消</el-button>
-                  <el-button type="primary" @click="modalVisible = false">确 定</el-button>
-                </span>
+                <div class="imgs-list">
+                  <div class="upload imgs-item">
+                    <label for="upload-img">
+                      <i class="el-icon-upload"></i>
+                      <div>上传图片</div>
+                    </label>
+                    <input type="file"
+                    id="upload-img"
+                    @change="handleChange"
+                    accept="image/png,image/jpeg">
+                  </div>
+                </div>
               </el-dialog>
             </div>
           </div>
@@ -36,10 +43,24 @@
     data() {
       return {
         form: {
-          cover: require('@/assets/images/logo.png')
+          cover: require('@/assets/images/img3.jpg')
         },
         modalVisible: false
       } 
+    },
+    methods: {
+      handleChange(event) {
+        var file = event.target;
+        var _this = this;
+        if (file.files && file.files[0]) {
+          var reader = new FileReader();
+          reader.onload = function(evt) {
+            _this.form.cover = evt.target.result;
+          }
+          reader.readAsDataURL(file.files[0]);
+        }
+        this.modalVisible = false;
+      }
     }
   }
 </script>

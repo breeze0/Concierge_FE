@@ -70,7 +70,7 @@
           this.isShowNumError = true;
         }
         if(this.isAvailable(this.inputTel) && this.inputNum.length == 6) {
-          this.$http.get(this,server + '/login?tel='+this.inputTel+'&code='+this.inputNum).then((res)=>{
+          this.$http.get(this.server + '/login?tel='+this.inputTel+'&code='+this.inputNum).then((res)=>{
             if(res.data.state == 'success') {
               var expire = 1000 * 60 * 60 * 36;
               this.setCookie('tel', this.inputTel, expire);
