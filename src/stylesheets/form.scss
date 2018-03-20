@@ -1,0 +1,29 @@
+.form-com-container {
+  margin: 0 20%;
+
+  .form-wrapper {
+    border: 1px solid #ebeef5;
+    background-color: #fff;
+    box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
+    border-radius: 2px;
+    margin-top: 20px;
+
+    .form-item-desc {
+      background-color: rgba(215, 215, 215, 1);
+      padding: 0 2%;
+    }
+    .img-wrapper {
+      max-height: 300px;
+      width: 90%;
+      margin: 10px 5%;
+      position: relative;
+      text-align: center;
+
+      .change-cover-btn {
+        position: absolute;
+        top: 3px;
+        right: 5px;
+      }
+    }
+  }
+}
