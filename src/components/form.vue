@@ -41,6 +41,16 @@
             <el-input v-model="form.title" placeholder="请输入预约项目名称"></el-input>
           </div>
         </el-form-item>
+        <el-form-item>
+          <div class="desc-wrapper">
+            <el-input
+              type="textarea"
+              :rows="5"
+              placeholder="预约详情介绍或预约注意事项"
+              v-model="form.desc">
+            </el-input>
+          </div>
+        </el-form-item>
       </el-form>
     </div>
   </div>
@@ -52,7 +62,8 @@
       return {
         form: {
           cover: './static/images/img1.jpg',
-          title: ''
+          title: '',
+          desc: ''
         },
         localImages: [
           './static/images/img1.jpg',
