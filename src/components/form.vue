@@ -28,6 +28,10 @@
                     @change="handleChange"
                     accept="image/png,image/jpeg">
                   </div>
+                  <div class="imgs-item" v-for="(item,index) in localImages"
+                  @click="changeCover(index)">
+                    <img :src="item" width="100%" height="100%">
+                  </div>
                 </div>
               </el-dialog>
             </div>
@@ -43,11 +47,23 @@
     data() {
       return {
         form: {
-          cover: require('@/assets/images/img3.jpg')
+          cover: './static/images/img1.jpg'
         },
-        modalVisible: false
+        localImages: [
+          './static/images/img1.jpg',
+          './static/images/img2.png',
+          './static/images/img3.jpg',
+          './static/images/img4.jpg',
+          './static/images/img5.jpg',
+          './static/images/img6.jpg',
+          './static/images/img7.jpg',
+          './static/images/img8.jpg',
+          './static/images/img9.png'
+        ],
+        modalVisible: false,
       } 
     },
+
     methods: {
       handleChange(event) {
         var file = event.target;
@@ -59,6 +75,10 @@
           }
           reader.readAsDataURL(file.files[0]);
         }
+        this.modalVisible = false;
+      },
+      changeCover(index) {
+        this.form.cover = this.localImages[index];
         this.modalVisible = false;
       }
     }

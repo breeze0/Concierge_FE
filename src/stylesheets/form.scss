@@ -29,10 +29,14 @@
       .imgs-list {
         display: flex;
         flex-wrap: wrap;
+        justify-content: space-around;
 
         .imgs-item {
           flex: 18% 0 0;
           height: 72px;
+          border: 1px solid;
+          margin-bottom: 5px;
+          cursor: pointer;
         }
 
         .upload {
