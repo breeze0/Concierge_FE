@@ -53,7 +53,7 @@ new Vue({
   watch: {
     $route(to, from) {
       this.checkLogin();
-      if(document.cookie) {
+      if(this.getCookie('tel') && this.getCookie('token')) {
         var expire = 1000 * 60 * 60 * 36;
         this.setCookie('tel', this.getCookie('tel'), expire);
         this.setCookie('token', this.getCookie('token'), expire);
@@ -63,7 +63,7 @@ new Vue({
 
   methods: {
     checkLogin() {
-      if(!document.cookie) {
+      if(!(this.getCookie('tel') && this.getCookie('token'))) {
         this.$router.push('/login')
       } else {
         if(this.$route.path == '/login') {

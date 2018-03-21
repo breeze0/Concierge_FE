@@ -7,7 +7,6 @@
     <div class="form-wrapper">
       <el-form ref="form" :model="form">
         <el-form-item>
-          <div class="form-item-desc">预约项目封面</div>
           <div class="img-wrapper">
             <img :src="form.cover" class="form-cover">
             <div class="change-cover-btn">
@@ -37,6 +36,11 @@
             </div>
           </div>
         </el-form-item>
+        <el-form-item>
+          <div class="title-wrapper">
+            <el-input v-model="form.title" placeholder="请输入预约项目名称"></el-input>
+          </div>
+        </el-form-item>
       </el-form>
     </div>
   </div>
@@ -47,7 +51,8 @@
     data() {
       return {
         form: {
-          cover: './static/images/img1.jpg'
+          cover: './static/images/img1.jpg',
+          title: ''
         },
         localImages: [
           './static/images/img1.jpg',
