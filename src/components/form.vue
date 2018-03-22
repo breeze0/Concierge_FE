@@ -55,11 +55,12 @@
           <div class="map-wrapper">
             <span>位置标注: </span>
             <el-input
-            @focus="handleFocus">
-              <el-button slot="append" icon="el-icon-search"></el-button>
+            @focus="handleFocus"
+            v-model="form.address">
+              <el-button slot="append" type="primary" @click="search">确定</el-button>
             </el-input>
           </div>
-          <div id="map-container"></div>
+          <div id="map-container" v-show="isShowMap"></div>
         </el-form-item>
       </el-form>
     </div>
@@ -73,7 +74,8 @@
         form: {
           cover: './static/images/img1.jpg',
           title: '',
-          desc: ''
+          desc: '',
+          address: ''
         },
         localImages: [
           './static/images/img1.jpg',
@@ -87,6 +89,10 @@
           './static/images/img9.png'
         ],
         modalVisible: false,
+        isShowMap: false,
+        map: null,
+        geocoder: null,
+        markers: []
       } 
     },
 
@@ -108,15 +114,55 @@
         this.modalVisible = false;
       },
       initMap() {
+        var _this = this;
         var myLatlng = new qq.maps.LatLng(30.67, 104.06);
         var myOptions = {
           zoom: 12,
           center: myLatlng,
         }  
-        var map = new qq.maps.Map(document.getElementById("map-container"), myOptions);
+        this.map = new qq.maps.Map(document.getElementById("map-container"), myOptions);
+        this.geocoder = new qq.maps.Geocoder();
+        //获取城市列表接口设置中心点
+        var citylocation = new qq.maps.CityService({
+          complete : function(result){
+            _this.map.setCenter(result.detail.latLng);
+          }
+        });
+        //调用searchLocalCity()方法,根据用户IP查询城市信息。
+        citylocation.searchLocalCity();
+        qq.maps.event.addListener(_this.map, 'click', function(event) {
+          var marker = new qq.maps.Marker({
+            map: _this.map,
+            position: event.latLng
+          })
+          var latLng = new qq.maps.LatLng(event.latLng.getLat(), event.latLng.getLng());
+          _this.geocoder.getAddress(latLng);
+          _this.geocoder.setComplete(function(result) {
+            _this.form.address = result.detail.address;
+          })
+        })
       },
+      clearOverlays(overlays) {
+        var overlay;
+        while (overlay = overlays.pop()) {
+          overlay.setMap(null);
+        }
+      },
+
       handleFocus() {
+        this.isShowMap = true;
         this.initMap();
+      },
+      search() {
+        var _this = this;
+        this.geocoder.getLocation(this.form.address);
+        this.geocoder.setComplete(function(result) {
+          _this.map.setCenter(result.detail.location);
+          var marker = new qq.maps.Marker({
+            map: _this.map,
+            position: result.detail.location
+          })
+        })
       }
     }
   }
