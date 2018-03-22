@@ -56,8 +56,9 @@
             <span>位置标注: </span>
             <el-input
             @focus="handleFocus"
-            v-model="form.address">
-              <el-button slot="append" type="primary" @click="search">确定</el-button>
+            v-model="form.address"
+            @input="handleInput">
+              <el-button slot="append" type="primary" @click="closeMap">确定</el-button>
             </el-input>
           </div>
           <div id="map-container" v-show="isShowMap"></div>
@@ -92,7 +93,9 @@
         isShowMap: false,
         map: null,
         geocoder: null,
-        markers: []
+        info: null,
+        markers: [],
+        timer: null
       } 
     },
 
@@ -114,39 +117,18 @@
         this.modalVisible = false;
       },
       initMap() {
-        var _this = this;
-        var myLatlng = new qq.maps.LatLng(30.67, 104.06);
-        var myOptions = {
-          zoom: 12,
-          center: myLatlng,
-        }  
-        this.map = new qq.maps.Map(document.getElementById("map-container"), myOptions);
-        this.geocoder = new qq.maps.Geocoder();
-        //获取城市列表接口设置中心点
-        var citylocation = new qq.maps.CityService({
-          complete : function(result){
-            _this.map.setCenter(result.detail.latLng);
-          }
-        });
-        //调用searchLocalCity()方法,根据用户IP查询城市信息。
-        citylocation.searchLocalCity();
-        qq.maps.event.addListener(_this.map, 'click', function(event) {
-          var latLng = new qq.maps.LatLng(event.latLng.getLat(), event.latLng.getLng());
-          _this.geocoder.getAddress(latLng);
-          _this.geocoder.setComplete(function(result) {
-            _this.form.address = result.detail.address;
-            var marker = new qq.maps.Marker({
-              map: _this.map,
-              position: event.latLng
-            });
-            qq.maps.event.addListener(marker, 'click', function() {
-              var info = new qq.maps.InfoWindow({map: _this.map});
-              info.open();
-              info.setContent('<div>'+ result.detail.address+'</div>');
-              info.setPosition(result.detail.location);
-            })
-          })
-        })
+        if(!this.form.address) {
+          var myLatlng = new qq.maps.LatLng(30.67, 104.06);
+          var myOptions = {
+            zoom: 13,
+            center: myLatlng,
+          }  
+          this.map = new qq.maps.Map(document.getElementById("map-container"), myOptions);
+          this.geocoder = new qq.maps.Geocoder();
+          this.info = new qq.maps.InfoWindow({map: this.map});
+          this.handleCityLocation();
+          this.handleClickMap();
+        }
       },
       clearOverlays(overlays) {
         var overlay;
@@ -154,25 +136,82 @@
           overlay.setMap(null);
         }
       },
+      handleCityLocation() {
+        var _this = this;
+        var citylocation = new qq.maps.CityService({
+          complete : function(result){
+            _this.map.setCenter(result.detail.latLng);
+          }
+        });
+        citylocation.searchLocalCity();
+      },
+      handleClickMap() {
+        var _this = this;
+        qq.maps.event.addListener(_this.map, 'click', function(event) {
+          var latLng = new qq.maps.LatLng(event.latLng.getLat(), event.latLng.getLng());
+          _this.geocoder.getAddress(latLng);
+          _this.geocoder.setComplete(function(result) {
+            _this.clearOverlays(_this.markers);
+            _this.info.close();
+            _this.form.address = result.detail.address;
+            var marker = new qq.maps.Marker({
+              map: _this.map,
+              position: event.latLng
+            });
+            _this.info.open();
+            _this.info.setContent('<div>'+ result.detail.address+'</div>');
+            _this.info.setPosition(result.detail.location);
+            _this.markers.push(marker);
+            qq.maps.event.addListener(marker, 'click', function() {
+              _this.info.open();
+              _this.info.setContent('<div>'+ result.detail.address+'</div>');
+              _this.info.setPosition(result.detail.location);
+            })
+          });
+        });
+      },
+
+      search() {
+        if(this.form.address) {
+          var _this = this;
+          this.geocoder.getLocation(this.form.address);
+          this.geocoder.setComplete(function(result) {
+            _this.map.setCenter(result.detail.location);
+            _this.clearOverlays(_this.markers);
+            _this.info.close();
+            var marker = new qq.maps.Marker({
+              map: _this.map,
+              position: result.detail.location
+            });
+            _this.info.open();
+            _this.info.setContent('<div>'+ _this.form.address +'</div>');
+            _this.info.setPosition(result.detail.location);
+            _this.markers.push(marker);
+            qq.maps.event.addListener(marker, 'click', function() {
+              _this.info.open();
+              _this.info.setContent('<div>'+ _this.form.address +'</div>');
+              _this.info.setPosition(result.detail.location);
+            })
+          })
+        } else {
+          this.initMap();
+        }
+      },
 
       handleFocus() {
         this.isShowMap = true;
         this.initMap();
       },
-      search() {
+
+      handleInput() {
         var _this = this;
-        this.geocoder.getLocation(this.form.address);
-        this.geocoder.setComplete(function(result) {
-          _this.map.setCenter(result.detail.location);
-          var marker = new qq.maps.Marker({
-            map: _this.map,
-            position: result.detail.location
-          });
-          var info = new qq.maps.InfoWindow({map: _this.map});
-          info.open();
-          info.setContent('<div>'+ _this.form.address +'</div>');
-          info.setPosition(result.detail.location);
-        })
+        if(this.timer) clearTimeout(this.timer)
+        this.timer = setTimeout(function() {
+          _this.search();
+        },1000)
+      },
+      closeMap() {
+        this.isShowMap = false;
       }
     }
   }
