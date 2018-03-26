@@ -131,20 +131,14 @@
         //调用searchLocalCity()方法,根据用户IP查询城市信息。
         citylocation.searchLocalCity();
         qq.maps.event.addListener(_this.map, 'click', function(event) {
+          var marker = new qq.maps.Marker({
+            map: _this.map,
+            position: event.latLng
+          })
           var latLng = new qq.maps.LatLng(event.latLng.getLat(), event.latLng.getLng());
           _this.geocoder.getAddress(latLng);
           _this.geocoder.setComplete(function(result) {
             _this.form.address = result.detail.address;
-            var marker = new qq.maps.Marker({
-              map: _this.map,
-              position: event.latLng
-            });
-            qq.maps.event.addListener(marker, 'click', function() {
-              var info = new qq.maps.InfoWindow({map: _this.map});
-              info.open();
-              info.setContent('<div>'+ result.detail.address+'</div>');
-              info.setPosition(result.detail.location);
-            })
           })
         })
       },
@@ -167,11 +161,7 @@
           var marker = new qq.maps.Marker({
             map: _this.map,
             position: result.detail.location
-          });
-          var info = new qq.maps.InfoWindow({map: _this.map});
-          info.open();
-          info.setContent('<div>'+ _this.form.address +'</div>');
-          info.setPosition(result.detail.location);
+          })
         })
       }
     }
