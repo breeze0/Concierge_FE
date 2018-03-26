@@ -89,7 +89,8 @@
           './static/images/img9.png'
         ],
         modalVisible: false,
-        map: null
+        map: null,
+        markers: []
       } 
     },
 
@@ -122,10 +123,12 @@
       mapClick() {
         var _this = this;
         this.map.on('click', function(e) {
+          _this.map.remove(_this.markers);
           var marker = new AMap.Marker({
             position: [e.lnglat.getLng(),e.lnglat.getLat()]
           });
           marker.setMap(_this.map);
+          _this.markers.push(marker);
         })
       }
     }
