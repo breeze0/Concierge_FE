@@ -73,5 +73,21 @@
     .desc-wrapper {
       margin: 0 5%;
     }
+    .form-address {
+      display: flex;
+      margin: 0 5%;
+      margin-bottom: 30px;
+      .address-text {
+        width: 10%;
+        margin-right: 3%;
+      }
+      .address-input {
+        width: 87%;
+      }
+    }
+    #map-container {
+      width: 100%;
+      height: 400px;
+    }
   }
 }

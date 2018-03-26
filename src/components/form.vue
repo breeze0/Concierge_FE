@@ -51,6 +51,17 @@
             </el-input>
           </div>
         </el-form-item>
+        <el-form-item>
+          <div class="form-address">
+            <span class="address-text">详细地址: </span>
+            <el-input class="address-input"
+            v-model="form.address"
+            @focus="handleFocus">
+              <el-button slot="append">确定</el-button>
+            </el-input>
+          </div>
+          <div id="map-container"></div>
+        </el-form-item>
       </el-form>
     </div>
   </div>
@@ -63,7 +74,8 @@
         form: {
           cover: './static/images/img1.jpg',
           title: '',
-          desc: ''
+          desc: '',
+          address: ''
         },
         localImages: [
           './static/images/img1.jpg',
@@ -77,6 +89,7 @@
           './static/images/img9.png'
         ],
         modalVisible: false,
+        map: null
       } 
     },
 
@@ -96,6 +109,24 @@
       changeCover(index) {
         this.form.cover = this.localImages[index];
         this.modalVisible = false;
+      },
+      handleFocus() {
+        this.mapInit();
+      },
+      mapInit() {
+        this.map = new AMap.Map('map-container', {
+          zoom: 12
+        });
+        this.mapClick();
+      },
+      mapClick() {
+        var _this = this;
+        this.map.on('click', function(e) {
+          var marker = new AMap.Marker({
+            position: [e.lnglat.getLng(),e.lnglat.getLat()]
+          });
+          marker.setMap(_this.map);
+        })
       }
     }
   }
