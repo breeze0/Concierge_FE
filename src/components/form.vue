@@ -57,10 +57,12 @@
             <el-input class="address-input"
             v-model="form.address"
             @focus="handleFocus">
-              <el-button slot="append">确定</el-button>
+              <el-button slot="append" icon="el-icon-search"
+              @click="search"></el-button>
             </el-input>
           </div>
-          <div id="map-container"></div>
+          <div id="map-container" v-show="isShowMap"></div>
+          <div id="map-panel" v-show="isShowPanel"></div>
         </el-form-item>
       </el-form>
     </div>
@@ -89,9 +91,12 @@
           './static/images/img9.png'
         ],
         modalVisible: false,
+        isShowMap: false,
+        isShowPanel: false,
         map: null,
         markers: [],
-        geocoder: null
+        geocoder: null,
+        placeSearch: null
       } 
     },
 
@@ -113,22 +118,35 @@
         this.modalVisible = false;
       },
       handleFocus() {
+        this.isShowMap = true;
         this.mapInit();
       },
       mapInit() {
         var _this = this;
-        this.map = new AMap.Map('map-container', {
-          zoom: 12
-        });
-        AMap.plugin('AMap.Geocoder',function(){
-            _this.geocoder = new AMap.Geocoder({
-              radius: 1000,
-              extensions: 'all'
-            });
-            _this.map.addControl(_this.geocoder)
-         });
+        if(!this.form.address) {
+          this.map = new AMap.Map('map-container', {
+            zoom: 12
+          });
+          AMap.plugin('AMap.Geocoder',function(){
+              _this.geocoder = new AMap.Geocoder({
+                radius: 1000,
+                extensions: 'all'
+              });
+              _this.map.addControl(_this.geocoder)
+           });
+          AMap.service(["AMap.PlaceSearch"], function() {
+            _this.placeSearch = new AMap.PlaceSearch({
+              pageSize: 5,
+              pageIndex: 1,
+              city: "028",
+              map: _this.map,
+              panel: "map-panel",
+              renderStyle: 'default'
+            })
+          });
 
-        this.mapClick();
+          this.mapClick();
+        }
       },
       mapClick() {
         var _this = this;
@@ -145,8 +163,20 @@
             if(status === 'complete' && result.info === 'OK') {
               _this.form.address = result.regeocode.formattedAddress;
             }
-          })
+          });
+          _this.placeSearch.clear();
+        });
+        this.placeSearch.on('listElementClick', function(event) {
+          _this.form.address = event.data.cityname + event.data.adname + event.data.address;
+        });
+        this.placeSearch.on('markerClick', function(event) {
+          _this.form.address = event.data.cityname + event.data.adname + event.data.address;
         })
+      },
+      search() {
+        this.isShowPanel = true;
+        this.map.remove(this.markers);
+        this.placeSearch.search(this.form.address);
       }
     }
   }
