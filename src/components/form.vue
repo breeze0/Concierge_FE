@@ -51,16 +51,6 @@
             </el-input>
           </div>
         </el-form-item>
-        <el-form-item>
-          <div class="map-wrapper">
-            <span>位置标注: </span>
-            <el-input
-            @focus="handleFocus">
-              <el-button slot="append" icon="el-icon-search"></el-button>
-            </el-input>
-          </div>
-          <div id="map-container"></div>
-        </el-form-item>
       </el-form>
     </div>
   </div>
@@ -106,17 +96,6 @@
       changeCover(index) {
         this.form.cover = this.localImages[index];
         this.modalVisible = false;
-      },
-      initMap() {
-        var myLatlng = new qq.maps.LatLng(30.67, 104.06);
-        var myOptions = {
-          zoom: 12,
-          center: myLatlng,
-        }  
-        var map = new qq.maps.Map(document.getElementById("map-container"), myOptions);
-      },
-      handleFocus() {
-        this.initMap();
       }
     }
   }
