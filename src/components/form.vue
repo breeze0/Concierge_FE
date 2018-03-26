@@ -90,7 +90,8 @@
         ],
         modalVisible: false,
         map: null,
-        markers: []
+        markers: [],
+        geocoder: null
       } 
     },
 
@@ -115,20 +116,36 @@
         this.mapInit();
       },
       mapInit() {
+        var _this = this;
         this.map = new AMap.Map('map-container', {
           zoom: 12
         });
+        AMap.plugin('AMap.Geocoder',function(){
+            _this.geocoder = new AMap.Geocoder({
+              radius: 1000,
+              extensions: 'all'
+            });
+            _this.map.addControl(_this.geocoder)
+         });
+
         this.mapClick();
       },
       mapClick() {
         var _this = this;
         this.map.on('click', function(e) {
+          var lng = e.lnglat.getLng();
+          var lat = e.lnglat.getLat();
           _this.map.remove(_this.markers);
           var marker = new AMap.Marker({
-            position: [e.lnglat.getLng(),e.lnglat.getLat()]
+            position: [lng, lat]
           });
           marker.setMap(_this.map);
           _this.markers.push(marker);
+          _this.geocoder.getAddress([lng, lat], function(status, result) {
+            if(status === 'complete' && result.info === 'OK') {
+              _this.form.address = result.regeocode.formattedAddress;
+            }
+          })
         })
       }
     }
