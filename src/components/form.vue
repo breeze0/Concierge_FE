@@ -67,6 +67,13 @@
             <i class="el-icon-close"></i>
           </div>
         </el-form-item>
+        <el-form-item>
+          <div class="form-check">
+            <span class="check-text">审核模式: </span>
+            <el-radio v-model="form.check" label="auto_check">自动审核</el-radio>
+            <el-radio v-model="form.check" label="manual_check">人工审核</el-radio>
+          </div>
+        </el-form-item>
       </el-form>
     </div>
   </div>
@@ -80,7 +87,8 @@
           cover: './static/images/img1.jpg',
           title: '',
           desc: '',
-          address: ''
+          address: '',
+          check: ''
         },
         localImages: [
           './static/images/img1.jpg',
