@@ -201,6 +201,7 @@
       },
       closeMap() {
         this.isShowPanel = false;
+        this.placeSearch.clear();
         this.isShowMap = false;
         this.isShowClose = false;
       }
