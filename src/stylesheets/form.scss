@@ -10,7 +10,7 @@
 
     .form-item-desc {
       background-color: rgba(215, 215, 215, 1);
-      padding: 0 2%;
+      padding: 0 5%;
     }
     .img-wrapper {
       margin: 10px 5% 0 5%;
@@ -110,6 +110,33 @@
 
       .check-text {
         margin-right: 3%;
+      }
+    }
+    .form-settime-wrapper {
+      .setting-pattern {
+        margin: 20px 5%;
+      }
+      .normal-setting-wrapper {
+        position: relative;
+        .normal-setting-item {
+          display: flex;
+          padding: 0 10% 0 5%;
+          justify-content: space-between;
+          background-color: #d7d7d7;
+          cursor: pointer;
+
+          .weekday {
+            margin-right: 10px;
+          }
+
+          .operate-btn {
+            position: absolute;
+            right: 0;
+            i {
+              margin-right: 5px;
+            }
+          }
+        }
       }
     }
   }

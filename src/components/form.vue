@@ -74,6 +74,31 @@
             <el-radio v-model="form.check" label="manual_check">人工审核</el-radio>
           </div>
         </el-form-item>
+        <el-form-item>
+          <div class="form-settime-wrapper">
+            <div class="form-item-desc">预约时间设置</div>
+            <el-radio-group v-model="isShowNormal" class="setting-pattern">
+              <el-radio-button :label="true">常规设置</el-radio-button>
+              <el-radio-button :label="false">特殊设置</el-radio-button>
+            </el-radio-group>
+            <div class="normal-setting-wrapper" v-show="isShowNormal">
+              <div class="normal-setting-item" v-for="item in formatedForm.time_state.normal"
+                @mouseover="handeHover"
+                @mouseout="isHover = false">
+                <span>{{ item.time }}</span>
+                <div>
+                  <span v-for="day in item.weekday" class="weekday">{{ day }}</span>
+                </div>
+                <span v-if="item.limit < 10000">名额{{ item.limit }}人</span>
+                <span v-else>名额不限制</span>
+                <span class="operate-btn" v-show="isHover">
+                  <i class="el-icon-circle-plus-outline"></i>
+                  <i class="el-icon-remove-outline" v-show="!isOnlyone"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </el-form-item>
       </el-form>
     </div>
   </div>
@@ -89,7 +114,13 @@
           desc: '',
           address: '',
           location: [],
-          check: ''
+          check: 'auto_check',
+          time_state: {
+            normal: [
+              {time: '09:00-10:00', limit: 10, weekday: ['Mon','Tues','Wed','Thur','Fri']}
+            ],
+            special: []
+          }
         },
         localImages: [
           './static/images/img1.jpg',
@@ -110,8 +141,47 @@
         markers: [],
         geocoder: null,
         placeSearch: null,
-        infoWindow: null
+        infoWindow: null,
+        isShowNormal: true,
+        isHover: false,
+        isOnlyone: false
       } 
+    },
+
+    computed: {
+      formatedForm() {
+        var array = [];
+        this.form.time_state.normal.forEach(function(item, index) {
+          item.weekday.forEach(function(value,i) {
+            switch(value)
+            {
+              case 'Mon':
+                array.push('周一');
+                break;
+              case 'Tues':
+                array.push('周二');
+                break;
+              case 'Wed':
+                array.push('周三');
+                break;
+              case 'Thur':
+                array.push('周四');
+                break;
+              case 'Fri':
+                array.push('周五');
+                break;
+              case 'Sat':
+                array.push('周六');
+                break;
+              case 'Sun':
+                array.push('周日');
+                break;
+            }
+          })
+          item.weekday = array;
+        })
+        return this.form;
+      }
     },
 
     methods: {
@@ -218,6 +288,12 @@
         this.isShowMap = false;
         this.isShowClose = false;
         console.log(this.form)
+      },
+      handeHover() {
+        this.isHover = true;
+        if(this.form.time_state.normal.length == 1) {
+          this.isOnlyone = true;
+        }
       }
     }
   }
