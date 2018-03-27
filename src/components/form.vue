@@ -88,6 +88,7 @@
           title: '',
           desc: '',
           address: '',
+          location: [],
           check: ''
         },
         localImages: [
@@ -175,6 +176,7 @@
           var lng = e.lnglat.getLng();
           var lat = e.lnglat.getLat();
           _this.map.remove(_this.markers);
+          _this.form.location = [lng, lat];
           var marker = new AMap.Marker({
             position: [lng, lat]
           });
@@ -189,15 +191,18 @@
               _this.infoWindow.open(_this.map, [lng, lat]);
               marker.on('click', function() {
                 _this.infoWindow.open(_this.map, [lng, lat]);
+                _this.form.location = [lng, lat];
               })
             }
           });
           _this.placeSearch.clear();
         });
         this.placeSearch.on('listElementClick', function(event) {
+          _this.form.location = [event.data.location.lng, event.data.location.lat];
           _this.form.address = event.data.cityname + event.data.adname + event.data.address;
         });
         this.placeSearch.on('markerClick', function(event) {
+          _this.form.location = [event.data.location.lng, event.data.location.lat];
           _this.form.address = event.data.cityname + event.data.adname + event.data.address;
         });
       },
@@ -212,6 +217,7 @@
         this.placeSearch.clear();
         this.isShowMap = false;
         this.isShowClose = false;
+        console.log(this.form)
       }
     }
   }
