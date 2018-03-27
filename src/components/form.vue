@@ -63,6 +63,9 @@
           </div>
           <div id="map-container" v-show="isShowMap"></div>
           <div id="map-panel" v-show="isShowPanel"></div>
+          <div class="map-close" @click="closeMap" v-show="isShowClose">
+            <i class="el-icon-close"></i>
+          </div>
         </el-form-item>
       </el-form>
     </div>
@@ -93,10 +96,12 @@
         modalVisible: false,
         isShowMap: false,
         isShowPanel: false,
+        isShowClose: false,
         map: null,
         markers: [],
         geocoder: null,
-        placeSearch: null
+        placeSearch: null,
+        infoWindow: null
       } 
     },
 
@@ -119,6 +124,7 @@
       },
       handleFocus() {
         this.isShowMap = true;
+        this.isShowClose = true;
         this.mapInit();
       },
       mapInit() {
@@ -144,6 +150,13 @@
               renderStyle: 'default'
             })
           });
+          AMap.plugin("AMap.InfoWindow", function() {
+            _this.infoWindow = new AMap.InfoWindow({
+              content: '',
+              autoMove: true,
+              closeWhenClickMap: true
+            });
+          });
 
           this.mapClick();
         }
@@ -158,10 +171,17 @@
             position: [lng, lat]
           });
           marker.setMap(_this.map);
+          _this.map.setZoom(14);
+          _this.map.setCenter([lng, lat]);
           _this.markers.push(marker);
           _this.geocoder.getAddress([lng, lat], function(status, result) {
             if(status === 'complete' && result.info === 'OK') {
               _this.form.address = result.regeocode.formattedAddress;
+              _this.infoWindow.setContent("<div>"+ result.regeocode.formattedAddress + "</div");
+              _this.infoWindow.open(_this.map, [lng, lat]);
+              marker.on('click', function() {
+                _this.infoWindow.open(_this.map, [lng, lat]);
+              })
             }
           });
           _this.placeSearch.clear();
@@ -171,12 +191,18 @@
         });
         this.placeSearch.on('markerClick', function(event) {
           _this.form.address = event.data.cityname + event.data.adname + event.data.address;
-        })
+        });
       },
       search() {
         this.isShowPanel = true;
         this.map.remove(this.markers);
+        this.infoWindow.close();
         this.placeSearch.search(this.form.address);
+      },
+      closeMap() {
+        this.isShowPanel = false;
+        this.isShowMap = false;
+        this.isShowClose = false;
       }
     }
   }
