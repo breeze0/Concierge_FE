@@ -10,10 +10,10 @@
           <div class="img-wrapper">
             <img :src="form.cover" class="form-cover">
             <div class="change-cover-btn">
-              <el-button type="primary" size="small" @click="modalVisible = true">更换封面</el-button>
+              <el-button type="primary" size="small" @click="coverModalVisible = true">更换封面</el-button>
               <el-dialog
                 title="更换封面"
-                :visible.sync="modalVisible"
+                :visible.sync="coverModalVisible"
                 width="800px"
                 center>
                 <div class="imgs-list">
@@ -92,10 +92,46 @@
                 <span v-if="item.limit < 10000">名额{{ item.limit }}人</span>
                 <span v-else>名额不限制</span>
                 <span class="operate-btn" v-show="isHover">
-                  <i class="el-icon-circle-plus-outline"></i>
+                  <i class="el-icon-circle-plus-outline" @click="settingDialogVisible = true"></i>
                   <i class="el-icon-remove-outline" v-show="!isOnlyone"></i>
                 </span>
               </div>
+              <el-dialog
+                title="预约时间设置"
+                :visible.sync="settingDialogVisible"
+                width="50%"
+                center>
+                <div class="setting-content">
+                  <div class="fields">
+                    <span class="text">时间段: </span>
+                    <el-time-picker
+                      is-range
+                      v-model="timeValue"
+                      range-separator="至"
+                      start-placeholder="开始时间"
+                      end-placeholder="结束时间"
+                      placeholder="选择时间范围"
+                      format="HH:mm"
+                      value-format="HH:mm">
+                    </el-time-picker>
+                  </div>
+                  <div class="fields">
+                    <span class="text">重复:</span>
+                    <el-select v-model="weekdayValue" multiple placeholder="请选择">
+                      <el-option
+                        v-for="item in weekdays"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                      </el-option>
+                    </el-select>
+                  </div>
+                </div>
+                <span slot="footer" class="dialog-footer">
+                  <el-button @click="settingDialogVisible = false">取 消</el-button>
+                  <el-button type="primary" @click="confirmSetting">确 定</el-button>
+                </span>
+              </el-dialog>
             </div>
           </div>
         </el-form-item>
@@ -133,7 +169,33 @@
           './static/images/img8.jpg',
           './static/images/img9.png'
         ],
-        modalVisible: false,
+        weekdays: [{
+          value: 'Mon',
+          label: '周一'
+        }, {
+          value: 'Tues',
+          label: '周二'
+        }, {
+          value: 'Wed',
+          label: '周三'
+        }, {
+          value: 'Thur',
+          label: '周四'
+        }, {
+          value: 'Fri',
+          label: '周五'
+        }, {
+          value: 'Sat',
+          label: '周六'
+        }, {
+          value: 'Sun',
+          label: '周日'
+        }, {
+          value: 'Holiday',
+          label: '法定节假日'
+        }],
+        coverModalVisible: false,
+        settingDialogVisible: false,
         isShowMap: false,
         isShowPanel: false,
         isShowClose: false,
@@ -144,7 +206,9 @@
         infoWindow: null,
         isShowNormal: true,
         isHover: false,
-        isOnlyone: false
+        isOnlyone: false,
+        timeValue: '',
+        weekdayValue: ''
       } 
     },
 
@@ -195,11 +259,11 @@
           }
           reader.readAsDataURL(file.files[0]);
         }
-        this.modalVisible = false;
+        this.coverModalVisible = false;
       },
       changeCover(index) {
         this.form.cover = this.localImages[index];
-        this.modalVisible = false;
+        this.coverModalVisible = false;
       },
       handleFocus() {
         this.isShowMap = true;
@@ -294,6 +358,10 @@
         if(this.form.time_state.normal.length == 1) {
           this.isOnlyone = true;
         }
+      },
+      confirmSetting() {
+        console.log(this.timeValue)
+        console.log(this.weekdayValue)
       }
     }
   }
