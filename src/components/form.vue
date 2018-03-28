@@ -82,17 +82,16 @@
               <el-radio-button :label="false">特殊设置</el-radio-button>
             </el-radio-group>
             <div class="normal-setting-wrapper" v-show="isShowNormal">
-              <div class="normal-setting-item" v-for="item in formatedForm.time_state.normal"
-                @mouseover="handeHover"
-                @mouseout="isHover = false">
+              <div class="normal-setting-item" v-for="item in formatedForm"
+                @mouseover="handeHover">
                 <span>{{ item.time }}</span>
                 <div>
                   <span v-for="day in item.weekday" class="weekday">{{ day }}</span>
                 </div>
-                <span v-if="item.limit < 10000">名额{{ item.limit }}人</span>
+                <span v-if="item.limit < 10000" class="number">名额{{ item.limit }}人</span>
                 <span v-else>名额不限制</span>
-                <span class="operate-btn" v-show="isHover">
-                  <i class="el-icon-circle-plus-outline" @click="settingDialogVisible = true"></i>
+                <span class="operate-btn">
+                  <i class="el-icon-circle-plus-outline" @click="enterSetting"></i>
                   <i class="el-icon-remove-outline" v-show="!isOnlyone"></i>
                 </span>
               </div>
@@ -126,6 +125,10 @@
                       </el-option>
                     </el-select>
                   </div>
+                  <div class="fields">
+                    <span class="text">名额限制: </span>
+                    <el-input v-model="limitValue" class="count-input"></el-input>
+                  </div>
                 </div>
                 <span slot="footer" class="dialog-footer">
                   <el-button @click="settingDialogVisible = false">取 消</el-button>
@@ -153,7 +156,8 @@
           check: 'auto_check',
           time_state: {
             normal: [
-              {time: '09:00-10:00', limit: 10, weekday: ['Mon','Tues','Wed','Thur','Fri']}
+              {time: '09:00-10:00', limit: 10, weekday: ['Mon','Tues','Wed','Thur','Fri']},
+              {time: '09:00-10:30', limit: 10, weekday: ['Mon','Tues','Wed','Thur']}
             ],
             special: []
           }
@@ -205,18 +209,18 @@
         placeSearch: null,
         infoWindow: null,
         isShowNormal: true,
-        isHover: false,
         isOnlyone: false,
         timeValue: '',
-        weekdayValue: ''
+        weekdayValue: ['Mon', 'Tues', 'Wed', 'Thur', 'Fri'],
+        limitValue: '不限制'
       } 
     },
 
     computed: {
       formatedForm() {
         var array = [];
-        this.form.time_state.normal.forEach(function(item, index) {
-          item.weekday.forEach(function(value,i) {
+        var newNormal = this.form.time_state.normal.map(function(item) {
+          item.weekday.forEach(function(value) {
             switch(value)
             {
               case 'Mon':
@@ -240,11 +244,15 @@
               case 'Sun':
                 array.push('周日');
                 break;
+              default:
+                array.push(value);
             }
           })
-          item.weekday = array;
+          var newItem = {"time": item.time, "limit": item.limit, "weekday": array};
+          array = [];
+          return newItem;
         })
-        return this.form;
+        return newNormal;
       }
     },
 
@@ -351,17 +359,44 @@
         this.placeSearch.clear();
         this.isShowMap = false;
         this.isShowClose = false;
-        console.log(this.form)
       },
       handeHover() {
-        this.isHover = true;
         if(this.form.time_state.normal.length == 1) {
           this.isOnlyone = true;
+        } else {
+          this.isOnlyone = false;
         }
       },
+      enterSetting() {
+        this.settingDialogVisible = true;
+        this.timeValue = '';
+        this.weekdayValue = ['Mon', 'Tues', 'Wed', 'Thur', 'Fri'];
+        this.limitValue = '不限制';
+      },
       confirmSetting() {
-        console.log(this.timeValue)
-        console.log(this.weekdayValue)
+        var isError = false;
+        var newItem = {};
+        var limit;
+        var time = this.timeValue[0] + '-' + this.timeValue[1];
+        var weekday = this.weekdayValue;
+        newItem = {"time": time, "limit": limit, "weekday": weekday};
+        if(this.limitValue == '不限制') {
+          limit = 65535
+        } else {
+          limit = this.limitValue;
+        }
+        this.form.time_state.normal.every(function(item) {
+          if(item.time == time) {
+            isError = true;
+            return false
+          }
+        })
+        if(!isError) {
+          this.form.time_state.normal.push(newItem);
+          this.settingDialogVisible = false;
+        } else {
+          this.$message.error('已存在相同时间段')
+        }
       }
     }
   }

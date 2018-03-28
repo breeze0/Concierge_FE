@@ -124,14 +124,25 @@
           justify-content: space-between;
           background-color: #d7d7d7;
           cursor: pointer;
+          margin-bottom: 20px;
+
+          &:hover {
+            .operate-btn {
+              display: block;
+            }
+          }
 
           .weekday {
             margin-right: 10px;
+          }
+          .number {
+            width: 70px;
           }
 
           .operate-btn {
             position: absolute;
             right: 10px;
+            display: none;
             i {
               margin-right: 5px;
             }
@@ -144,9 +155,12 @@
             .text {
               margin-right: 20px;
               display: inline-block;
-              width: 50px;
+              width: 60px;
             }
             .el-select{
+              width: 350px;
+            }
+            .count-input {
               width: 350px;
             }
           }
