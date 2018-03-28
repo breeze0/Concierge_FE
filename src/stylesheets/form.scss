@@ -123,7 +123,6 @@
           padding: 0 10% 0 5%;
           justify-content: space-between;
           background-color: #d7d7d7;
-          cursor: pointer;
           margin-bottom: 20px;
 
           &:hover {
@@ -131,7 +130,9 @@
               display: block;
             }
           }
-
+          .weekday-container {
+            cursor: pointer;
+          }
           .weekday {
             margin-right: 10px;
           }
@@ -141,7 +142,7 @@
 
           .operate-btn {
             position: absolute;
-            right: 10px;
+            right: 5px;
             display: none;
             i {
               margin-right: 5px;
