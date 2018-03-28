@@ -82,7 +82,7 @@
               <el-radio-button :label="false">特殊设置</el-radio-button>
             </el-radio-group>
             <div class="normal-setting-wrapper" v-show="isShowNormal">
-              <div class="normal-setting-item" v-for="item in formatedForm"
+              <div class="normal-setting-item" v-for="(item, index) in formatedForm"
                 @mouseover="handeHover">
                 <span>{{ item.time }}</span>
                 <div>
@@ -92,7 +92,8 @@
                 <span v-else>名额不限制</span>
                 <span class="operate-btn">
                   <i class="el-icon-circle-plus-outline" @click="enterSetting"></i>
-                  <i class="el-icon-remove-outline" v-show="!isOnlyone"></i>
+                  <i class="el-icon-remove-outline" v-show="!isOnlyone"
+                  @click="deleteItem(index)"></i>
                 </span>
               </div>
               <el-dialog
@@ -397,6 +398,10 @@
         } else {
           this.$message.error('已存在相同时间段')
         }
+      },
+      deleteItem(index) {
+        this.form.time_state.normal.splice(index,1);
+        console.log(this.form.time_state.normal)
       }
     }
   }
