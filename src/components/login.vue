@@ -71,10 +71,9 @@
         }
         if(this.isAvailable(this.inputTel) && this.inputNum.length == 6) {
           this.$http.get(this.server + '/login?tel='+this.inputTel+'&code='+this.inputNum).then((res)=>{
-            if(res.data.state == 'success') {
+            if(res.status == 200) {
               var expire = 1000 * 60 * 60 * 36;
-              this.setCookie('tel', this.inputTel, expire);
-              this.setCookie('token', res.data.token, expire);
+              this.setCookie('token',res.headers.authorization,expire);
               this.$router.push('/admin');
             } else {
               this.isShowNumError = true
@@ -107,7 +106,7 @@
         this.countDown();
         if(this.isAvailable(this.inputTel)) {
           this.$http.get(this.server+ '/login?tel='+this.inputTel).then((response)=>{
-            if(response.data.state == 'fail') {
+            if(response.status == 403) {
               this.isShowTelError = true;
             }
           })
