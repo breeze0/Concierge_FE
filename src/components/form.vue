@@ -8,7 +8,7 @@
       <el-form ref="form" :model="form">
         <el-form-item>
           <div class="img-wrapper">
-            <img :src="form.cover" class="form-cover">
+            <img :src="imageObject" class="form-cover">
             <div class="change-cover-btn">
               <el-button type="primary" size="small" @click="coverModalVisible = true">更换封面</el-button>
               <el-dialog
@@ -38,7 +38,7 @@
         </el-form-item>
         <el-form-item>
           <div class="title-wrapper">
-            <el-input v-model="form.title" placeholder="请输入预约项目名称"></el-input>
+            <el-input v-model="form.name" placeholder="请输入预约项目名称"></el-input>
           </div>
         </el-form-item>
         <el-form-item>
@@ -47,7 +47,7 @@
               type="textarea"
               :rows="5"
               placeholder="预约详情介绍或预约注意事项"
-              v-model="form.desc">
+              v-model="form.des">
             </el-input>
           </div>
         </el-form-item>
@@ -70,8 +70,8 @@
         <el-form-item>
           <div class="form-check">
             <span class="check-text">审核模式: </span>
-            <el-radio v-model="form.check" label="auto_check">自动审核</el-radio>
-            <el-radio v-model="form.check" label="manual_check">人工审核</el-radio>
+            <el-radio v-model="form.check_mode" label="auto">自动审核</el-radio>
+            <el-radio v-model="form.check_mode" label="manual">人工审核</el-radio>
           </div>
         </el-form-item>
         <el-form-item>
@@ -140,6 +140,10 @@
           </div>
         </el-form-item>
       </el-form>
+      <div class="form-btn">
+        <el-button>取消</el-button>
+        <el-button type="primary" @click="submitForm">确定</el-button>
+      </div>
     </div>
   </div>
 </template>
@@ -149,15 +153,17 @@
     data() {
       return {
         form: {
-          cover: './static/images/img1.jpg',
-          title: '',
-          desc: '',
+          image: '',
+          default_image: './static/images/img1.jpg',
+          name: '',
+          des: '',
           address: '',
-          location: [],
-          check: 'auto_check',
+          latitude: 0,
+          longtitude: 0,
+          check: 'auto',
           time_state: {
             normal: [
-              {time: '09:00-10:00', limit: 10, weekday: ['Mon','Tues','Wed','Thur','Fri']}
+             {time: '09:00-10:00', limit: 10, weekday: ['Mon','Tues','Wed','Thur','Fri']}
             ],
             special: []
           }
@@ -252,6 +258,13 @@
           return newItem;
         })
         return newNormal;
+      },
+      imageObject() {
+        if(this.form.image === '') {
+          return this.form.default_image
+        } else if(this.form.default_image === '') {
+          return this.form.image
+        }
       }
     },
 
@@ -262,14 +275,16 @@
         if (file.files && file.files[0]) {
           var reader = new FileReader();
           reader.onload = function(evt) {
-            _this.form.cover = evt.target.result;
+            _this.form.image = evt.target.result;
+            _this.form.default_image = '';
           }
           reader.readAsDataURL(file.files[0]);
         }
         this.coverModalVisible = false;
       },
       changeCover(index) {
-        this.form.cover = this.localImages[index];
+        this.form.default_image = this.localImages[index];
+        this.form.image = '';
         this.coverModalVisible = false;
       },
       handleFocus() {
@@ -316,7 +331,8 @@
           var lng = e.lnglat.getLng();
           var lat = e.lnglat.getLat();
           _this.map.remove(_this.markers);
-          _this.form.location = [lng, lat];
+          _this.form.latitude = lat;
+          _this.form.longtitude = lng;
           var marker = new AMap.Marker({
             position: [lng, lat]
           });
@@ -331,18 +347,22 @@
               _this.infoWindow.open(_this.map, [lng, lat]);
               marker.on('click', function() {
                 _this.infoWindow.open(_this.map, [lng, lat]);
-                _this.form.location = [lng, lat];
+                _this.form.latitude = lat;
+                _this.form.longtitude = lng;
               })
             }
           });
           _this.placeSearch.clear();
         });
         this.placeSearch.on('listElementClick', function(event) {
-          _this.form.location = [event.data.location.lng, event.data.location.lat];
+          _this.form.latitude = event.data.location.lat;
+          _this.form.longtitude = event.data.location.lng;
           _this.form.address = event.data.cityname + event.data.adname + event.data.address;
+          console.log(_this.form)
         });
         this.placeSearch.on('markerClick', function(event) {
-          _this.form.location = [event.data.location.lng, event.data.location.lat];
+          _this.form.latitude = event.data.location.lat;
+          _this.form.longtitude = event.data.location.lng;
           _this.form.address = event.data.cityname + event.data.adname + event.data.address;
         });
       },
@@ -416,6 +436,14 @@
         this.limitValue = item.limit > 10000?'':item.limit;
         this.isEdit = true;
         this.editIndex = index;
+      },
+      submitForm() {
+        this.$http.post(this.server+'/projects?token='+ this.getCookie('token'),
+        {
+          data: this.form
+        }).then(function(res) {
+          console.log(res)
+        })
       }
     }
   }
