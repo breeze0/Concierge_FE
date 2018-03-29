@@ -63,7 +63,7 @@
           </div>
           <div id="map-container" v-show="isShowMap"></div>
           <div id="map-panel" v-show="isShowPanel"></div>
-          <div class="map-close" @click="closeMap" v-show="isShowClose">
+          <div class="map-close" @click="closeMap" v-show="isShowMap">
             <i class="el-icon-close"></i>
           </div>
         </el-form-item>
@@ -82,8 +82,7 @@
               <el-radio-button :label="false">特殊设置</el-radio-button>
             </el-radio-group>
             <div class="normal-setting-wrapper" v-show="isShowNormal">
-              <div class="normal-setting-item" v-for="(item, index) in formatedForm"
-                @mouseover="handeHover">
+              <div class="normal-setting-item" v-for="(item, index) in formatedForm">
                 <span>{{ item.time }}</span>
                 <div @click="editItem(index)" class="weekday-container">
                   <span v-for="day in item.weekday" class="weekday">{{ day }}</span>
@@ -92,7 +91,7 @@
                 <span v-else>名额不限制</span>
                 <span class="operate-btn">
                   <i class="el-icon-circle-plus-outline" @click="enterSetting"></i>
-                  <i class="el-icon-remove-outline" v-show="!isOnlyone"
+                  <i class="el-icon-remove-outline" v-show="formatedForm.length > 1"
                   @click="deleteItem(index)"></i>
                 </span>
               </div>
@@ -100,7 +99,8 @@
                 title="预约时间设置"
                 :visible.sync="settingDialogVisible"
                 width="50%"
-                center>
+                center
+                @close="isEdit = false">
                 <div class="setting-content">
                   <div class="fields">
                     <span class="text">时间段: </span>
@@ -128,7 +128,7 @@
                   </div>
                   <div class="fields">
                     <span class="text">名额限制: </span>
-                    <el-input v-model="limitValue" class="count-input"></el-input>
+                    <el-input v-model="limitValue" class="count-input" placeholder="不填写则默认为无限制" type="number"></el-input>
                   </div>
                 </div>
                 <span slot="footer" class="dialog-footer">
@@ -202,17 +202,11 @@
         settingDialogVisible: false,
         isShowMap: false,
         isShowPanel: false,
-        isShowClose: false,
-        map: null,
         markers: [],
-        geocoder: null,
-        placeSearch: null,
-        infoWindow: null,
         isShowNormal: true,
-        isOnlyone: false,
         timeValue: '',
         weekdayValue: ['Mon', 'Tues', 'Wed', 'Thur', 'Fri'],
-        limitValue: '不限制',
+        limitValue: '',
         isEdit: false,
         editIndex: null
       } 
@@ -280,7 +274,6 @@
       },
       handleFocus() {
         this.isShowMap = true;
-        this.isShowClose = true;
         this.mapInit();
       },
       mapInit() {
@@ -363,20 +356,12 @@
         this.isShowPanel = false;
         this.placeSearch.clear();
         this.isShowMap = false;
-        this.isShowClose = false;
-      },
-      handeHover() {
-        if(this.form.time_state.normal.length == 1) {
-          this.isOnlyone = true;
-        } else {
-          this.isOnlyone = false;
-        }
       },
       enterSetting() {
         this.settingDialogVisible = true;
         this.timeValue = '';
         this.weekdayValue = ['Mon', 'Tues', 'Wed', 'Thur', 'Fri'];
-        this.limitValue = '不限制';
+        this.limitValue = '';
       },
       confirmSetting() {
         var isError = false;
@@ -385,7 +370,7 @@
         var limit;
         var time = this.timeValue[0] + '-' + this.timeValue[1];
         var weekday = this.weekdayValue;
-        if(this.limitValue == '不限制') {
+        if(this.limitValue === '') {
           limit = 65535
         } else {
           limit = this.limitValue;
@@ -394,10 +379,11 @@
 
         if(!this.isEdit) {
           this.form.time_state.normal.every(function(item) {
-            if(item.time == time) {
+            if(item.time === time) {
               isError = true;
               return false
             }
+            return true
           })
           if(!isError) {
             this.form.time_state.normal.push(newItem);
@@ -407,14 +393,13 @@
           }
         } else {
           this.form.time_state.normal.forEach(function(item, index) {
-            if(index != _this.editIndex && item.time == time) {
+            if(index !== _this.editIndex && item.time === time) {
               isError = true;
             }
           })
           if(!isError) {
             this.form.time_state.normal.splice(this.editIndex,1,newItem);
             this.settingDialogVisible = false;
-            this.isEdit = false;
           } else {
             this.$message.error('已存在相同时间段')
           }
@@ -422,14 +407,13 @@
       },
       deleteItem(index) {
         this.form.time_state.normal.splice(index,1);
-        console.log(this.form.time_state.normal)
       },
       editItem(index) {
         this.settingDialogVisible = true;
         var item = this.form.time_state.normal[index];
         this.timeValue = item.time.split('-');
         this.weekdayValue = item.weekday;
-        this.limitValue = item.limit > 10000?'不限制':item.limit;
+        this.limitValue = item.limit > 10000?'':item.limit;
         this.isEdit = true;
         this.editIndex = index;
       }
