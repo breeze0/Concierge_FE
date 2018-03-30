@@ -1,8 +1,9 @@
 <template>
   <div class="login-com-container">
     <el-card class="box-card">
-      <div slot="header" class="login-title">
-        <span>手机登录</span>
+      <div class="login-title">
+        <span class="title-zn">预约管理系统</span>
+        <span class="title-en">Reservation Management System</span>
       </div>
       <div class="login-content">
         <div class="input-container">
@@ -10,24 +11,25 @@
           v-model="inputTel"
           @blur="handleBlur"
           placeholder="请输入手机号码"
+          maxlength="11" 
           >
-        </div>
-        <div class="error-msg">
-          <span v-show='isShowTelError'>{{ telErrorMsg }}</span>
+          <div class="error-msg tel-error">
+            <span v-show='isShowTelError'>请输入正确的手机号</span>
+          </div>
         </div>
         <div class="input-wrapper">
           <div class="input-msg-container">
-            <input type="number" class="login-input" v-model="inputNum" placeholder="请输入6位短信验证码">
+            <input type="number" class="login-input message-input" v-model="inputNum" placeholder="请输入6位短信验证码">
           </div>
           <el-button type="text"
           @click="getCode"
           :disabled="disabled">{{ btnVal }}</el-button>
-        </div>
-        <div class="error-msg">
-          <span v-show="isShowNumError">{{ numErrorMsg }}</span>
+          <div class="error-msg code-error">
+            <span v-show="isShowNumError">请输入正确的短信验证码</span>
+          </div>
         </div>
         <el-button type="primary" class="login-btn"
-        @click="login">登录</el-button>
+        @click="login" :disabled="inputTel == '' || inputNum == '' ">登录</el-button>
       </div>
     </el-card>
   </div>
@@ -42,9 +44,7 @@
         isShowTelError: false,
         isShowNumError: false,
         disabled: false,
-        countdown: 5,
-        telErrorMsg: '请输入正确的手机号',
-        numErrorMsg: '请输入正确的短信验证码',
+        countdown: 60,
         btnVal: '获取短信验证码'
       }
     },
@@ -88,7 +88,7 @@
           if(this.countdown == 0) {
             this.disabled = false;
             this.btnVal = '获取短信验证码';
-            this.countdown = 5;
+            this.countdown = 60;
             return;
           } else {
             this.disabled = true;

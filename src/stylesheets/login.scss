@@ -7,11 +7,19 @@
 
 
   .box-card {
-    width: 480px;
-    height: 300px;
+    width: 500px;
 
     .login-title {
-      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+      .title-zn {
+        font-size: 30px;
+      }
+      .title-en {
+        font-size: 25px;
+      }
     }
   }
 
@@ -31,34 +39,48 @@
       line-height: 1;
       outline: 0;
       transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+
+      &.message-input {
+        width: 80%;
+      }
     }
 
     .input-container {
       position: relative;
       font-size: 14px;
       display: inline-block;
-      width: 80%;
-      margin: 0 10%;
+      width: 90%;
+      margin: 0 5% 20px 5%;
       border-bottom: 1px solid #ebebeb;
     }
     .error-msg {
-      margin-left: 10%;
       color: #F56C6C;
       font-size: 12px;
       min-height: 20px;
+
+      &.tel-error {
+        position: absolute;
+        right: 0;
+        top: 13px;
+      }
+      &.code-error {
+        position: absolute;
+        top: 11px;
+        left: 30%;
+      }
     }
 
     .input-wrapper {
-      margin: 20px 10% 0 10%;
+      margin: 20px 5% 0 5%;
       display: flex;
       justify-content: space-between;
       border-bottom: 1px solid #ebebeb;
-
+      position: relative;
     }
 
     .login-btn {
-      margin-left: 10%;
-      width: 80%;
+      margin-left: 5%;
+      width: 90%;
       margin-top: 20px;
     }
   }
