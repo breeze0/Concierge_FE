@@ -160,7 +160,7 @@
           address: '',
           latitude: 0,
           longtitude: 0,
-          check: 'auto',
+          check_mode: 'auto',
           time_state: {
             normal: [
              {time: '09:00-10:00', limit: 10, weekday: ['Mon','Tues','Wed','Thur','Fri']}
@@ -438,12 +438,28 @@
         this.editIndex = index;
       },
       submitForm() {
-        this.$http.post(this.server+'/projects?token='+ this.getCookie('token'),
-        {
-          data: this.form
-        }).then(function(res) {
-          console.log(res)
-        })
+        var formData = new FormData();
+        formData.append('name',this.form.name);
+        formData.append('des', this.form.des);
+        formData.append('image', this.form.image);
+        formData.append('default_image', this.form.default_image);
+        formData.append('address', this.form.address);
+        formData.append('latitude', this.form.latitude);
+        formData.append('longtitude', this.form.longtitude);
+        formData.append('time_state', JSON.stringify(this.form.time_state));
+        formData.append('check_mode', this.form.check_mode);
+        var config = {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+        if(this.form.name) {
+          this.$http.post(this.server+'/projects?token='+ this.getCookie('token'),formData,config).then(function(res) {
+            console.log(res)
+          })
+        } else {
+          this.$message.error('预约项目名称不能为空')
+        }
       }
     }
   }
