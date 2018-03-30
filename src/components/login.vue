@@ -72,8 +72,7 @@
         if(this.isAvailable(this.inputTel) && this.inputNum.length == 6) {
           this.$http.get(this.server + '/login?tel='+this.inputTel+'&code='+this.inputNum).then((res)=>{
             if(res.status == 200) {
-              var expire = 1000 * 60 * 60 * 36;
-              this.setCookie('token',res.headers.authorization,expire);
+              this.setCookie('token',res.headers.authorization,this.expire);
               this.$router.push('/admin');
             } else {
               this.isShowNumError = true

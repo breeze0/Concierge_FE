@@ -39,6 +39,7 @@ Vue.prototype.delCookie = (name) => {
 }
 
 Vue.prototype.server = 'http://192.168.31.208';
+Vue.prototype.expire = 1000 * 60 * 60 * 36;
 
 new Vue({
   el: '#app',

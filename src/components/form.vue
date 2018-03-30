@@ -18,14 +18,15 @@
                 center>
                 <div class="imgs-list">
                   <div class="upload imgs-item">
-                    <label for="upload-img">
+                    <label for="uploadImg">
                       <i class="el-icon-upload"></i>
                       <div>上传图片</div>
                     </label>
                     <input type="file"
-                    id="upload-img"
+                    id="uploadImg"
                     @change="handleChange"
-                    accept="image/png,image/jpeg">
+                    accept="image/png,image/jpeg"
+                    name="uploadImg" ref="uploadImg">
                   </div>
                   <div class="imgs-item" v-for="(item,index) in localImages"
                   @click="changeCover(index)">
@@ -441,7 +442,7 @@
         var formData = new FormData();
         formData.append('name',this.form.name);
         formData.append('des', this.form.des);
-        formData.append('image', this.form.image);
+        formData.append('image', this.$refs.uploadImg.files[0]);
         formData.append('default_image', this.form.default_image);
         formData.append('address', this.form.address);
         formData.append('latitude', this.form.latitude);
@@ -450,12 +451,14 @@
         formData.append('check_mode', this.form.check_mode);
         var config = {
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'multipart/form-data',
+            "Authorization": this.getCookie('token')
           }
         }
         if(this.form.name) {
-          this.$http.post(this.server+'/projects?token='+ this.getCookie('token'),formData,config).then(function(res) {
-            console.log(res)
+          this.$http.post(this.server+'/projects',formData,config).then((res)=> {
+            this.setCookie('token',res.headers.authorization,this.expire);
+            this.$router.push('/admin');
           })
         } else {
           this.$message.error('预约项目名称不能为空')
