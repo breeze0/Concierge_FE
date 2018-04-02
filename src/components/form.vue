@@ -389,42 +389,48 @@
         var _this = this;
         var newItem = {};
         var limit;
-        var time = this.timeValue[0] + '-' + this.timeValue[1];
+        var time = '';
         var weekday = this.weekdayValue;
         if(this.limitValue === '') {
           limit = 65535
         } else {
-          limit = this.limitValue;
+          limit = Number(this.limitValue);
         }
-        newItem = {"time": time, "limit": limit, "weekday": weekday};
-
-        if(!this.isEdit) {
-          this.form.time_state.normal.every(function(item) {
-            if(item.time === time) {
-              isError = true;
-              return false
+        if(this.timeValue.length) {
+          time = this.timeValue[0] + '-' + this.timeValue[1];
+          newItem = {"time": time, "limit": limit, "weekday": weekday};
+          if(!this.isEdit) {
+            this.form.time_state.normal.every(function(item) {
+              if(item.time === time) {
+                isError = true;
+                return false
+              }
+              return true
+            })
+            if(!isError) {
+              this.form.time_state.normal.push(newItem);
+              this.settingDialogVisible = false;
+            } else {
+              this.$message.error('已存在相同时间段')
             }
-            return true
-          })
-          if(!isError) {
-            this.form.time_state.normal.push(newItem);
-            this.settingDialogVisible = false;
           } else {
-            this.$message.error('已存在相同时间段')
+            this.form.time_state.normal.forEach(function(item, index) {
+              if(index !== _this.editIndex && item.time === time) {
+                isError = true;
+              }
+            })
+            if(!isError) {
+              this.form.time_state.normal.splice(this.editIndex,1,newItem);
+              this.settingDialogVisible = false;
+            } else {
+              this.$message.error('已存在相同时间段')
+            }
           }
         } else {
-          this.form.time_state.normal.forEach(function(item, index) {
-            if(index !== _this.editIndex && item.time === time) {
-              isError = true;
-            }
-          })
-          if(!isError) {
-            this.form.time_state.normal.splice(this.editIndex,1,newItem);
-            this.settingDialogVisible = false;
-          } else {
-            this.$message.error('已存在相同时间段')
-          }
+          this.settingDialogVisible = true;
+          this.$message.error('请填写时间段');
         }
+
       },
       deleteItem(index) {
         this.form.time_state.normal.splice(index,1);
@@ -442,13 +448,17 @@
         var formData = new FormData();
         formData.append('name',this.form.name);
         formData.append('des', this.form.des);
-        formData.append('image', this.$refs.uploadImg.files[0]);
         formData.append('default_image', this.form.default_image);
         formData.append('address', this.form.address);
         formData.append('latitude', this.form.latitude);
         formData.append('longtitude', this.form.longtitude);
         formData.append('time_state', JSON.stringify(this.form.time_state));
         formData.append('check_mode', this.form.check_mode);
+        if(this.form.image) {
+          formData.append('image', this.$refs.uploadImg.files[0]);
+        } else {
+          formData.append('image', '');
+        }
         var config = {
           headers: {
             'Content-Type': 'multipart/form-data',
