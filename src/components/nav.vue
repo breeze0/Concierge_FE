@@ -31,14 +31,8 @@
         }
       },
       logout() {
-        this.$http.get(this.server + '/logout?tel='+ this.getCookie('tel') +'&token='+ this.getCookie('token')).then((res) => {
-          console.log(res.data)
-          if(res.data.state == 'success') {
-            this.delCookie('tel');
-            this.delCookie('token');
-            this.$router.push('/login');
-          }
-        })
+        this.delCookie('token');
+        this.$router.push('/login');
       }
     }
   }
