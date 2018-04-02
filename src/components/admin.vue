@@ -2,9 +2,9 @@
   <div class="admin-com-container">
     <div class="tabs-wrapper">
       <el-tabs v-model="activeName" @tab-click="handleClick">
-        <el-tab-pane label="我拥有的预约项目" name="first">
+        <el-tab-pane label="预约项目" name="first">
           <div class="card-wrapper">
-            <div class="card-item add-card" @click="addNew">
+            <div class="card-item add-card" @click="newProject">
               <el-card class="box-card">
                 <div class="card-content">
                   <div class="card-icon">
@@ -14,7 +14,8 @@
                 </div>
               </el-card>
             </div>
-            <div class="card-item project" v-for="project in handledProject">
+            <div class="card-item project" v-for="(project, index) in handledProject"
+            @click="editProject(index)">
               <img :src="project.image" class="project-image">
               <span class="project-name">{{ project.name }}</span>
               <span class="project-state" v-if="project.state === 'open'">开启</span>
@@ -23,8 +24,7 @@
             </div>
           </div>
         </el-tab-pane>
-        <el-tab-pane label="我参与的预约项目" name="second">hello world2</el-tab-pane>
-        <el-tab-pane label="我拥有的分类" name="third">hello world3</el-tab-pane>
+        <el-tab-pane label="分类" name="second">hello world2</el-tab-pane>
       </el-tabs>
     </div>
   </div>
@@ -42,8 +42,11 @@
       handleClick(tab, event) {
         console.log(tab, event);
       },
-      addNew() {
-        this.$router.push('/admin/new');
+      newProject() {
+        this.$router.push('/admin/projects/new');
+      },
+      editProject(index) {
+        this.$router.push('/admin/projects/'+ this.projectsList[index].id + '/edit');
       }
     },
     computed: {

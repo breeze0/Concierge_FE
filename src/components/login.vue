@@ -70,12 +70,15 @@
           this.isShowNumError = true;
         }
         if(this.isAvailable(this.inputTel) && this.inputNum.length == 6) {
-          this.$http.get(this.server + '/login?tel='+this.inputTel+'&code='+this.inputNum).then((res)=>{
-            if(res.status == 200) {
-              this.setCookie('token',res.headers.authorization,this.expire);
-              this.$router.push('/admin');
-            } else {
-              this.isShowNumError = true
+          var formdata = new FormData();
+          formdata.append('tel', this.inputTel);
+          formdata.append('code', this.inputNum);
+          this.axios.post(this.server+'/sms', formdata).then((res)=>{
+            this.setCookie('token',res.headers.authorization,this.expire);
+            this.$router.push('/admin/projects');
+          }).catch(error => {
+            if(error.response.status === 403) {
+              this.isShowNumError = true;
             }
           })
         }
@@ -104,7 +107,9 @@
       getCode() {
         this.countDown();
         if(this.isAvailable(this.inputTel)) {
-          this.$http.get(this.server+ '/login?tel='+this.inputTel).then((response)=>{
+          var formdata = new FormData();
+          formdata.append('tel',this.inputTel);
+          this.$http.post(this.server+ '/telephone',formdata).then((response)=>{
             if(response.status == 403) {
               this.isShowTelError = true;
             }

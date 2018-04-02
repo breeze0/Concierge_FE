@@ -63,7 +63,7 @@ new Vue({
         this.$router.push('/login')
       } else {
         if(this.$route.path == '/login') {
-          this.$router.push('/admin');
+          this.$router.push('/admin/projects');
         } else {
           this.$router.push(this.$route.path);
         }

@@ -1,8 +1,9 @@
 <template>
   <div class="form-com-container">
     <div class="return_to_prev">
-      <router-link to="/admin"><i class="el-icon-back"></i></router-link>
-      <span>创建新预约项目</span>
+      <router-link to="/admin/projects"><i class="el-icon-back"></i></router-link>
+      <span v-if="this.$route.params.id">修改预约项目</span>
+      <span v-else>创建新的预约项目</span>
     </div>
     <div class="form-wrapper">
       <el-form ref="form" :model="form">
@@ -209,13 +210,15 @@
         settingDialogVisible: false,
         isShowMap: false,
         isShowPanel: false,
+        isInitMap: true,
         markers: [],
         isShowNormal: true,
         timeValue: '',
         weekdayValue: ['Mon', 'Tues', 'Wed', 'Thur', 'Fri'],
         limitValue: '',
         isEdit: false,
-        editIndex: null
+        editIndex: null,
+        tempImage: ''
       } 
     },
 
@@ -268,7 +271,24 @@
         }
       }
     },
-
+    created() {
+      if(this.$route.params.id) {
+        var url = this.server + '/projects/' + this.$route.params.id;
+        var config = {
+          headers: {
+            'Authorization': this.getCookie('token')
+          }
+        }
+        this.form.image = '';
+        this.form.default_image = '';
+        this.$http.get(url, config).then((res)=> {
+          this.tempImage = res.data.image;
+          res.data.default_image  = this.server + res.data.image;
+          res.data.image = '';
+          this.form = res.data;
+        })
+      }
+    },
     methods: {
       handleChange(event) {
         var file = event.target;
@@ -285,46 +305,49 @@
       },
       changeCover(index) {
         this.form.default_image = this.localImages[index];
+        this.tempImage = this.localImages[index];
         this.form.image = '';
         this.coverModalVisible = false;
       },
       handleFocus() {
         this.isShowMap = true;
-        this.mapInit();
+        if(this.$route.params.id && this.isInitMap) {
+          this.mapInit();
+          this.isInitMap = false;
+        } else if(!this.form.address) {
+          this.mapInit()
+        }
       },
       mapInit() {
         var _this = this;
-        if(!this.form.address) {
-          this.map = new AMap.Map('map-container', {
-            zoom: 12
-          });
-          AMap.plugin('AMap.Geocoder',function(){
-              _this.geocoder = new AMap.Geocoder({
-                radius: 1000,
-                extensions: 'all'
-              });
-              _this.map.addControl(_this.geocoder)
-           });
-          AMap.service(["AMap.PlaceSearch"], function() {
-            _this.placeSearch = new AMap.PlaceSearch({
-              pageSize: 5,
-              pageIndex: 1,
-              city: "028",
-              map: _this.map,
-              panel: "map-panel",
-              renderStyle: 'default'
-            })
-          });
-          AMap.plugin("AMap.InfoWindow", function() {
-            _this.infoWindow = new AMap.InfoWindow({
-              content: '',
-              autoMove: true,
-              closeWhenClickMap: true
+        this.map = new AMap.Map('map-container', {
+          zoom: 12
+        });
+        AMap.plugin('AMap.Geocoder',function(){
+            _this.geocoder = new AMap.Geocoder({
+              radius: 1000,
+              extensions: 'all'
             });
+            _this.map.addControl(_this.geocoder)
+         });
+        AMap.service(["AMap.PlaceSearch"], function() {
+          _this.placeSearch = new AMap.PlaceSearch({
+            pageSize: 5,
+            pageIndex: 1,
+            city: "028",
+            map: _this.map,
+            panel: "map-panel",
+            renderStyle: 'default'
+          })
+        });
+        AMap.plugin("AMap.InfoWindow", function() {
+          _this.infoWindow = new AMap.InfoWindow({
+            content: '',
+            autoMove: true,
+            closeWhenClickMap: true
           });
-
-          this.mapClick();
-        }
+        });
+        this.mapClick();
       },
       mapClick() {
         var _this = this;
@@ -359,7 +382,6 @@
           _this.form.latitude = event.data.location.lat;
           _this.form.longtitude = event.data.location.lng;
           _this.form.address = event.data.cityname + event.data.adname + event.data.address;
-          console.log(_this.form)
         });
         this.placeSearch.on('markerClick', function(event) {
           _this.form.latitude = event.data.location.lat;
@@ -448,7 +470,6 @@
         var formData = new FormData();
         formData.append('name',this.form.name);
         formData.append('des', this.form.des);
-        formData.append('default_image', this.form.default_image);
         formData.append('address', this.form.address);
         formData.append('latitude', this.form.latitude);
         formData.append('longtitude', this.form.longtitude);
@@ -462,14 +483,27 @@
         var config = {
           headers: {
             'Content-Type': 'multipart/form-data',
-            "Authorization": this.getCookie('token')
+            'Authorization': this.getCookie('token')
           }
         }
         if(this.form.name) {
-          this.$http.post(this.server+'/projects',formData,config).then((res)=> {
-            this.setCookie('token',res.headers.authorization,this.expire);
-            this.$router.push('/admin');
-          })
+          if(this.$route.params.id) {
+            if(this.form.image) {
+              formData.append('default_image', '');
+            } else {
+              formData.append('default_image', this.tempImage);
+            }
+            this.$http.put(this.server + '/projects/' + this.$route.params.id, formData, config).then((res)=> {
+              this.setCookie('token',res.headers.authorization,this.expire);
+              this.$router.push('/admin/projects');
+            })
+          } else {
+            formData.append('default_image', this.form.default_image);
+            this.$http.post(this.server+'/projects',formData,config).then((res)=> {
+              this.setCookie('token',res.headers.authorization,this.expire);
+              this.$router.push('/admin/projects');
+            })
+          }
         } else {
           this.$message.error('预约项目名称不能为空')
         }

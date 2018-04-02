@@ -24,14 +24,21 @@ export default new Router({
       }
     },
     {
-      path: '/admin',
+      path: '/admin/projects',
       components: {
         nav: nav,
         content: admin
       }
     },
     {
-      path: '/admin/new',
+      path: '/admin/projects/new',
+      components: {
+        nav: nav,
+        content: form
+      }
+    },
+    {
+      path: '/admin/projects/:id/edit',
       components: {
         nav: nav,
         content: form
