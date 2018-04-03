@@ -143,7 +143,9 @@
         </el-form-item>
       </el-form>
       <div class="form-btn">
-        <el-button>取消</el-button>
+        <el-button>
+          <router-link to="/admin/projects">取消</router-link>
+        </el-button>
         <el-button type="primary" @click="submitForm">确定</el-button>
       </div>
     </div>
@@ -273,6 +275,7 @@
     },
     created() {
       if(this.$route.params.id) {
+        this.openFullScreen();
         var url = this.server + '/projects/' + this.$route.params.id;
         var config = {
           headers: {
@@ -290,6 +293,18 @@
       }
     },
     methods: {
+      openFullScreen() {
+        const loading = this.$loading({
+          lock: true,
+          text: '拼命加载中',
+          spinner: 'el-icon-loading',
+          background: '#f1f1f1',
+          customClass: 'loading-style'
+        });
+        setTimeout(() => {
+          loading.close();
+        }, 1500);
+      },
       handleChange(event) {
         var file = event.target;
         var _this = this;

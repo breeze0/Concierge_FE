@@ -11,6 +11,7 @@
       margin-right: 2%;
       .box-card {
         height: 100%;
+        max-height: 150px;
       }
       .card-content {
         .card-icon {
@@ -33,6 +34,7 @@
         position: relative;
         box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
         border: 1px solid #ebeef5;
+        max-height: 150px;
 
         &:hover{
           .project-share {

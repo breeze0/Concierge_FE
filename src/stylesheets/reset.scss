@@ -15,5 +15,12 @@ html {
         margin: 0;
       }
     }
+    a {
+      text-decoration: none;
+      color: #000;
+    }
+    .el-icon-loading {
+      font-size: 30px;
+    }
   }
 }
