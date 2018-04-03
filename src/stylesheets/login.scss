@@ -4,21 +4,23 @@
   display: flex;
   justify-content: center;
   align-items: center;
-
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
 
   .box-card {
-    width: 500px;
+    width: 520px;
 
     .login-title {
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
+      color: $primary;
       .title-zn {
-        font-size: 30px;
+        font-size: 60px;
       }
       .title-en {
-        font-size: 25px;
+        font-size: 24px;
       }
     }
   }
@@ -41,7 +43,7 @@
       transition: border-color .2s cubic-bezier(.645,.045,.355,1);
 
       &.message-input {
-        width: 80%;
+        width: 170px;
       }
     }
 
@@ -50,38 +52,37 @@
       font-size: 14px;
       display: inline-block;
       width: 90%;
-      margin: 0 5% 20px 5%;
-      border-bottom: 1px solid #ebebeb;
+      margin: 0 5% 24px 5%;
+      border-bottom: 1px solid #dcdfe6;
     }
     .error-msg {
       color: #F56C6C;
-      font-size: 12px;
+      font-size: 14px;
       min-height: 20px;
 
       &.tel-error {
         position: absolute;
         right: 0;
-        top: 13px;
+        top: 10px;
       }
       &.code-error {
         position: absolute;
-        top: 11px;
-        left: 30%;
+        top: 9px;
+        left: 170px;
       }
     }
 
     .input-wrapper {
-      margin: 20px 5% 0 5%;
+      margin: 0 5% 50px 5%;
       display: flex;
       justify-content: space-between;
-      border-bottom: 1px solid #ebebeb;
+      border-bottom: 1px solid #dcdfe6;
       position: relative;
     }
 
     .login-btn {
       margin-left: 5%;
       width: 90%;
-      margin-top: 20px;
     }
   }
 }

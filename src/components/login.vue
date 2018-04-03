@@ -1,5 +1,5 @@
 <template>
-  <div class="login-com-container">
+  <div class="login-com-container" style="background-image: url('./static/images/login.jpg');">
     <el-card class="box-card">
       <div class="login-title">
         <span class="title-zn">预约管理系统</span>
@@ -109,8 +109,8 @@
         if(this.isAvailable(this.inputTel)) {
           var formdata = new FormData();
           formdata.append('tel',this.inputTel);
-          this.$http.post(this.server+ '/telephone',formdata).then((response)=>{
-            if(response.status == 403) {
+          this.$http.post(this.server+ '/telephone',formdata).catch(error=>{
+            if(error.response.status === 403) {
               this.isShowTelError = true;
             }
           })
