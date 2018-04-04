@@ -100,7 +100,7 @@
               <el-dialog
                 title="预约时间设置"
                 :visible.sync="settingDialogVisible"
-                width="50%"
+                width="600px"
                 center
                 @close="isEdit = false">
                 <div class="setting-content">
@@ -114,7 +114,8 @@
                       end-placeholder="结束时间"
                       placeholder="选择时间范围"
                       format="HH:mm"
-                      value-format="HH:mm">
+                      value-format="HH:mm"
+                      class="time-input">
                     </el-time-picker>
                   </div>
                   <div class="fields">
@@ -130,7 +131,7 @@
                   </div>
                   <div class="fields">
                     <span class="text">名额限制: </span>
-                    <el-input v-model="limitValue" class="count-input" placeholder="不填写则默认为无限制" type="number"></el-input>
+                    <el-input v-model="limitValue" class="count-input" placeholder="不填写则默认为无限制" type="number" ></el-input>
                   </div>
                 </div>
                 <span slot="footer" class="dialog-footer">
@@ -419,7 +420,7 @@
         this.settingDialogVisible = true;
         this.timeValue = '';
         this.weekdayValue = ['Mon', 'Tues', 'Wed', 'Thur', 'Fri'];
-        this.limitValue = '';
+        this.limitValue = ' ';
       },
       confirmSetting() {
         var isError = false;
@@ -481,6 +482,7 @@
         this.isEdit = true;
         this.editIndex = index;
       },
+
       submitForm() {
         var formData = new FormData();
         formData.append('name',this.form.name);
@@ -490,11 +492,6 @@
         formData.append('longtitude', this.form.longtitude);
         formData.append('time_state', JSON.stringify(this.form.time_state));
         formData.append('check_mode', this.form.check_mode);
-        if(this.form.image) {
-          formData.append('image', this.$refs.uploadImg.files[0]);
-        } else {
-          formData.append('image', '');
-        }
         var config = {
           headers: {
             'Content-Type': 'multipart/form-data',
@@ -504,20 +501,48 @@
         if(this.form.name) {
           if(this.$route.params.id) {
             if(this.form.image) {
-              formData.append('default_image', '');
+              //压缩上传图片并上传
+              lrz(this.$refs.uploadImg.files[0])
+                .then(rst=> {
+                  formData.append('image', rst.formData.get('file'));
+                  formData.append('default_image', '');
+                  this.$http.put(this.server + '/projects/' + this.$route.params.id, formData, config).then((res)=> {
+                    this.setCookie('token',res.headers.authorization,this.expire);
+                    this.$router.push('/admin/projects');
+                  })
+                }).catch(err=> {
+                  alert('压缩失败')
+                });
             } else {
+              //上传默认图片
               formData.append('default_image', this.tempImage);
+              formData.append('image', '');
+              this.$http.put(this.server + '/projects/' + this.$route.params.id, formData, config).then((res)=> {
+                this.setCookie('token',res.headers.authorization,this.expire);
+                this.$router.push('/admin/projects');
+              })
             }
-            this.$http.put(this.server + '/projects/' + this.$route.params.id, formData, config).then((res)=> {
-              this.setCookie('token',res.headers.authorization,this.expire);
-              this.$router.push('/admin/projects');
-            })
           } else {
-            formData.append('default_image', this.form.default_image);
-            this.$http.post(this.server+'/projects',formData,config).then((res)=> {
-              this.setCookie('token',res.headers.authorization,this.expire);
-              this.$router.push('/admin/projects');
-            })
+            if(this.form.image) {
+              lrz(this.$refs.uploadImg.files[0])
+                .then(rst=> {
+                  formData.append('image', rst.formData.get('file'));
+                  formData.append('default_image', '');
+                  this.$http.post(this.server + '/projects/', formData, config).then((res)=> {
+                    this.setCookie('token',res.headers.authorization,this.expire);
+                    this.$router.push('/admin/projects');
+                  })
+                }).catch(err=> {
+                  alert('压缩失败')
+                });
+            } else {
+              formData.append('default_image', this.form.default_image);
+              formData.append('image', '');
+              this.$http.post(this.server+'/projects',formData,config).then((res)=> {
+                this.setCookie('token',res.headers.authorization,this.expire);
+                this.$router.push('/admin/projects');
+              })
+            }
           }
         } else {
           this.$message.error('预约项目名称不能为空')

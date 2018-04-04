@@ -7,6 +7,7 @@ import App from './App'
 import router from './router'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import lrz from 'lrz'
 import './stylesheets/index.scss'
 
 Vue.config.productionTip = false
