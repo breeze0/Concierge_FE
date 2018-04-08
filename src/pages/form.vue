@@ -92,7 +92,7 @@
                 <span v-if="item.limit < 10000" class="number">名额{{ item.limit }}人</span>
                 <span v-else>名额不限制</span>
                 <span class="operate-btn">
-                  <i class="el-icon-circle-plus-outline" @click="enterSetting"></i>
+                  <i class="el-icon-circle-plus-outline" @click="newItem"></i>
                   <i class="el-icon-remove-outline" v-show="formatedForm.length > 1"
                   @click="deleteItem(index)"></i>
                 </span>
@@ -416,11 +416,11 @@
         this.placeSearch.clear();
         this.isShowMap = false;
       },
-      enterSetting() {
+      newItem() {
         this.settingDialogVisible = true;
         this.timeValue = '';
         this.weekdayValue = ['Mon', 'Tues', 'Wed', 'Thur', 'Fri'];
-        this.limitValue = ' ';
+        this.limitValue = '';
       },
       confirmSetting() {
         var isError = false;

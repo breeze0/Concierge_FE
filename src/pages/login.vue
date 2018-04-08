@@ -7,12 +7,12 @@
       </div>
       <div class="login-content">
         <div class="input-container">
-          <input type="text" class="login-input"
-          v-model="inputTel"
-          @blur="handleBlur"
-          placeholder="请输入手机号码"
-          maxlength="11" 
-          >
+          <input type="text"
+                 class="login-input"
+                 v-model="inputTel"
+                 @blur="handleBlur"
+                 placeholder="请输入手机号码"
+                 maxlength="11">
           <div class="error-msg tel-error">
             <span v-show='isShowTelError'>请输入正确的手机号</span>
           </div>
@@ -69,6 +69,7 @@
         if(this.inputNum.length != 6 ) {
           this.isShowNumError = true;
         }
+
         if(this.isAvailable(this.inputTel) && this.inputNum.length == 6) {
           var formdata = new FormData();
           formdata.append('tel', this.inputTel);

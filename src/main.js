@@ -14,10 +14,10 @@ Vue.config.productionTip = false
 Vue.use(ElementUI)
 Vue.use(VueAxios, axios)
 
-Vue.prototype.setCookie = (name, value, expiredays) => {
-  var exdate = new Date();
-  exdate.setTime(exdate.getTime() + expiredays);　　
-  document.cookie = name + "=" + escape(value) + ((expiredays == null) ? "" : ";expires=" + exdate.toGMTString());
+function setCookie(name, value, expiretime) {
+  var exp = new Date();
+  exp.setTime(exp.getTime() + expiretime);　　
+  document.cookie = name + "=" + escape(value) + ((expiretime == null) ? "" : ";expires=" + exp.toGMTString());
 }
 
 function getCookie(name) {
@@ -28,10 +28,7 @@ function getCookie(name) {
     return null;
 }
 
-Vue.prototype.getCookie = getCookie;
-
-
-Vue.prototype.delCookie = (name) => {
+function delCookie(name) {
   var exp = new Date();
   exp.setTime(exp.getTime() - 1);
   var cval = getCookie(name);
@@ -39,6 +36,9 @@ Vue.prototype.delCookie = (name) => {
     document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
 }
 
+Vue.prototype.setCookie = setCookie;
+Vue.prototype.getCookie = getCookie;
+Vue.prototype.delCookie = delCookie;
 Vue.prototype.server = 'http://192.168.31.208';
 Vue.prototype.expire = 1000 * 60 * 60 * 36;
 

@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import login from '@/components/login'
-import admin from '@/components/admin'
-import nav from '@/components/nav'
-import form from '@/components/form'
+import login from '@/pages/login'
+import admin from '@/pages/admin'
+import nav from '@/pages/nav'
+import form from '@/pages/form'
 
 Vue.use(Router)
 
