@@ -74,7 +74,7 @@
           var formdata = new FormData();
           formdata.append('tel', this.inputTel);
           formdata.append('code', this.inputNum);
-          this.axios.post(this.server+'/sms', formdata).then((res)=>{
+          this.axios.post(this.server+'/login', formdata).then((res)=>{
             this.setCookie('token',res.headers.authorization,this.expire);
             this.$router.push('/admin/projects');
           }).catch(error => {
@@ -110,7 +110,7 @@
         if(this.isAvailable(this.inputTel)) {
           var formdata = new FormData();
           formdata.append('tel',this.inputTel);
-          this.$http.post(this.server+ '/telephone',formdata).catch(error=>{
+          this.$http.post(this.server+ '/code',formdata).catch(error=>{
             if(error.response.status === 403) {
               this.isShowTelError = true;
             }

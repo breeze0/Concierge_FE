@@ -8,35 +8,7 @@
     <div class="form-wrapper">
       <el-form ref="form" :model="form">
         <el-form-item>
-          <div class="img-wrapper">
-            <img :src="imageObject" class="form-cover">
-            <div class="change-cover-btn">
-              <el-button type="primary" size="small" @click="coverModalVisible = true">更换封面</el-button>
-              <el-dialog
-                title="更换封面"
-                :visible.sync="coverModalVisible"
-                width="800px"
-                center>
-                <div class="imgs-list">
-                  <div class="upload imgs-item">
-                    <label for="uploadImg">
-                      <i class="el-icon-upload"></i>
-                      <div>上传图片</div>
-                    </label>
-                    <input type="file"
-                    id="uploadImg"
-                    @change="handleChange"
-                    accept="image/png,image/jpeg"
-                    name="uploadImg" ref="uploadImg">
-                  </div>
-                  <div class="imgs-item" v-for="(item,index) in localImages"
-                  @click="changeCover(index)">
-                    <img :src="item" width="100%" height="100%">
-                  </div>
-                </div>
-              </el-dialog>
-            </div>
-          </div>
+          <selectImg :uploadImage="form.image" :defaultImage="form.default_image" @on-change="setCover" ref='selectImgRef'></selectImg>
         </el-form-item>
         <el-form-item>
           <div class="title-wrapper">
@@ -154,12 +126,18 @@
 </template>
 
 <script>
+  import selectImg from '@/components/selectImg'
+
   export default {
+    components: {
+      selectImg
+    },
+
     data() {
       return {
         form: {
           image: '',
-          default_image: './static/images/img1.jpg',
+          default_image: '',
           name: '',
           des: '',
           address: '',
@@ -173,17 +151,6 @@
             special: []
           }
         },
-        localImages: [
-          './static/images/img1.jpg',
-          './static/images/img2.png',
-          './static/images/img3.jpg',
-          './static/images/img4.jpg',
-          './static/images/img5.jpg',
-          './static/images/img6.jpg',
-          './static/images/img7.jpg',
-          './static/images/img8.jpg',
-          './static/images/img9.png'
-        ],
         weekdays: [{
           value: 'Mon',
           label: '周一'
@@ -209,7 +176,6 @@
           value: 'Holiday',
           label: '法定节假日'
         }],
-        coverModalVisible: false,
         settingDialogVisible: false,
         isShowMap: false,
         isShowPanel: false,
@@ -221,7 +187,7 @@
         limitValue: '',
         isEdit: false,
         editIndex: null,
-        tempImage: ''
+        imgFile: {}
       } 
     },
 
@@ -265,13 +231,6 @@
           return newItem;
         })
         return newNormal;
-      },
-      imageObject() {
-        if(this.form.image === '') {
-          return this.form.default_image
-        } else if(this.form.default_image === '') {
-          return this.form.image
-        }
       }
     },
     created() {
@@ -286,8 +245,7 @@
         this.form.image = '';
         this.form.default_image = '';
         this.$http.get(url, config).then((res)=> {
-          this.tempImage = res.data.image;
-          res.data.default_image  = this.server + res.data.image;
+          res.data.default_image  = res.data.image;
           res.data.image = '';
           this.form = res.data;
         })
@@ -306,24 +264,10 @@
           loading.close();
         }, 1500);
       },
-      handleChange(event) {
-        var file = event.target;
-        var _this = this;
-        if (file.files && file.files[0]) {
-          var reader = new FileReader();
-          reader.onload = function(evt) {
-            _this.form.image = evt.target.result;
-            _this.form.default_image = '';
-          }
-          reader.readAsDataURL(file.files[0]);
-        }
-        this.coverModalVisible = false;
-      },
-      changeCover(index) {
-        this.form.default_image = this.localImages[index];
-        this.tempImage = this.localImages[index];
-        this.form.image = '';
-        this.coverModalVisible = false;
+      setCover(args) {
+        this.form.default_image = args[0];
+        this.form.image = args[1];
+        this.imgFile = args[2]
       },
       handleFocus() {
         this.isShowMap = true;
@@ -486,7 +430,7 @@
       submitForm() {
         var formData = new FormData();
         formData.append('name',this.form.name);
-        formData.append('des', this.form.des);
+        formData.append('description', this.form.des);
         formData.append('address', this.form.address);
         formData.append('latitude', this.form.latitude);
         formData.append('longtitude', this.form.longtitude);
@@ -502,7 +446,7 @@
           if(this.$route.params.id) {
             if(this.form.image) {
               //压缩上传图片并上传
-              lrz(this.$refs.uploadImg.files[0])
+              lrz(this.imgFile)
                 .then(rst=> {
                   formData.append('image', rst.formData.get('file'));
                   formData.append('default_image', '');
@@ -515,7 +459,7 @@
                 });
             } else {
               //上传默认图片
-              formData.append('default_image', this.tempImage);
+              formData.append('default_image', this.form.default_image);
               formData.append('image', '');
               this.$http.put(this.server + '/projects/' + this.$route.params.id, formData, config).then((res)=> {
                 this.setCookie('token',res.headers.authorization,this.expire);
@@ -524,7 +468,7 @@
             }
           } else {
             if(this.form.image) {
-              lrz(this.$refs.uploadImg.files[0])
+              lrz(this.imgFile)
                 .then(rst=> {
                   formData.append('image', rst.formData.get('file'));
                   formData.append('default_image', '');

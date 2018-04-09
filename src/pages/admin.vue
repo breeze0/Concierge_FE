@@ -14,7 +14,7 @@
                 </div>
               </el-card>
             </div>
-            <div class="card-item project" v-for="(project, index) in handledProject"
+            <div class="card-item project" v-for="(project, index) in projectsList"
             @click="editProject(index)">
               <img :src="project.image" class="project-image">
               <span class="project-name">{{ project.name }}</span>
@@ -50,14 +50,14 @@
       }
     },
     computed: {
-      handledProject() {
-        var _this = this;
-        var newProject = this.projectsList.map(function(item) {
-          var newItem = {"id": item.id,"name": item.name, "image": _this.server + item.image,"state": item.state};
-          return newItem
-        })
-        return newProject
-      }
+      // handledProject() {
+      //   var _this = this;
+      //   var newProject = this.projectsList.map(function(item) {
+      //     var newItem = {"id": item.id,"name": item.name, "image": _this.server + item.image,"state": item.state};
+      //     return newItem
+      //   })
+      //   return newProject
+      // }
     },
 
     mounted() {
