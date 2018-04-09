@@ -24,13 +24,21 @@
       address: {
         type: String,
         default: ''
+      },
+      latitude: {
+        type: Number,
+        default: 0
+      },
+      longtitude: {
+        type: Number,
+        default: 0
       }
     },
     data() {
       return {
         currentAddress: this.address,
-        latitude: 0,
-        longtitude: 0,
+        currentLatitude: this.latitude,
+        currentLongtitude: this.longtitude,
         isShowMap: false,
         isShowPanel: false,
         isInitMap: true,
@@ -77,6 +85,15 @@
           });
         });
         this.mapClick();
+        if(_this.currentLatitude && _this.currentLongtitude) {
+          var marker = new AMap.Marker({
+            position: [_this.currentLongtitude,_this.currentLatitude]
+          });
+          marker.setMap(_this.map);
+          _this.map.setZoom(14);
+          _this.map.setCenter([_this.currentLongtitude, _this.currentLatitude]);
+          _this.markers.push(marker);
+        }
       },
       mapClick() {
         var _this = this;
@@ -84,8 +101,8 @@
           var lng = e.lnglat.getLng();
           var lat = e.lnglat.getLat();
           _this.map.remove(_this.markers);
-          _this.latitude = lat;
-          _this.longtitude = lng;
+          _this.currentLatitude = lat;
+          _this.currentLongtitude = lng;
           var marker = new AMap.Marker({
             position: [lng, lat]
           });
@@ -100,21 +117,21 @@
               _this.infoWindow.open(_this.map, [lng, lat]);
               marker.on('click', function() {
                 _this.infoWindow.open(_this.map, [lng, lat]);
-                _this.latitude = lat;
-                _this.longtitude = lng;
+                _this.currentLatitude = lat;
+                _this.currentLongtitude = lng;
               })
             }
           });
           _this.placeSearch.clear();
         });
         this.placeSearch.on('listElementClick', function(event) {
-          _this.latitude = event.data.location.lat;
-          _this.longtitude = event.data.location.lng;
+          _this.currentLatitude = event.data.location.lat;
+          _this.currentLongtitude = event.data.location.lng;
           _this.currentAddress = event.data.cityname + event.data.adname + event.data.address;
         });
         this.placeSearch.on('markerClick', function(event) {
-          _this.latitude = event.data.location.lat;
-          _this.longtitude = event.data.location.lng;
+          _this.currentLatitude = event.data.location.lat;
+          _this.currentLongtitude = event.data.location.lng;
           _this.currentAddress = event.data.cityname + event.data.adname + event.data.address;
         });
       },
@@ -128,12 +145,13 @@
         this.isShowPanel = false;
         this.placeSearch.clear();
         this.isShowMap = false;
+        this.deliverData()
       },
       deliverData() {
         var args = {
           "address": this.currentAddress,
-          "longtitude": this.longtitude,
-          "latitude": this.latitude
+          "longtitude": this.currentLongtitude,
+          "latitude": this.currentLatitude
         }
         this.$emit("on-change",args);
       }
@@ -141,8 +159,13 @@
     watch: {
       address(val) {
         this.currentAddress = val;
+      },
+      latitude(val) {
+        this.currentLatitude = val;
+      },
+      longtitude(val) {
+        this.currentLongtitude = val;
       }
-
     }
   }
 </script>

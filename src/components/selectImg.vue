@@ -1,6 +1,6 @@
 <template>
   <div class="img-wrapper">
-    <img :src="imageObject" class="form-cover">
+    <img :src="formatedImage" class="form-cover">
     <div class="change-cover-btn">
       <el-button type="primary" size="small" @click="coverModalVisible = true">更换封面</el-button>
       <el-dialog title="更换封面"
@@ -32,11 +32,7 @@
 <script>
   export default {
     props: {
-      uploadImage: {
-        type: String,
-        default: ''
-      },
-      defaultImage: {
+      image: {
         type: String,
         default: ''
       }
@@ -44,10 +40,8 @@
     data() {
       return {
         coverModalVisible: false,
-        currentUploadImage: this.uploadImage,
-        currentDefaultImage: this.defaultImage,
+        currentImage: this.image,
         defaultImageList: [],
-        tempImage: ''
       }
     },
     created() {
@@ -55,27 +49,26 @@
 
     },
     computed: {
-      imageObject() {
-        if(this.currentUploadImage === '') {
-          return this.currentDefaultImage
-        } else if(this.currentDefaultImage === '') {
-          return this.currentUploadImage
-        }
-      },
       formatedDafaultImage() {
         var newImage = this.defaultImageList.map(item=> {
           item = this.server + item;
           return item
         })
         return newImage
+      },
+      formatedImage() {
+        if(this.currentImage) {
+          var image =this.server + this.currentImage;
+        }
+        return image;
       }
     },
     watch: {
-      uploadImage(val) {
-        this.currentUploadImage = val;
+      image(val) {
+        this.currentImage = val;
       },
-      defaultImage(val) {
-        this.currentDefaultImage = val;
+      currentImage() {
+        this.deliverData();
       }
     },
     methods: {
@@ -89,8 +82,8 @@
         var url = this.server + '/covers';
         this.$http.get(url).then(res=> {
           this.defaultImageList = res.data.images;
-          if(this.currentDefaultImage === '') {
-            this.currentDefaultImage = this.server + this.defaultImageList[0]
+          if(this.currentImage === '') {
+            this.currentImage = this.defaultImageList[0]
           }
         })
       },
@@ -100,24 +93,34 @@
         if (file.files && file.files[0]) {
           var reader = new FileReader();
           reader.onload = function(evt) {
-            _this.currentUploadImage = evt.target.result;
-            _this.currentDefaultImage = '';
-            _this.deliverData();
+            _this.currentImage = evt.target.result;
           }
           reader.readAsDataURL(file.files[0]);
         }
+        lrz(this.$refs.uploadImg.files[0]).then(result=> {
+          var url = this.server + '/image';
+          var config = {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              'Authorization': this.getCookie('token')
+            }
+          }
+          var formData = new FormData();
+          formData.append('image',result.formData.get('file'));
+          this.$http.post(url, formData, config).then(res=> {
+            _this.currentImage = res.data.image;
+          })
+        })
+
         this.coverModalVisible = false;
       },
       changeCover(index) {
-        this.currentDefaultImage = this.server + this.defaultImageList[index];
-        this.tempImage = this.defaultImageList[index];
-        this.currentUploadImage = '';
-        this.deliverData();
+        this.currentImage = this.defaultImageList[index];
         this.coverModalVisible = false;
       },
       deliverData() {
-        var args = [this.currentDefaultImage,this.currentUploadImage, this.$refs.uploadImg.files[0]];
-        this.$emit('on-change', args)
+        var args = {"image": this.currentImage};
+        this.$emit('on-change',args);
       }
     }
   }

@@ -8,7 +8,8 @@
     <div class="form-wrapper">
       <el-form ref="form" :model="form">
         <el-form-item>
-          <selectImg :uploadImage="form.image" :defaultImage="form.default_image" @on-change="setCover" ref='selectImgRef'></selectImg>
+          <selectImg :image="form.image"
+                     @on-change="setCover"></selectImg>
         </el-form-item>
         <el-form-item>
           <div class="title-wrapper">
@@ -26,20 +27,10 @@
           </div>
         </el-form-item>
         <el-form-item>
-          <div class="form-address">
-            <span class="address-text">详细地址: </span>
-            <el-input class="address-input"
-            v-model="form.address"
-            @focus="handleFocus">
-              <el-button slot="append" icon="el-icon-search"
-              @click="search"></el-button>
-            </el-input>
-          </div>
-          <div id="map-container" v-show="isShowMap"></div>
-          <div id="map-panel" v-show="isShowPanel"></div>
-          <div class="map-close" @click="closeMap" v-show="isShowMap">
-            <i class="el-icon-close"></i>
-          </div>
+          <addressPicker :address="form.address"
+                         :latitude="form.latitude"
+                         :longtitude="form.longtitude"
+                         @on-change="setAddress"></addressPicker>
         </el-form-item>
         <el-form-item>
           <div class="form-check">
@@ -127,17 +118,17 @@
 
 <script>
   import selectImg from '@/components/selectImg'
-
+  import addressPicker from '@/components/map'
   export default {
     components: {
-      selectImg
+      selectImg,
+      addressPicker
     },
 
     data() {
       return {
         form: {
           image: '',
-          default_image: '',
           name: '',
           des: '',
           address: '',
@@ -177,10 +168,6 @@
           label: '法定节假日'
         }],
         settingDialogVisible: false,
-        isShowMap: false,
-        isShowPanel: false,
-        isInitMap: true,
-        markers: [],
         isShowNormal: true,
         timeValue: '',
         weekdayValue: ['Mon', 'Tues', 'Wed', 'Thur', 'Fri'],
@@ -242,11 +229,7 @@
             'Authorization': this.getCookie('token')
           }
         }
-        this.form.image = '';
-        this.form.default_image = '';
         this.$http.get(url, config).then((res)=> {
-          res.data.default_image  = res.data.image;
-          res.data.image = '';
           this.form = res.data;
         })
       }
@@ -265,100 +248,12 @@
         }, 1500);
       },
       setCover(args) {
-        this.form.default_image = args[0];
-        this.form.image = args[1];
-        this.imgFile = args[2]
+        this.form.image = args.image;
       },
-      handleFocus() {
-        this.isShowMap = true;
-        if(this.$route.params.id && this.isInitMap) {
-          this.mapInit();
-          this.isInitMap = false;
-        } else if(!this.form.address) {
-          this.mapInit()
-        }
-      },
-      mapInit() {
-        var _this = this;
-        this.map = new AMap.Map('map-container', {
-          zoom: 12
-        });
-        AMap.plugin('AMap.Geocoder',function(){
-            _this.geocoder = new AMap.Geocoder({
-              radius: 1000,
-              extensions: 'all'
-            });
-            _this.map.addControl(_this.geocoder)
-         });
-        AMap.service(["AMap.PlaceSearch"], function() {
-          _this.placeSearch = new AMap.PlaceSearch({
-            pageSize: 5,
-            pageIndex: 1,
-            city: "028",
-            map: _this.map,
-            panel: "map-panel",
-            renderStyle: 'default'
-          })
-        });
-        AMap.plugin("AMap.InfoWindow", function() {
-          _this.infoWindow = new AMap.InfoWindow({
-            content: '',
-            autoMove: true,
-            closeWhenClickMap: true
-          });
-        });
-        this.mapClick();
-      },
-      mapClick() {
-        var _this = this;
-        this.map.on('click', function(e) {
-          var lng = e.lnglat.getLng();
-          var lat = e.lnglat.getLat();
-          _this.map.remove(_this.markers);
-          _this.form.latitude = lat;
-          _this.form.longtitude = lng;
-          var marker = new AMap.Marker({
-            position: [lng, lat]
-          });
-          marker.setMap(_this.map);
-          _this.map.setZoom(14);
-          _this.map.setCenter([lng, lat]);
-          _this.markers.push(marker);
-          _this.geocoder.getAddress([lng, lat], function(status, result) {
-            if(status === 'complete' && result.info === 'OK') {
-              _this.form.address = result.regeocode.formattedAddress;
-              _this.infoWindow.setContent("<div>"+ result.regeocode.formattedAddress + "</div");
-              _this.infoWindow.open(_this.map, [lng, lat]);
-              marker.on('click', function() {
-                _this.infoWindow.open(_this.map, [lng, lat]);
-                _this.form.latitude = lat;
-                _this.form.longtitude = lng;
-              })
-            }
-          });
-          _this.placeSearch.clear();
-        });
-        this.placeSearch.on('listElementClick', function(event) {
-          _this.form.latitude = event.data.location.lat;
-          _this.form.longtitude = event.data.location.lng;
-          _this.form.address = event.data.cityname + event.data.adname + event.data.address;
-        });
-        this.placeSearch.on('markerClick', function(event) {
-          _this.form.latitude = event.data.location.lat;
-          _this.form.longtitude = event.data.location.lng;
-          _this.form.address = event.data.cityname + event.data.adname + event.data.address;
-        });
-      },
-      search() {
-        this.isShowPanel = true;
-        this.map.remove(this.markers);
-        this.infoWindow.close();
-        this.placeSearch.search(this.form.address);
-      },
-      closeMap() {
-        this.isShowPanel = false;
-        this.placeSearch.clear();
-        this.isShowMap = false;
+      setAddress(args) {
+        this.form.address = args.address;
+        this.form.longtitude = args.longtitude;
+        this.form.latitude = args.latitude;
       },
       newItem() {
         this.settingDialogVisible = true;
@@ -436,6 +331,7 @@
         formData.append('longtitude', this.form.longtitude);
         formData.append('time_state', JSON.stringify(this.form.time_state));
         formData.append('check_mode', this.form.check_mode);
+        formData.append('image', this.form.image)
         var config = {
           headers: {
             'Content-Type': 'multipart/form-data',
@@ -444,49 +340,15 @@
         }
         if(this.form.name) {
           if(this.$route.params.id) {
-            if(this.form.image) {
-              //压缩上传图片并上传
-              lrz(this.imgFile)
-                .then(rst=> {
-                  formData.append('image', rst.formData.get('file'));
-                  formData.append('default_image', '');
-                  this.$http.put(this.server + '/projects/' + this.$route.params.id, formData, config).then((res)=> {
-                    this.setCookie('token',res.headers.authorization,this.expire);
-                    this.$router.push('/admin/projects');
-                  })
-                }).catch(err=> {
-                  alert('压缩失败')
-                });
-            } else {
-              //上传默认图片
-              formData.append('default_image', this.form.default_image);
-              formData.append('image', '');
-              this.$http.put(this.server + '/projects/' + this.$route.params.id, formData, config).then((res)=> {
-                this.setCookie('token',res.headers.authorization,this.expire);
-                this.$router.push('/admin/projects');
-              })
-            }
+            this.$http.put(this.server + '/projects/' + this.$route.params.id, formData, config).then((res)=> {
+              this.setCookie('token',res.headers.authorization,this.expire);
+              this.$router.push('/admin/projects');
+            })
           } else {
-            if(this.form.image) {
-              lrz(this.imgFile)
-                .then(rst=> {
-                  formData.append('image', rst.formData.get('file'));
-                  formData.append('default_image', '');
-                  this.$http.post(this.server + '/projects/', formData, config).then((res)=> {
-                    this.setCookie('token',res.headers.authorization,this.expire);
-                    this.$router.push('/admin/projects');
-                  })
-                }).catch(err=> {
-                  alert('压缩失败')
-                });
-            } else {
-              formData.append('default_image', this.form.default_image);
-              formData.append('image', '');
-              this.$http.post(this.server+'/projects',formData,config).then((res)=> {
-                this.setCookie('token',res.headers.authorization,this.expire);
-                this.$router.push('/admin/projects');
-              })
-            }
+            this.$http.post(this.server+'/projects',formData,config).then((res)=> {
+              this.setCookie('token',res.headers.authorization,this.expire);
+              this.$router.push('/admin/projects');
+            })
           }
         } else {
           this.$message.error('预约项目名称不能为空')
