@@ -67,8 +67,8 @@
       image(val) {
         this.currentImage = val;
       },
-      currentImage() {
-        this.deliverData();
+      currentImage(val) {
+        this.$emit("on-change", val)
       }
     },
     methods: {
@@ -117,10 +117,6 @@
       changeCover(index) {
         this.currentImage = this.defaultImageList[index];
         this.coverModalVisible = false;
-      },
-      deliverData() {
-        var args = {"image": this.currentImage};
-        this.$emit('on-change',args);
       }
     }
   }

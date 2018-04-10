@@ -8,10 +8,10 @@
     <div class="form-wrapper">
       <el-form ref="form" :model="form">
         <el-form-item>
-          <selectImg
+          <image-picker
             :image="form.image"
             @on-change="setCover">
-          </selectImg>
+          </image-picker>
         </el-form-item>
         <el-form-item>
           <div class="title-wrapper">
@@ -29,12 +29,12 @@
           </div>
         </el-form-item>
         <el-form-item>
-          <addressPicker
+          <address-picker
             :address="form.address"
             :latitude="form.latitude"
             :longtitude="form.longtitude"
             @on-change="setAddress">
-          </addressPicker>
+          </address-picker>
         </el-form-item>
         <el-form-item>
           <div class="form-check">
@@ -44,10 +44,10 @@
           </div>
         </el-form-item>
         <el-form-item>
-          <timeSetting
+          <time-setter
             :timeState="form.time_state"
             @on-change="setTimeState">
-          </timeSetting>
+          </time-setter>
         </el-form-item>
       </el-form>
       <div class="form-btn">
@@ -61,14 +61,14 @@
 </template>
 
 <script>
-  import selectImg from '@/components/selectImg'
-  import addressPicker from '@/components/map'
-  import timeSetting from '@/components/timeSetting'
+  import imagePicker from '@/components/image_picker.vue'
+  import addressPicker from '@/components/map.vue'
+  import timeSetter from '@/components/time_setter.vue'
   export default {
     components: {
-      selectImg,
-      addressPicker,
-      timeSetting
+      "image-picker": imagePicker,
+      "address-picker": addressPicker,
+      "time-setter": timeSetter
     },
 
     data() {
@@ -118,8 +118,8 @@
           loading.close();
         }, 1500);
       },
-      setCover(args) {
-        this.form.image = args.image;
+      setCover(arg) {
+        this.form.image = arg;
       },
       setAddress(args) {
         this.form.address = args.address;

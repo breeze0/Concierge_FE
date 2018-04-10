@@ -2,7 +2,7 @@
   <div class="admin-com-container">
     <div class="tabs-wrapper">
       <el-tabs v-model="activeName" @tab-click="handleClick">
-        <el-tab-pane label="预约项目" name="first">
+        <el-tab-pane label="预约项目" name="project">
           <div class="card-wrapper">
             <div class="card-item add-card" @click="newProject">
               <el-card class="box-card">
@@ -24,7 +24,7 @@
             </div>
           </div>
         </el-tab-pane>
-        <el-tab-pane label="分类" name="second">hello world2</el-tab-pane>
+        <el-tab-pane label="分类" name="category"></el-tab-pane>
       </el-tabs>
     </div>
   </div>
@@ -34,7 +34,7 @@
   export default {
     data() {
       return {
-        activeName: 'first',
+        activeName: 'project',
         projectsList:[]
       };
     },
