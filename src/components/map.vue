@@ -56,83 +56,81 @@
         }
       },
       mapInit() {
-        var _this = this;
         this.map = new AMap.Map('map-container', {
           zoom: 12
         });
-        AMap.plugin('AMap.Geocoder',function(){
-            _this.geocoder = new AMap.Geocoder({
+        AMap.plugin('AMap.Geocoder',()=> {
+            this.geocoder = new AMap.Geocoder({
               radius: 1000,
               extensions: 'all'
             });
-            _this.map.addControl(_this.geocoder)
+            this.map.addControl(this.geocoder)
          });
-        AMap.service(["AMap.PlaceSearch"], function() {
-          _this.placeSearch = new AMap.PlaceSearch({
+        AMap.service(["AMap.PlaceSearch"], ()=> {
+          this.placeSearch = new AMap.PlaceSearch({
             pageSize: 5,
             pageIndex: 1,
             city: "028",
-            map: _this.map,
+            map: this.map,
             panel: "map-panel",
             renderStyle: 'default'
           })
         });
-        AMap.plugin("AMap.InfoWindow", function() {
-          _this.infoWindow = new AMap.InfoWindow({
+        AMap.plugin("AMap.InfoWindow", ()=> {
+          this.infoWindow = new AMap.InfoWindow({
             content: '',
             autoMove: true,
             closeWhenClickMap: true
           });
         });
         this.mapClick();
-        if(_this.currentLatitude && _this.currentLongtitude) {
+        if(this.currentLatitude && this.currentLongtitude) {
           var marker = new AMap.Marker({
-            position: [_this.currentLongtitude,_this.currentLatitude]
+            position: [this.currentLongtitude,this.currentLatitude]
           });
-          marker.setMap(_this.map);
-          _this.map.setZoom(14);
-          _this.map.setCenter([_this.currentLongtitude, _this.currentLatitude]);
-          _this.markers.push(marker);
+          marker.setMap(this.map);
+          this.map.setZoom(14);
+          this.map.setCenter([this.currentLongtitude, this.currentLatitude]);
+          this.markers.push(marker);
         }
       },
       mapClick() {
-        var _this = this;
-        this.map.on('click', function(e) {
+        this.map.on('click', (e)=> {
           var lng = e.lnglat.getLng();
           var lat = e.lnglat.getLat();
-          _this.map.remove(_this.markers);
-          _this.currentLatitude = lat;
-          _this.currentLongtitude = lng;
+          this.map.remove(this.markers);
+          this.currentLatitude = lat;
+          this.currentLongtitude = lng;
           var marker = new AMap.Marker({
             position: [lng, lat]
           });
-          marker.setMap(_this.map);
-          _this.map.setZoom(14);
-          _this.map.setCenter([lng, lat]);
-          _this.markers.push(marker);
-          _this.geocoder.getAddress([lng, lat], function(status, result) {
+          marker.setMap(this.map);
+          this.map.setZoom(14);
+          this.map.setCenter([lng, lat]);
+          this.markers.push(marker);
+          this.geocoder.getAddress([lng, lat], (status, result)=> {
             if(status === 'complete' && result.info === 'OK') {
-              _this.currentAddress = result.regeocode.formattedAddress;
-              _this.infoWindow.setContent("<div>"+ result.regeocode.formattedAddress + "</div");
-              _this.infoWindow.open(_this.map, [lng, lat]);
-              marker.on('click', function() {
-                _this.infoWindow.open(_this.map, [lng, lat]);
-                _this.currentLatitude = lat;
-                _this.currentLongtitude = lng;
+              this.currentAddress = result.regeocode.formattedAddress;
+              this.infoWindow.setContent("<div>"+ result.regeocode.formattedAddress + "</div");
+              this.infoWindow.open(this.map, [lng, lat]);
+              marker.on('click', ()=> {
+                this.infoWindow.open(this.map, [lng, lat]);
+                this.currentLatitude = lat;
+                this.currentLongtitude = lng;
               })
             }
           });
-          _this.placeSearch.clear();
+          this.placeSearch.clear();
         });
-        this.placeSearch.on('listElementClick', function(event) {
-          _this.currentLatitude = event.data.location.lat;
-          _this.currentLongtitude = event.data.location.lng;
-          _this.currentAddress = event.data.cityname + event.data.adname + event.data.address;
+        this.placeSearch.on('listElementClick', (event)=> {
+          this.currentLatitude = event.data.location.lat;
+          this.currentLongtitude = event.data.location.lng;
+          this.currentAddress = event.data.cityname + event.data.adname + event.data.address;
         });
-        this.placeSearch.on('markerClick', function(event) {
-          _this.currentLatitude = event.data.location.lat;
-          _this.currentLongtitude = event.data.location.lng;
-          _this.currentAddress = event.data.cityname + event.data.adname + event.data.address;
+        this.placeSearch.on('markerClick', (event)=> {
+          this.currentLatitude = event.data.location.lat;
+          this.currentLongtitude = event.data.location.lng;
+          this.currentAddress = event.data.cityname + event.data.adname + event.data.address;
         });
       },
       search() {
@@ -145,26 +143,19 @@
         this.isShowPanel = false;
         this.placeSearch.clear();
         this.isShowMap = false;
-        this.deliverData()
       },
-      deliverData() {
+      updateValue(args) {
+        this.currentAddress = args.address;
+        this.currentLatitude = args.latitude;
+        this.currentLongtitude = args.longtitude;
+      },
+      getData() {
         var args = {
           "address": this.currentAddress,
-          "longtitude": this.currentLongtitude,
-          "latitude": this.currentLatitude
+          "latitude": this.currentLatitude,
+          "longtitude": this.currentLongtitude
         }
-        this.$emit("on-change",args);
-      }
-    },
-    watch: {
-      address(val) {
-        this.currentAddress = val;
-      },
-      latitude(val) {
-        this.currentLatitude = val;
-      },
-      longtitude(val) {
-        this.currentLongtitude = val;
+        return args
       }
     }
   }

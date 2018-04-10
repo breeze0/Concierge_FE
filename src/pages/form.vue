@@ -8,10 +8,7 @@
     <div class="form-wrapper">
       <el-form ref="form" :model="form">
         <el-form-item>
-          <image-picker
-            :image="form.image"
-            @on-change="setCover">
-          </image-picker>
+          <cover-picker :image="form.image" ref="coverPickerRef"></cover-picker>
         </el-form-item>
         <el-form-item>
           <div class="title-wrapper">
@@ -20,20 +17,18 @@
         </el-form-item>
         <el-form-item>
           <div class="desc-wrapper">
-            <el-input
-              type="textarea"
-              :rows="5"
-              placeholder="预约详情介绍或预约注意事项"
-              v-model="form.des">
+            <el-input type="textarea"
+                      :rows="5"
+                      placeholder="预约详情介绍或预约注意事项"
+                      v-model="form.des">
             </el-input>
           </div>
         </el-form-item>
         <el-form-item>
-          <address-picker
-            :address="form.address"
-            :latitude="form.latitude"
-            :longtitude="form.longtitude"
-            @on-change="setAddress">
+          <address-picker :address="form.address"
+                          :latitude="form.latitude"
+                          :longtitude="form.longtitude"
+                          ref="addressPickerRef">
           </address-picker>
         </el-form-item>
         <el-form-item>
@@ -44,10 +39,7 @@
           </div>
         </el-form-item>
         <el-form-item>
-          <time-setter
-            :timeState="form.time_state"
-            @on-change="setTimeState">
-          </time-setter>
+          <time-setter :timeState="form.time_state" ref="timeSetterRef"></time-setter>
         </el-form-item>
       </el-form>
       <div class="form-btn">
@@ -61,12 +53,12 @@
 </template>
 
 <script>
-  import imagePicker from '@/components/image_picker.vue'
+  import coverPicker from '@/components/cover_picker.vue'
   import addressPicker from '@/components/map.vue'
   import timeSetter from '@/components/time_setter.vue'
   export default {
     components: {
-      "image-picker": imagePicker,
+      "cover-picker": coverPicker,
       "address-picker": addressPicker,
       "time-setter": timeSetter
     },
@@ -102,13 +94,19 @@
         }
         this.$http.get(url, config).then((res)=> {
           this.form = res.data;
+          var address_picker_args = {};
+          address_picker_args.address = this.form.address;
+          address_picker_args.latitude = this.form.latitude;
+          address_picker_args.longtitude = this.form.longtitude;
+          this.$refs.coverPickerRef.updateValue(this.form.image);
+          this.$refs.addressPickerRef.updateValue(address_picker_args);
+          this.$refs.timeSetterRef.updateValue(this.form.time_state);
         })
       }
     },
     methods: {
       openFullScreen() {
         const loading = this.$loading({
-          lock: true,
           text: '拼命加载中',
           spinner: 'el-icon-loading',
           background: '#f1f1f1',
@@ -118,19 +116,12 @@
           loading.close();
         }, 1500);
       },
-      setCover(arg) {
-        this.form.image = arg;
-      },
-      setAddress(args) {
-        this.form.address = args.address;
-        this.form.longtitude = args.longtitude;
-        this.form.latitude = args.latitude;
-      },
-      setTimeState(arg) {
-        this.form.time_state = arg;
-      },
-
       submitForm() {
+        this.form.image = this.$refs.coverPickerRef.getData();
+        this.form.address = this.$refs.addressPickerRef.getData().address;
+        this.form.latitude = this.$refs.addressPickerRef.getData().latitude;
+        this.form.longtitude = this.$refs.addressPickerRef.getData().longtitude;
+        this.form.time_state = this.$refs.timeSetterRef.getData();
         var formData = new FormData();
         formData.append('name',this.form.name);
         formData.append('description', this.form.des);

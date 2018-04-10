@@ -9,27 +9,36 @@
         <div class="input-container">
           <input type="text"
                  class="login-input"
-                 v-model="tel"
-                 @blur="handleBlur"
                  placeholder="请输入手机号码"
-                 maxlength="11">
+                 maxlength="11"
+                 v-model="tel"
+                 @blur="handleBlur">
           <div class="error-msg tel-error">
             <span v-show='isShowTelError'>请输入正确的手机号</span>
           </div>
         </div>
         <div class="input-wrapper">
           <div class="input-msg-container">
-            <input type="number" class="login-input message-input" v-model="code" placeholder="请输入6位短信验证码">
+            <input type="number"
+                   class="login-input message-input"
+                   v-model="code"
+                   placeholder="请输入6位短信验证码">
           </div>
           <el-button type="text"
-          @click="getCode"
-          :disabled="codeButtonDisabled">{{ btnVal }}</el-button>
+                     @click="getCode"
+                     :disabled="codeButtonDisabled">
+            {{ btnVal }}
+          </el-button>
           <div class="error-msg code-error">
             <span v-show="isShowNumError">请输入正确的短信验证码</span>
           </div>
         </div>
-        <el-button type="primary" class="login-btn"
-        @click="login" :disabled="tel == '' || code == '' ">登录</el-button>
+        <el-button type="primary"
+                   class="login-btn"
+                   @click="login"
+                   :disabled="tel == '' || code == '' ">
+          登录
+        </el-button>
       </div>
     </el-card>
   </div>

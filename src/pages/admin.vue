@@ -14,8 +14,9 @@
                 </div>
               </el-card>
             </div>
-            <div class="card-item project" v-for="(project, index) in handledProject"
-            @click="editProject(index)">
+            <div class="card-item project"
+                 v-for="(project, index) in handledProject"
+                 @click="editProject(index)">
               <img :src="project.image" class="project-image">
               <span class="project-name">{{ project.name }}</span>
               <span class="project-state" v-if="project.state === 'open'">开启</span>
@@ -38,6 +39,16 @@
         projectsList:[]
       };
     },
+    computed: {
+      handledProject() {
+        var _this = this;
+        var newProject = this.projectsList.map(function(item) {
+          var newItem = {"id": item.id,"name": item.name, "image": _this.server + item.image,"state": item.state};
+          return newItem
+        })
+        return newProject
+      }
+    },
     methods: {
       handleClick(tab, event) {
         console.log(tab, event);
@@ -49,17 +60,6 @@
         this.$router.push('/admin/projects/'+ this.projectsList[index].id + '/edit');
       }
     },
-    computed: {
-      handledProject() {
-        var _this = this;
-        var newProject = this.projectsList.map(function(item) {
-          var newItem = {"id": item.id,"name": item.name, "image": _this.server + item.image,"state": item.state};
-          return newItem
-        })
-        return newProject
-      }
-    },
-
     mounted() {
       var url = this.server+'/projects';
       var config = {

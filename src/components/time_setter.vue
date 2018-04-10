@@ -6,7 +6,8 @@
       <el-radio-button :label="false">特殊设置</el-radio-button>
     </el-radio-group>
     <div class="normal-setting-wrapper" v-show="isShowNormal">
-      <div class="normal-setting-item" v-for="(item, index) in formatedForm">
+      <div class="normal-setting-item"
+           v-for="(item, index) in formatedTimeState">
         <span>{{ item.time }}</span>
         <div @click="editItem(index)" class="weekday-container">
           <span v-for="day in item.weekday" class="weekday">{{ day }}</span>
@@ -15,7 +16,7 @@
         <span v-else>名额不限制</span>
         <span class="operate-btn">
           <i class="el-icon-circle-plus-outline" @click="newItem"></i>
-          <i class="el-icon-remove-outline" v-show="formatedForm.length > 1"
+          <i class="el-icon-remove-outline" v-show="formatedTimeState.length > 1"
           @click="deleteItem(index)"></i>
         </span>
       </div>
@@ -58,7 +59,7 @@
         </div>
         <span slot="footer" class="dialog-footer">
           <el-button @click="settingDialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="confirmSetting">确 定</el-button>
+          <el-button type="primary" @click="compeleteSetting">确 定</el-button>
         </span>
       </el-dialog>
     </div>
@@ -125,9 +126,9 @@
       }
     },
     computed: {
-      formatedForm() {
+      formatedTimeState() {
         var array = [];
-        var newNormal = this.currentTimeState.normal.map(function(item) {
+        var new_normal = this.currentTimeState.normal.map(function(item) {
           item.weekday.forEach(function(value) {
             switch(value)
             {
@@ -159,60 +160,56 @@
                 array.push(value);
             }
           })
-          var newItem = {"time": item.time, "limit": item.limit, "weekday": array};
+          var new_item = {"time": item.time, "limit": item.limit, "weekday": array};
           array = [];
-          return newItem;
+          return new_item;
         })
-        return newNormal;
+        return new_normal;
       }
     },
     methods: {
-      isValueNumber (val) {
-        return (/(^-?[0-9]+\.{1}\d+$)|(^-?[1-9][0-9]*$)|(^-?0{1}$)/).test(val+ '');
-      },
       newItem() {
         this.settingDialogVisible = true;
         this.timeValue = '';
         this.weekdayValue = ['Mon', 'Tues', 'Wed', 'Thur', 'Fri'];
         this.limitValue = ' ';
       },
-      confirmSetting() {
-        var isError = false;
-        var _this = this;
-        var newItem = {};
+      compeleteSetting() {
+        var invalid = false;
+        var new_item = {};
         var limit;
         var time = '';
         var weekday = this.weekdayValue;
         if(this.limitValue === ' ' || this.limitValue === '') {
           limit = 65535
         } else {
-          limit = Number(this.limitValue);
+          limit = parseInt(this.limitValue);
         }
         if(this.timeValue.length) {
           time = this.timeValue[0] + '-' + this.timeValue[1];
-          newItem = {"time": time, "limit": limit, "weekday": weekday};
+          new_item = {"time": time, "limit": limit, "weekday": weekday};
           if(!this.isEdit) {
             this.currentTimeState.normal.every(function(item) {
               if(item.time === time) {
-                isError = true;
+                invalid = true;
                 return false
               }
               return true
             })
-            if(!isError) {
-              this.currentTimeState.normal.push(newItem);
+            if(!invalid) {
+              this.currentTimeState.normal.push(new_item);
               this.settingDialogVisible = false;
             } else {
               this.$message.error('已存在相同时间段')
             }
           } else {
-            this.currentTimeState.normal.forEach(function(item, index) {
-              if(index !== _this.editIndex && item.time === time) {
-                isError = true;
+            this.currentTimeState.normal.forEach((item, index)=> {
+              if(index !== this.editIndex && item.time === time) {
+                invalid = true;
               }
             })
-            if(!isError) {
-              this.currentTimeState.normal.splice(this.editIndex,1,newItem);
+            if(!invalid) {
+              this.currentTimeState.normal.splice(this.editIndex,1,new_item);
               this.settingDialogVisible = false;
             } else {
               this.$message.error('已存在相同时间段')
@@ -234,17 +231,12 @@
         this.limitValue = item.limit > 10000?' ':item.limit;
         this.isEdit = true;
         this.editIndex = index;
-      }
-    },
-    watch: {
-      timeState(val) {
-        this.currentTimeState = val;
       },
-      "currentTimeState": {
-        handler: function(val) {
-          this.$emit('on-change',val)
-        },
-        deep: true
+      updateValue(val) {
+        this.currentTimeState = val
+      },
+      getData() {
+        return this.currentTimeState
       }
     }
   }
