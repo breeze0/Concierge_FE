@@ -29,7 +29,7 @@
         type: Number,
         default: 0
       },
-      longtitude: {
+      longitude: {
         type: Number,
         default: 0
       }
@@ -38,7 +38,7 @@
       return {
         currentAddress: this.address,
         currentLatitude: this.latitude,
-        currentLongtitude: this.longtitude,
+        currentLongitude: this.longitude,
         isShowMap: false,
         isShowPanel: false,
         isInitMap: true,
@@ -84,13 +84,13 @@
           });
         });
         this.mapClick();
-        if(this.currentLatitude && this.currentLongtitude) {
+        if(this.currentLatitude && this.currentLongitude) {
           var marker = new AMap.Marker({
-            position: [this.currentLongtitude,this.currentLatitude]
+            position: [this.currentLongitude,this.currentLatitude]
           });
           marker.setMap(this.map);
           this.map.setZoom(14);
-          this.map.setCenter([this.currentLongtitude, this.currentLatitude]);
+          this.map.setCenter([this.currentLongitude, this.currentLatitude]);
           this.markers.push(marker);
         }
       },
@@ -100,7 +100,7 @@
           var lat = e.lnglat.getLat();
           this.map.remove(this.markers);
           this.currentLatitude = lat;
-          this.currentLongtitude = lng;
+          this.currentLongitude = lng;
           var marker = new AMap.Marker({
             position: [lng, lat]
           });
@@ -116,7 +116,7 @@
               marker.on('click', ()=> {
                 this.infoWindow.open(this.map, [lng, lat]);
                 this.currentLatitude = lat;
-                this.currentLongtitude = lng;
+                this.currentLongitude = lng;
               })
             }
           });
@@ -124,12 +124,12 @@
         });
         this.placeSearch.on('listElementClick', (event)=> {
           this.currentLatitude = event.data.location.lat;
-          this.currentLongtitude = event.data.location.lng;
+          this.currentLongitude = event.data.location.lng;
           this.currentAddress = event.data.cityname + event.data.adname + event.data.address;
         });
         this.placeSearch.on('markerClick', (event)=> {
           this.currentLatitude = event.data.location.lat;
-          this.currentLongtitude = event.data.location.lng;
+          this.currentLongitude = event.data.location.lng;
           this.currentAddress = event.data.cityname + event.data.adname + event.data.address;
         });
       },
@@ -147,13 +147,13 @@
       updateValue(args) {
         this.currentAddress = args.address;
         this.currentLatitude = args.latitude;
-        this.currentLongtitude = args.longtitude;
+        this.currentLongitude = args.longitude;
       },
       getData() {
         var args = {
           "address": this.currentAddress,
           "latitude": this.currentLatitude,
-          "longtitude": this.currentLongtitude
+          "longitude": this.currentLongitude
         }
         return args
       }

@@ -27,7 +27,7 @@
         <el-form-item>
           <address-picker :address="form.address"
                           :latitude="form.latitude"
-                          :longtitude="form.longtitude"
+                          :longitude="form.longitude"
                           ref="addressPickerRef">
           </address-picker>
         </el-form-item>
@@ -71,7 +71,7 @@
           des: '',
           address: '',
           latitude: 0,
-          longtitude: 0,
+          longitude: 0,
           check_mode: 'auto',
           time_state: {
             normal: [
@@ -97,7 +97,7 @@
           var address_picker_args = {};
           address_picker_args.address = this.form.address;
           address_picker_args.latitude = this.form.latitude;
-          address_picker_args.longtitude = this.form.longtitude;
+          address_picker_args.longitude = this.form.longitude;
           this.$refs.coverPickerRef.updateValue(this.form.image);
           this.$refs.addressPickerRef.updateValue(address_picker_args);
           this.$refs.timeSetterRef.updateValue(this.form.time_state);
@@ -120,14 +120,14 @@
         this.form.image = this.$refs.coverPickerRef.getData();
         this.form.address = this.$refs.addressPickerRef.getData().address;
         this.form.latitude = this.$refs.addressPickerRef.getData().latitude;
-        this.form.longtitude = this.$refs.addressPickerRef.getData().longtitude;
+        this.form.longitude = this.$refs.addressPickerRef.getData().longitude;
         this.form.time_state = this.$refs.timeSetterRef.getData();
         var formData = new FormData();
         formData.append('name',this.form.name);
         formData.append('description', this.form.des);
         formData.append('address', this.form.address);
         formData.append('latitude', this.form.latitude);
-        formData.append('longtitude', this.form.longtitude);
+        formData.append('longitude', this.form.longitude);
         formData.append('time_state', JSON.stringify(this.form.time_state));
         formData.append('check_mode', this.form.check_mode);
         formData.append('image', this.form.image)
