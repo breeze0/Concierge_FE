@@ -185,7 +185,7 @@
         } else {
           limit = parseInt(this.limitValue);
         }
-        if(this.timeValue.length) {
+        if(this.timeValue.length && this.weekdayValue.length) {
           time = this.timeValue[0] + '-' + this.timeValue[1];
           new_item = {"time": time, "limit": limit, "weekday": weekday};
           if(!this.isEdit) {
@@ -217,7 +217,7 @@
           }
         } else {
           this.settingDialogVisible = true;
-          this.$message.error('请填写时间段');
+          this.$message.error('请填写时间段和重复日期');
         }
       },
       deleteItem(index) {
