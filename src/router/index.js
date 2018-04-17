@@ -38,7 +38,7 @@ export default new Router({
       }
     },
     {
-      path: '/admin/projects/:id/edit',
+      path: '/admin/projects/edit/:id',
       components: {
         nav: nav,
         content: form

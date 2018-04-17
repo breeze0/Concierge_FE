@@ -63,10 +63,10 @@ new Vue({
   methods: {
     checkLogin() {
       if(!(this.getCookie('token'))) {
-        this.$router.push('/login')
+        this.$router.push(this.GLOBAL.routers.login)
       } else {
-        if(this.$route.path == '/login') {
-          this.$router.push('/admin/projects');
+        if(this.$route.path == this.GLOBAL.routers.login) {
+          this.$router.push(this.GLOBAL.routers.projects);
         } else {
           this.$router.push(this.$route.path);
         }

@@ -32,7 +32,7 @@
       },
       logout() {
         this.delCookie('token');
-        this.$router.push('/login');
+        this.$router.push(this.GLOBAL.routers.login);
       }
     }
   }

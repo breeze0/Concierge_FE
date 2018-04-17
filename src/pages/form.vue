@@ -56,6 +56,10 @@
   import coverPicker from '@/components/cover_picker.vue'
   import addressPicker from '@/components/map.vue'
   import timeSetter from '@/components/time_setter.vue'
+  const TIP = {
+    'loading': '拼命加载中',
+    'name_error': '预约项目名称不能为空'
+  }
   export default {
     components: {
       "cover-picker": coverPicker,
@@ -85,43 +89,43 @@
 
     created() {
       if(this.$route.params.id) {
-        this.openFullScreen();
-        var url = this.server + '/projects/' + this.$route.params.id;
+        let loading = this.$loading({
+          text: TIP.loading,
+          spinner: 'el-icon-loading',
+          background: '#f1f1f1',
+          customClass: 'loading-style'
+        });
         var config = {
           headers: {
             'Authorization': this.getCookie('token')
           }
         }
-        this.$http.get(url, config).then((res)=> {
+        this.$http.get(this.GLOBAL.requestUrls.projects_id + this.$route.params.id, config).then((res)=> {
           this.form = res.data;
-          var address_picker_args = {};
-          address_picker_args.address = this.form.address;
-          address_picker_args.latitude = this.form.latitude;
-          address_picker_args.longitude = this.form.longitude;
-          this.$refs.coverPickerRef.updateValue(this.form.image);
-          this.$refs.addressPickerRef.updateValue(address_picker_args);
-          this.$refs.timeSetterRef.updateValue(this.form.time_state);
+          this.updateProps(this.form);
+          loading.close();
         })
       }
     },
     methods: {
-      openFullScreen() {
-        const loading = this.$loading({
-          text: '拼命加载中',
-          spinner: 'el-icon-loading',
-          background: '#f1f1f1',
-          customClass: 'loading-style'
-        });
-        setTimeout(() => {
-          loading.close();
-        }, 1500);
+      updateProps(form) {
+        var address_picker_args = {};
+        address_picker_args.address = form.address;
+        address_picker_args.latitude = form.latitude;
+        address_picker_args.longitude = form.longitude;
+        this.$refs.coverPickerRef.updateValue(form.image);
+        this.$refs.addressPickerRef.updateValue(address_picker_args);
+        this.$refs.timeSetterRef.updateValue(form.time_state);
       },
-      submitForm() {
+      getFormData() {
         this.form.image = this.$refs.coverPickerRef.getData();
         this.form.address = this.$refs.addressPickerRef.getData().address;
         this.form.latitude = this.$refs.addressPickerRef.getData().latitude;
         this.form.longitude = this.$refs.addressPickerRef.getData().longitude;
         this.form.time_state = this.$refs.timeSetterRef.getData();
+      },
+      submitForm() {
+        this.getFormData();
         var formData = new FormData();
         formData.append('name',this.form.name);
         formData.append('description', this.form.des);
@@ -138,18 +142,18 @@
         }
         if(this.form.name) {
           if(this.$route.params.id) {
-            this.$http.put(this.server + '/projects/' + this.$route.params.id, formData, config).then((res)=> {
+            this.$http.put(this.GLOBAL.requestUrls.projects_id + this.$route.params.id, formData, config).then((res)=> {
               this.setCookie('token',res.headers.authorization,this.expire);
-              this.$router.push('/admin/projects');
+              this.$router.push(this.GLOBAL.routers.projects);
             })
           } else {
-            this.$http.post(this.server+'/projects',formData,config).then((res)=> {
+            this.$http.post(this.GLOBAL.requestUrls.projects, formData,config).then((res)=> {
               this.setCookie('token',res.headers.authorization,this.expire);
-              this.$router.push('/admin/projects');
+              this.$router.push(this.GLOBAL.routers.projects);
             })
           }
         } else {
-          this.$message.error('预约项目名称不能为空')
+          this.$message.error(TIP.name_error)
         }
       }
     }

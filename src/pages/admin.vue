@@ -54,20 +54,19 @@
         console.log(tab, event);
       },
       newProject() {
-        this.$router.push('/admin/projects/new');
+        this.$router.push(this.GLOBAL.routers.projects_new);
       },
       editProject(index) {
-        this.$router.push('/admin/projects/'+ this.projectsList[index].id + '/edit');
+        this.$router.push(this.GLOBAL.routers.projects_edit + this.projectsList[index].id);
       }
     },
     mounted() {
-      var url = this.server+'/projects';
       var config = {
         headers: {
           "Authorization": this.getCookie('token')
         }
       };
-      this.$http.get(url,config).then((res) =>{
+      this.$http.get(this.GLOBAL.requestUrls.projects, config).then((res) =>{
         this.projectsList = res.data.projects;
         this.setCookie('token',res.headers.authorization,this.expire);
       })

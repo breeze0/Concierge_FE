@@ -71,8 +71,7 @@
             'Authorization': this.getCookie('token')
           }
         };
-        var url = this.server + '/covers';
-        this.$http.get(url).then(res=> {
+        this.$http.get(this.GLOBAL.requestUrls.covers).then(res=> {
           this.defaultImageList = res.data.images;
           if(this.currentImage === '') {
             this.currentImage = this.defaultImageList[0]
@@ -84,21 +83,19 @@
           target: ".img-wrapper",
           background: "#f1f1f1"
         });
-        setTimeout(()=> {
-          loading.close()
-        },2000)
         lrz(this.$refs.uploadImageRef.files[0]).then(result=> {
-          var url = this.server + '/image';
           var config = {
             headers: {
-              'Content-Type': 'multipart/form-data',
               'Authorization': this.getCookie('token')
             }
           }
           var formData = new FormData();
           formData.append('image',result.formData.get('file'));
-          this.$http.post(url, formData, config).then(res=> {
+          this.$http.post(this.GLOBAL.requestUrls.image, formData, config).then(res=> {
             this.currentImage = res.data.image;
+            setTimeout(()=>{
+              loading.close();
+            }, 200)
           })
         })
         this.coverModalVisible = false;

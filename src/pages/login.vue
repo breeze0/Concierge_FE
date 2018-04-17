@@ -13,7 +13,7 @@
                  maxlength="11"
                  v-model="tel">
           <div class="error-msg tel-error">
-            <span v-show='isShowTelError'>请输入正确的手机号</span>
+            <span v-show='telError'>请输入正确的手机号</span>
           </div>
         </div>
         <div class="input-wrapper">
@@ -29,7 +29,7 @@
             {{ btnVal }}
           </el-button>
           <div class="error-msg code-error">
-            <span v-show="isShowNumError">请输入正确的短信验证码</span>
+            <span v-show="numError">请输入正确的短信验证码</span>
           </div>
         </div>
         <el-button type="primary"
@@ -44,54 +44,55 @@
 </template>
 
 <script>
+  const BUTTON_VALUE = {
+    'default': '获取短信验证码',
+    'waiting': '秒后重新获取'
+  }
   export default {
     data () {
       return {
         tel: '',
         code: '',
-        isShowTelError: false,
-        isShowNumError: false,
+        telError: false,
+        numError: false,
         codeButtonDisabled: false,
         countdownRange: 10,
-        btnVal: '获取短信验证码'
+        btnVal: BUTTON_VALUE.default
       }
     },
     methods: {
-      isAvailable(val) {
-        var reg=/^1[3|4|5|7|8][0-9]{9}$/;
+      validate(val) {
+        var reg=/^1[34578][0-9]{9}$/;
         return reg.test(val)
       },
 
       login() {
-        if(this.isAvailable(this.tel) && this.code.length == 6) {
-          // var formdata = new FormData();
-          // formdata.append('tel', this.tel);
-          // formdata.append('code', this.code);
+        if(this.validate(this.tel) && this.code.length == 6) {
           var data = {
             'tel': this.tel,
             'code': this.code
           }
-          this.$http.post(this.GLOBAL.server+'/login', data).then((res)=>{
+          this.$http.post(this.GLOBAL.requestUrls.login, data).then((res)=>{
             this.setCookie('token',res.headers.authorization,this.expire);
-            this.$router.push('/admin/projects');
+            this.$router.push(this.GLOBAL.routers.projects);
           }).catch(error => {
             if(error.response.status === 422) {
-              this.isShowNumError = true;
+              this.numError = true;
             }
           })
         }
       },
 
       countdown() {
-        if(!this.isShowTelError) {
+        if(!this.telError) {
           if(this.countdownRange == 0) {
             this.codeButtonDisabled = false;
-            this.btnVal = '获取短信验证码';
+            this.btnVal = BUTTON_VALUE.default;
             this.countdownRange = 10;
             return;
           } else {
             this.codeButtonDisabled = true;
-            this.btnVal = this.countdownRange+'秒后重新获取';
+            this.btnVal = this.countdownRange + BUTTON_VALUE.waiting;
             this.countdownRange--;
           }
           setTimeout(() => {
@@ -101,22 +102,15 @@
       },
 
       getCode() {
-        this.isShowTelError = !this.isAvailable(this.tel);
+        this.telError = !this.validate(this.tel);
         this.countdown();
-        if(this.isAvailable(this.tel)) {
-          // var formdata = new FormData();
-          // formdata.append('tel',this.tel);
-            var data = {
-              'tel': this.tel
-            }
-            var config = {
-              headers: {
-                "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
-              }
-            }
-          this.$http.post(this.GLOBAL.server+ '/code',data).catch(error=>{
+        if(this.validate(this.tel)) {
+          var data = {
+            'tel': this.tel
+          }
+          this.$http.post(this.GLOBAL.requestUrls.code, data).catch(error=>{
             if(error.response.status === 422) {
-              this.isShowTelError = true;
+              this.telError = true;
             }
           })
         }
