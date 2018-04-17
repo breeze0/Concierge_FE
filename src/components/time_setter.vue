@@ -12,8 +12,8 @@
         <div @click="editItem(index)" class="weekday-container">
           <span v-for="day in item.weekday" class="weekday">{{ day }}</span>
         </div>
-        <span v-if="item.limit < 10000" class="number">名额{{ item.limit }}人</span>
-        <span v-else>名额不限制</span>
+        <span  v-if="item.limit === null">名额不限制</span>
+        <span v-else class="number">名额{{ item.limit }}人</span>
         <span class="operate-btn">
           <i class="el-icon-circle-plus-outline" @click="newItem"></i>
           <i class="el-icon-remove-outline" v-show="formatedTimeState.length > 1"
@@ -25,7 +25,7 @@
         :visible.sync="settingDialogVisible"
         width="600px"
         center
-        @close="isEdit = false">
+        @close="editStatus = false">
         <div class="setting-content">
           <div class="fields">
             <span class="text">时间段: </span>
@@ -67,6 +67,16 @@
 </template>
 
 <script>
+  const WEEKDAY_MAP = {
+    'Mon': '周一',
+    'Tues': '周二',
+    'Wed': '周三',
+    'Thur': '周四',
+    'Fri': '周五',
+    'Sat': '周六',
+    'Sun': '周日',
+    'Holiday': '法定节假日'
+  }
   export default {
     props: {
       timeState: {
@@ -121,48 +131,17 @@
         timeValue: '',
         weekdayValue: ['Mon', 'Tues', 'Wed', 'Thur', 'Fri'],
         limitValue: '',
-        isEdit: false,
+        editStatus: false,
         editIndex: null
       }
     },
     computed: {
       formatedTimeState() {
-        var array = [];
         var new_normal = this.currentTimeState.normal.map(function(item) {
-          item.weekday.forEach(function(value) {
-            switch(value)
-            {
-              case 'Mon':
-                array.push('周一');
-                break;
-              case 'Tues':
-                array.push('周二');
-                break;
-              case 'Wed':
-                array.push('周三');
-                break;
-              case 'Thur':
-                array.push('周四');
-                break;
-              case 'Fri':
-                array.push('周五');
-                break;
-              case 'Sat':
-                array.push('周六');
-                break;
-              case 'Sun':
-                array.push('周日');
-                break;
-              case 'Holiday':
-                array.push('法定节假日');
-                break;
-              default:
-                array.push(value);
-            }
+          var new_weekday = item.weekday.map(function(weekday) {
+            return WEEKDAY_MAP[weekday];
           })
-          var new_item = {"time": item.time, "limit": item.limit, "weekday": array};
-          array = [];
-          return new_item;
+          return  {"time": item.time, "limit": item.limit, "weekday": new_weekday};
         })
         return new_normal;
       }
@@ -174,50 +153,62 @@
         this.weekdayValue = ['Mon', 'Tues', 'Wed', 'Thur', 'Fri'];
         this.limitValue = ' ';
       },
+      validateEmpty() {
+        this.error = {};
+        if(!(this.timeValue.length && this.weekdayValue.length)) {
+          this.error.empty_tip = '请填写时间段和重复日期';
+        }
+        return Object.keys(this.error).length == 0
+      },
+      validateNewTime(time) {
+        this.error = {};
+        this.currentTimeState.normal.forEach(item => {
+          if(item.time == time) {
+            this.error.new_repeat_tip = '已存在相同时间段';
+          }
+        });
+        return Object.keys(this.error).length == 0
+      },
+      validateEditTime(time) {
+        this.error = {};
+        this.currentTimeState.normal.forEach((item, index) => {
+          if(index !== this.editIndex && item.time === time) {
+            this.error.edit_repeat_tip = '已存在相同时间段';
+          }
+        });
+        return Object.keys(this.error).length == 0
+      },
       compeleteSetting() {
-        var invalid = false;
         var new_item = {};
         var limit;
         var time = '';
         var weekday = this.weekdayValue;
         if(this.limitValue === ' ' || this.limitValue === '') {
-          limit = 65535
+          limit = null
         } else {
-          limit = parseInt(this.limitValue);
+          limit = Math.abs(parseInt(this.limitValue));
         }
-        if(this.timeValue.length && this.weekdayValue.length) {
+        if(this.validateEmpty()) {
           time = this.timeValue[0] + '-' + this.timeValue[1];
           new_item = {"time": time, "limit": limit, "weekday": weekday};
-          if(!this.isEdit) {
-            this.currentTimeState.normal.every(function(item) {
-              if(item.time === time) {
-                invalid = true;
-                return false
-              }
-              return true
-            })
-            if(!invalid) {
+          if(!this.editStatus) {
+            if(this.validateNewTime(time)) {
               this.currentTimeState.normal.push(new_item);
               this.settingDialogVisible = false;
             } else {
-              this.$message.error('已存在相同时间段')
+              this.$message.error(this.error.new_repeat_tip);
             }
           } else {
-            this.currentTimeState.normal.forEach((item, index)=> {
-              if(index !== this.editIndex && item.time === time) {
-                invalid = true;
-              }
-            })
-            if(!invalid) {
+            if(this.validateEditTime(time)) {
               this.currentTimeState.normal.splice(this.editIndex,1,new_item);
               this.settingDialogVisible = false;
             } else {
-              this.$message.error('已存在相同时间段')
+              this.$message.error(this.error.edit_repeat_tip);
             }
           }
         } else {
           this.settingDialogVisible = true;
-          this.$message.error('请填写时间段和重复日期');
+          this.$message.error(this.error.empty_tip);
         }
       },
       deleteItem(index) {
@@ -228,8 +219,8 @@
         var item = this.currentTimeState.normal[index];
         this.timeValue = item.time.split('-');
         this.weekdayValue = item.weekday;
-        this.limitValue = item.limit > 10000?' ':item.limit;
-        this.isEdit = true;
+        this.limitValue = item.limit === null?' ':item.limit;
+        this.editStatus = true;
         this.editIndex = index;
       },
       updateValue(val) {

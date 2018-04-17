@@ -133,7 +133,6 @@
         formData.append('image', this.form.image)
         var config = {
           headers: {
-            'Content-Type': 'multipart/form-data',
             'Authorization': this.getCookie('token')
           }
         }

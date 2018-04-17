@@ -9,6 +9,7 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 import lrz from 'lrz'
 import './stylesheets/index.scss'
+import global from './components/global'
 
 Vue.config.productionTip = false
 Vue.use(ElementUI)
@@ -39,6 +40,7 @@ function delCookie(name) {
 Vue.prototype.setCookie = setCookie;
 Vue.prototype.getCookie = getCookie;
 Vue.prototype.delCookie = delCookie;
+Vue.prototype.GLOBAL = global;
 Vue.prototype.server = 'http://192.168.31.208';
 Vue.prototype.expire = 1000 * 60 * 60 * 36;
 
