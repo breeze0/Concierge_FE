@@ -37,12 +37,20 @@ function delCookie(name) {
     document.cookie = name + "=" + val + ";expires=" + exp.toGMTString();
 }
 
+function getRequestConfig() {
+  var config = {
+    headers: {
+      'Authorization': getCookie('token')
+    }
+  }
+  return config;
+}
+
 Vue.prototype.setCookie = setCookie;
 Vue.prototype.getCookie = getCookie;
 Vue.prototype.delCookie = delCookie;
+Vue.prototype.getRequestConfig = getRequestConfig;
 Vue.prototype.GLOBAL = global;
-Vue.prototype.server = 'http://192.168.31.208';
-Vue.prototype.expire = 1000 * 60 * 60 * 36;
 
 new Vue({
   el: '#app',

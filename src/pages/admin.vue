@@ -15,9 +15,9 @@
               </el-card>
             </div>
             <div class="card-item project"
-                 v-for="(project, index) in handledProject"
+                 v-for="(project, index) in projectsList"
                  @click="editProject(index)">
-              <img :src="project.image" class="project-image">
+              <formated-image :originUrl="project.image" :className="imageClass" class="image-wrapper"></formated-image>
               <span class="project-name">{{ project.name }}</span>
               <span class="project-state" v-if="project.state === 'open'">开启</span>
               <span class="project-state" v-else>关闭</span>
@@ -32,22 +32,17 @@
 </template>
 
 <script>
+  import formatedImage from '@/components/formated_image.vue'
   export default {
+    components: {
+      "formated-image": formatedImage
+    },
     data() {
       return {
         activeName: 'project',
-        projectsList:[]
+        projectsList:[],
+        imageClass: 'project-image'
       };
-    },
-    computed: {
-      handledProject() {
-        var _this = this;
-        var newProject = this.projectsList.map(function(item) {
-          var newItem = {"id": item.id,"name": item.name, "image": _this.server + item.image,"state": item.state};
-          return newItem
-        })
-        return newProject
-      }
     },
     methods: {
       handleClick(tab, event) {
@@ -61,15 +56,15 @@
       }
     },
     mounted() {
-      var config = {
-        headers: {
-          "Authorization": this.getCookie('token')
-        }
-      };
-      this.$http.get(this.GLOBAL.requestUrls.projects, config).then((res) =>{
+      this.$http.get(this.GLOBAL.requestUrls.projects, this.getRequestConfig()).then((res) =>{
         this.projectsList = res.data.projects;
-        this.setCookie('token',res.headers.authorization,this.expire);
-      })
+        this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
+      }).catch(err=>{
+          if(err.response.status === 401) {
+           this.delCookie('token');
+           this.$router.push(this.GLOBAL.routers.login);
+         }
+       })
     }
   }
 </script>

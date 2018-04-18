@@ -89,21 +89,21 @@
 
     created() {
       if(this.$route.params.id) {
-        let loading = this.$loading({
+        const loading = this.$loading({
           text: TIP.loading,
           spinner: 'el-icon-loading',
           background: '#f1f1f1',
           customClass: 'loading-style'
         });
-        var config = {
-          headers: {
-            'Authorization': this.getCookie('token')
-          }
-        }
-        this.$http.get(this.GLOBAL.requestUrls.projects_id + this.$route.params.id, config).then((res)=> {
+        this.$http.get(this.GLOBAL.requestUrls.projects_id + this.$route.params.id, this.getRequestConfig()).then(res => {
           this.form = res.data;
           this.updateProps(this.form);
           loading.close();
+        }).catch(err => {
+          if(err.response.status === 401) {
+            this.delCookie('token');
+            this.$router.push(this.GLOBAL.routers.login);
+          }
         })
       }
     },
@@ -117,15 +117,15 @@
         this.$refs.addressPickerRef.updateValue(address_picker_args);
         this.$refs.timeSetterRef.updateValue(form.time_state);
       },
-      getFormData() {
+      getComponentsData() {
         this.form.image = this.$refs.coverPickerRef.getData();
         this.form.address = this.$refs.addressPickerRef.getData().address;
         this.form.latitude = this.$refs.addressPickerRef.getData().latitude;
         this.form.longitude = this.$refs.addressPickerRef.getData().longitude;
         this.form.time_state = this.$refs.timeSetterRef.getData();
       },
-      submitForm() {
-        this.getFormData();
+      getFormData() {
+        this.getComponentsData();
         var formData = new FormData();
         formData.append('name',this.form.name);
         formData.append('description', this.form.des);
@@ -134,22 +134,27 @@
         formData.append('longitude', this.form.longitude);
         formData.append('time_state', JSON.stringify(this.form.time_state));
         formData.append('check_mode', this.form.check_mode);
-        formData.append('image', this.form.image)
-        var config = {
-          headers: {
-            'Authorization': this.getCookie('token')
-          }
-        }
+        formData.append('image', this.form.image);
+        return formData;
+      },
+      submitForm() {
+        var formData = this.getFormData();
         if(this.form.name) {
           if(this.$route.params.id) {
-            this.$http.put(this.GLOBAL.requestUrls.projects_id + this.$route.params.id, formData, config).then((res)=> {
-              this.setCookie('token',res.headers.authorization,this.expire);
+            this.$http.put(this.GLOBAL.requestUrls.projects_id + this.$route.params.id, formData, this.getRequestConfig()).then((res)=> {
+              this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
               this.$router.push(this.GLOBAL.routers.projects);
+            }).catch(err => {
+              this.delCookie('token');
+              this.$router.push(this.GLOBAL.routers.login);
             })
           } else {
-            this.$http.post(this.GLOBAL.requestUrls.projects, formData,config).then((res)=> {
-              this.setCookie('token',res.headers.authorization,this.expire);
+            this.$http.post(this.GLOBAL.requestUrls.projects, formData, this.getRequestConfig()).then((res)=> {
+              this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
               this.$router.push(this.GLOBAL.routers.projects);
+            }).catch(err => {
+              this.delCookie('token');
+              this.$router.push(this.GLOBAL.routers.login);
             })
           }
         } else {

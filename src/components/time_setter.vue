@@ -181,7 +181,7 @@
       compeleteSetting() {
         var new_item = {};
         var limit;
-        var time = '';
+        var time = this.timeValue[0] + '-' + this.timeValue[1];
         var weekday = this.weekdayValue;
         if(this.limitValue === ' ' || this.limitValue === '') {
           limit = null
@@ -189,7 +189,6 @@
           limit = Math.abs(parseInt(this.limitValue));
         }
         if(this.validateEmpty()) {
-          time = this.timeValue[0] + '-' + this.timeValue[1];
           new_item = {"time": time, "limit": limit, "weekday": weekday};
           if(!this.editStatus) {
             if(this.validateNewTime(time)) {

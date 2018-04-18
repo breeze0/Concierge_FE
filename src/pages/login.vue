@@ -25,8 +25,8 @@
           </div>
           <el-button type="text"
                      @click="getCode"
-                     :disabled="codeButtonDisabled">
-            {{ btnVal }}
+                     :disabled="counting">
+            {{ codeButtonText }}
           </el-button>
           <div class="error-msg code-error">
             <span v-show="numError">请输入正确的短信验证码</span>
@@ -44,9 +44,9 @@
 </template>
 
 <script>
-  const BUTTON_VALUE = {
+  const BUTTON_TEXT = {
     'default': '获取短信验证码',
-    'waiting': '秒后重新获取'
+    'counting': '秒后重新获取'
   }
   export default {
     data () {
@@ -55,64 +55,73 @@
         code: '',
         telError: false,
         numError: false,
-        codeButtonDisabled: false,
-        countdownRange: 10,
-        btnVal: BUTTON_VALUE.default
+        countdownRange: 60,
+        counting: false
+      }
+    },
+    computed: {
+      codeButtonText() {
+        if(this.counting) {
+          return `${this.countdownRange}${BUTTON_TEXT.counting}`
+        } else {
+          return `${BUTTON_TEXT.default}`
+        }
       }
     },
     methods: {
-      validate(val) {
-        var reg=/^1[34578][0-9]{9}$/;
-        return reg.test(val)
+      validate() {
+        var reg =/^1[34578][0-9]{9}$/;
+        return reg.test(this.tel)
       },
 
       login() {
-        if(this.validate(this.tel) && this.code.length == 6) {
+        if(this.validate() && this.code.length == 6) {
           var data = {
-            'tel': this.tel,
-            'code': this.code
+            tel: this.tel,
+            code: this.code
           }
           this.$http.post(this.GLOBAL.requestUrls.login, data).then((res)=>{
-            this.setCookie('token',res.headers.authorization,this.expire);
+            this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
             this.$router.push(this.GLOBAL.routers.projects);
           }).catch(error => {
             if(error.response.status === 422) {
               this.numError = true;
             }
           })
-        }
+        } else if(this.validate() && !this.code.length == 6) this.numError = true;
+          else if(!this.validate() && this.code.length == 6) this.telError = true;
+          else {
+            this.telError = true;
+            this.numError = true;
+          }
       },
 
       countdown() {
-        if(!this.telError) {
-          if(this.countdownRange == 0) {
-            this.codeButtonDisabled = false;
-            this.btnVal = BUTTON_VALUE.default;
-            this.countdownRange = 10;
-            return;
-          } else {
-            this.codeButtonDisabled = true;
-            this.btnVal = this.countdownRange + BUTTON_VALUE.waiting;
-            this.countdownRange--;
-          }
-          setTimeout(() => {
-            this.countdown()
-          },1000);
-        }
+        this.counting = true;
+        this._count();
       },
 
       getCode() {
-        this.telError = !this.validate(this.tel);
+        this.telError = !this.validate();
+        if (this.telError) return;
         this.countdown();
-        if(this.validate(this.tel)) {
-          var data = {
-            'tel': this.tel
+        var data = {
+          tel: this.tel
+        }
+        this.$http.post(this.GLOBAL.requestUrls.code, data).catch(error=>{
+          if(error.response.status === 422) {
+            this.telError = true;
           }
-          this.$http.post(this.GLOBAL.requestUrls.code, data).catch(error=>{
-            if(error.response.status === 422) {
-              this.telError = true;
-            }
-          })
+        })
+      },
+      _count() {
+        if(this.countdownRange === 0) {
+          this.counting = false;
+          this.countdownRange = 60;
+          return;
+        } else {
+          this.countdownRange--;
+          setTimeout(this._count, 1000);
         }
       }
     }

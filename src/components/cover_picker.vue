@@ -1,6 +1,6 @@
 <template>
   <div class="img-wrapper">
-    <img :src="formatedImage" class="form-cover">
+    <formated-image :originUrl="currentImage" :className="classNames.form_cover"></formated-image>
     <div class="change-cover-btn">
       <el-button type="primary" size="small" @click="coverModalVisible = true">更换封面</el-button>
       <el-dialog title="更换封面"
@@ -20,9 +20,9 @@
                    ref="uploadImageRef">
           </div>
           <div class="imgs-item"
-               v-for="(item,index) in formatedDafaultImage"
+               v-for="(item,index) in defaultImageList"
                @click="changeCover(index)">
-            <img :src="item" width="100%" height="100%">
+            <formated-image :originUrl="item" :className="classNames.default_cover"></formated-image>
           </div>
         </div>
       </el-dialog>
@@ -31,7 +31,11 @@
 </template>
 
 <script>
+  import formatedImage from '@/components/formated_image.vue'
   export default {
+    components: {
+      "formated-image": formatedImage
+    },
     props: {
       image: {
         type: String,
@@ -43,38 +47,22 @@
         coverModalVisible: false,
         currentImage: this.image,
         defaultImageList: [],
+        classNames: {
+          form_cover: 'form-cover',
+          default_cover: 'img'
+        }
       }
     },
     created() {
       this.getCovers();
 
     },
-    computed: {
-      formatedDafaultImage() {
-        var newImage = this.defaultImageList.map(item=> {
-          item = this.server + item;
-          return item
-        })
-        return newImage
-      },
-      formatedImage() {
-        if(this.currentImage) {
-          var image =this.server + this.currentImage;
-        }
-        return image;
-      }
-    },
     methods: {
       getCovers() {
-        var config = {
-          headers: {
-            'Authorization': this.getCookie('token')
-          }
-        };
         this.$http.get(this.GLOBAL.requestUrls.covers).then(res=> {
           this.defaultImageList = res.data.images;
           if(this.currentImage === '') {
-            this.currentImage = this.defaultImageList[0]
+            this.currentImage = this.defaultImageList[0];
           }
         })
       },
@@ -84,18 +72,17 @@
           background: "#f1f1f1"
         });
         lrz(this.$refs.uploadImageRef.files[0]).then(result=> {
-          var config = {
-            headers: {
-              'Authorization': this.getCookie('token')
-            }
-          }
           var formData = new FormData();
           formData.append('image',result.formData.get('file'));
-          this.$http.post(this.GLOBAL.requestUrls.image, formData, config).then(res=> {
+          this.$http.post(this.GLOBAL.requestUrls.image, formData, this.getRequestConfig()).then(res=> {
             this.currentImage = res.data.image;
+            this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
             setTimeout(()=>{
               loading.close();
             }, 200)
+          }).catch(err => {
+            this.delCookie('token');
+            this.$router.push(this.GLOBAL.routers.login);
           })
         })
         this.coverModalVisible = false;
