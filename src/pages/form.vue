@@ -145,16 +145,20 @@
               this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
               this.$router.push(this.GLOBAL.routers.projects);
             }).catch(err => {
-              this.delCookie('token');
-              this.$router.push(this.GLOBAL.routers.login);
+              if(err.response.status === 401) {
+                this.delCookie('token');
+                this.$router.push(this.GLOBAL.routers.login);
+              }
             })
           } else {
             this.$http.post(this.GLOBAL.requestUrls.projects, formData, this.getRequestConfig()).then((res)=> {
               this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
               this.$router.push(this.GLOBAL.routers.projects);
             }).catch(err => {
-              this.delCookie('token');
-              this.$router.push(this.GLOBAL.routers.login);
+              if(err.response.status === 401) {
+                this.delCookie('token');
+                this.$router.push(this.GLOBAL.routers.login);
+              }
             })
           }
         } else {
