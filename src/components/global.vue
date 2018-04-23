@@ -5,15 +5,17 @@
     'login': '/login',
     'projects': '/admin/projects',
     'projects_new': '/admin/projects/new',
-    'projects_edit': '/admin/projects/edit/'
+    'projects_edit': '/admin/projects/edit/',
+    'reservations_details': '/admin/projects/reservation/'
   };
   const requestUrls = {
     'code': server + '/code',
     'login': server + '/login',
     'projects': server + '/projects',
-    'projects_id': server + '/projects/',
+    'project': server + '/projects/',
     'covers': server + '/covers',
-    'image': server + '/image'
+    'image': server + '/image',
+    'reservation': server + '/projects/reservations/'
   }
   export default {
     server,

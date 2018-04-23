@@ -16,12 +16,15 @@
             </div>
             <div class="card-item project"
                  v-for="(project, index) in projectsList"
-                 @click="editProject(index)">
+                 @click="showDetail(index)">
               <formated-image :originUrl="project.image" :className="imageClass" class="image-wrapper"></formated-image>
               <span class="project-name">{{ project.name }}</span>
               <span class="project-state" v-if="project.state === 'open'">开启</span>
               <span class="project-state" v-else>关闭</span>
-              <span class="project-share"><i class="el-icon-share"></i></span>
+              <span class="project-share">
+                <i class="el-icon-edit" @click.stop="editProject(index)"></i>
+                <i class="el-icon-share"></i>
+              </span>
             </div>
           </div>
         </el-tab-pane>
@@ -53,6 +56,9 @@
       },
       editProject(index) {
         this.$router.push(this.GLOBAL.routers.projects_edit + this.projectsList[index].id);
+      },
+      showDetail(index) {
+        this.$router.push(this.GLOBAL.routers.reservations_details + this.projectsList[index].id)
       }
     },
     mounted() {

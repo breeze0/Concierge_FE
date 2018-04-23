@@ -95,7 +95,7 @@
           background: '#f1f1f1',
           customClass: 'loading-style'
         });
-        this.$http.get(this.GLOBAL.requestUrls.projects_id + this.$route.params.id, this.getRequestConfig()).then(res => {
+        this.$http.get(this.GLOBAL.requestUrls.project + this.$route.params.id, this.getRequestConfig()).then(res => {
           this.form = res.data;
           this.updateProps(this.form);
           loading.close();
@@ -141,7 +141,7 @@
         var formData = this.getFormData();
         if(this.form.name) {
           if(this.$route.params.id) {
-            this.$http.put(this.GLOBAL.requestUrls.projects_id + this.$route.params.id, formData, this.getRequestConfig()).then((res)=> {
+            this.$http.put(this.GLOBAL.requestUrls.project + this.$route.params.id, formData, this.getRequestConfig()).then((res)=> {
               this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
               this.$router.push(this.GLOBAL.routers.projects);
             }).catch(err => {

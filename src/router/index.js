@@ -4,6 +4,7 @@ import login from '@/pages/login'
 import admin from '@/pages/admin'
 import nav from '@/pages/nav'
 import form from '@/pages/form'
+import detail from '@/pages/detail'
 
 Vue.use(Router)
 
@@ -42,6 +43,13 @@ export default new Router({
       components: {
         nav: nav,
         content: form
+      }
+    },
+    {
+      path: '/admin/projects/reservation/:id',
+      components: {
+        nav: nav,
+        content: detail
       }
     }
   ]
