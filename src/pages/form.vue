@@ -20,7 +20,7 @@
             <el-input type="textarea"
                       :rows="5"
                       placeholder="预约详情介绍或预约注意事项"
-                      v-model="form.des">
+                      v-model="form.description">
             </el-input>
           </div>
         </el-form-item>
@@ -72,7 +72,7 @@
         form: {
           image: '',
           name: '',
-          des: '',
+          description: '',
           address: '',
           latitude: 0,
           longitude: 0,
@@ -128,7 +128,7 @@
         this.getComponentsData();
         var formData = new FormData();
         formData.append('name',this.form.name);
-        formData.append('description', this.form.des);
+        formData.append('description', this.form.description);
         formData.append('address', this.form.address);
         formData.append('latitude', this.form.latitude);
         formData.append('longitude', this.form.longitude);
