@@ -1,0 +1,77 @@
+.detail-com-container {
+  margin: 0 10%;
+  .return-to-prev {
+    border: 1px solid #f1f1f1;
+    padding: 5px;
+    border-radius: 4px;
+    .project-state {
+      margin-left: 10px;
+    }
+  }
+  .reservations-list {
+    margin-top: 15px;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    border: 1px solid #ebeef5;
+    min-height: 500px;
+
+    .reservations-search {
+      display: flex;
+      padding: 10px 5px;
+      border-bottom: 1px solid #f1f1f1;
+
+      .date-picker {
+        width: 300px;
+      }
+      .reservations-tel {
+        margin-left: 20px;
+
+        .tel-input {
+          width: 150px;
+        }
+      }
+      .reservations-state {
+        margin-left: 20px;
+
+        .state-select {
+          width: 150px;
+        }
+      }
+      .search-btn {
+        margin-left: 20px;
+      }
+    }
+    .reservations-list-body {
+      .table-head {
+        margin-top: 10px;
+        background-color: rgba(242, 242, 242, 1);
+      }
+      .table-item {
+        display: flex;
+        .item {
+          flex: 1;
+          text-align: center;
+          padding: 5px;
+          line-height: 25px;
+        }
+        .remark {
+          flex-grow: 3;
+        }
+        .operate {
+          flex-grow: 2;
+          .operate-set {
+            color: $primary;
+            cursor: pointer;
+          }
+        }
+      }
+      .border-bottom {
+        .el-input__inner {
+          border-top: none;
+          border-left: none;
+          border-right: none;
+          border-radius: 0;
+        }
+      }
+    }
+  }
+}

@@ -14,8 +14,7 @@
     'projects': server + '/projects',
     'project': server + '/projects/',
     'covers': server + '/covers',
-    'image': server + '/image',
-    'reservation': server + '/projects/reservations/'
+    'image': server + '/image'
   }
   export default {
     server,

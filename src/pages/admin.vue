@@ -58,7 +58,7 @@
         this.$router.push(this.GLOBAL.routers.projects_edit + this.projectsList[index].id);
       },
       showDetail(index) {
-        this.$router.push(this.GLOBAL.routers.reservations_details + this.projectsList[index].id)
+        this.$router.push(this.GLOBAL.routers.reservations_details + this.projectsList[index].id + '/' + this.projectsList[index].name)
       }
     },
     mounted() {

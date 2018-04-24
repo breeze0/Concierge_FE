@@ -46,7 +46,7 @@ export default new Router({
       }
     },
     {
-      path: '/admin/projects/reservation/:id',
+      path: '/admin/projects/reservation/:id/:projectName',
       components: {
         nav: nav,
         content: detail
