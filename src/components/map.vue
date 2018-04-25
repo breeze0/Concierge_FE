@@ -59,13 +59,22 @@
         this.map = new AMap.Map('map-container', {
           zoom: 12
         });
+        this.geocoderInit();
+        this.placeSearchInit();
+        this.infoWindowInit();
+        this.mapClick();
+        this.renderOriginLocation();
+      },
+      geocoderInit() {
         AMap.plugin('AMap.Geocoder',()=> {
-            this.geocoder = new AMap.Geocoder({
-              radius: 1000,
-              extensions: 'all'
-            });
-            this.map.addControl(this.geocoder)
-         });
+          this.geocoder = new AMap.Geocoder({
+            radius: 1000,
+            extensions: 'all'
+          });
+          this.map.addControl(this.geocoder)
+       });
+      },
+      placeSearchInit() {
         AMap.service(["AMap.PlaceSearch"], ()=> {
           this.placeSearch = new AMap.PlaceSearch({
             pageSize: 5,
@@ -76,6 +85,8 @@
             renderStyle: 'default'
           })
         });
+      },
+      infoWindowInit() {
         AMap.plugin("AMap.InfoWindow", ()=> {
           this.infoWindow = new AMap.InfoWindow({
             content: '',
@@ -83,7 +94,8 @@
             closeWhenClickMap: true
           });
         });
-        this.mapClick();
+      },
+      renderOriginLocation() {
         if(this.currentLatitude && this.currentLongitude) {
           var marker = new AMap.Marker({
             position: [this.currentLongitude,this.currentLatitude]
@@ -123,14 +135,20 @@
           this.placeSearch.clear();
         });
         this.placeSearch.on('listElementClick', (event)=> {
-          this.currentLatitude = event.data.location.lat;
-          this.currentLongitude = event.data.location.lng;
-          this.currentAddress = event.data.cityname + event.data.adname + event.data.address;
+          var args = {
+            latitude: event.data.location.lat,
+            longitude: event.data.location.lng,
+            address: event.data.cityname + event.data.adname + event.data.address
+          }
+          this.updateValue(args);
         });
         this.placeSearch.on('markerClick', (event)=> {
-          this.currentLatitude = event.data.location.lat;
-          this.currentLongitude = event.data.location.lng;
-          this.currentAddress = event.data.cityname + event.data.adname + event.data.address;
+          var args = {
+            latitude: event.data.location.lat,
+            longitude: event.data.location.lng,
+            address: event.data.cityname + event.data.adname + event.data.address
+          }
+          this.updateValue(args);
         });
       },
       search() {

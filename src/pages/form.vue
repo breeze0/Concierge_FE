@@ -119,10 +119,11 @@
       },
       getComponentsData() {
         this.form.image = this.$refs.coverPickerRef.getData();
-        this.form.address = this.$refs.addressPickerRef.getData().address;
-        this.form.latitude = this.$refs.addressPickerRef.getData().latitude;
-        this.form.longitude = this.$refs.addressPickerRef.getData().longitude;
         this.form.time_state = this.$refs.timeSetterRef.getData();
+        address_data = this.$refs.addressPickerRef.getData();
+        this.form.address = address_data.address;
+        this.form.latitude = address_data.latitude;
+        this.form.longitude = address_data.longitude;
       },
       getFormData() {
         this.getComponentsData();

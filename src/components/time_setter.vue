@@ -77,6 +77,16 @@
     'Sun': '周日',
     'Holiday': '法定节假日'
   }
+  const WEEKDAYS = [
+          {value: 'Mon', label: '周一'},
+          {value: 'Tues', label: '周二'},
+          {value: 'Wed', label: '周三'},
+          {value: 'Thur', label: '周四'},
+          {value: 'Fri', label: '周五'},
+          {value: 'Sat', label: '周六'},
+          {value: 'Sun', label: '周日'},
+          {value: 'Holiday', label: '法定节假日'}
+        ]
   export default {
     props: {
       timeState: {
@@ -91,40 +101,7 @@
     },
     data() {
       return {
-        weekdays: [
-          {
-            value: 'Mon',
-            label: '周一'
-          },
-          {
-            value: 'Tues',
-            label: '周二'
-          },
-          {
-            value: 'Wed',
-            label: '周三'
-          },
-          {
-            value: 'Thur',
-            label: '周四'
-          },
-          {
-            value: 'Fri',
-            label: '周五'
-          },
-          {
-            value: 'Sat',
-            label: '周六'
-          },
-          {
-            value: 'Sun',
-            label: '周日'
-          },
-          {
-            value: 'Holiday',
-            label: '法定节假日'
-          }
-        ],
+        weekdays: WEEKDAYS,
         currentTimeState: this.timeState,
         settingDialogVisible: false,
         isShowNormal: true,
