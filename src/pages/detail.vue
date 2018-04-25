@@ -58,12 +58,12 @@
           <span class="item">{{ item.time }}</span>
           <span class="remark item">{{ item.remark }}</span>
           <span class="operate item" v-if="item.state === '已成功'">
-            <span class="operate-set">核销</span>
-            <span class="operate-set" @click="cancel(index,item.state)">取消</span>
+            <span class="operate-set" @click="allow(index, item.state)">核销</span>
+            <span class="operate-set" @click="dismiss(index,item.state)">取消</span>
           </span>
           <span class="operate item" v-else-if="item.state === '待审核'">
-            <span class="operate-set">通过</span>
-            <span class="operate-set" @click='cancel(index,item.state)'>拒绝</span>
+            <span class="operate-set" @click="allow(index, item.state)">通过</span>
+            <span class="operate-set" @click='dismiss(index,item.state)'>拒绝</span>
           </span>
           <span class="operate item" v-else>---</span>
         </div>
@@ -126,7 +126,9 @@
     computed: {
       formatedReservations() {
         var new_reservations = this.reservations.map(item => {
-          item.state = STATE_MAP[item.state];
+          if(STATE_MAP[item.state]) {
+            item.state = STATE_MAP[item.state];
+          }
           return item;
         });
         return new_reservations;
@@ -154,32 +156,68 @@
           }
         }).then(res => {
           this.reservations = res.data.reservations
+        }).catch(err => {
+          if(err.response.status === 401) {
+           this.delCookie('token');
+           this.$router.push(this.GLOBAL.routers.login);
+          }
         })
       },
-      cancel(index, state) {
+      dismiss(index, state) {
         this.reservationsIndex = index;
         this.modalTitle = MODAL_TITLE[state];
         this.dialogVisible = true;
       },
-      confirm() {
-        if(this.modalTitle === '取消预约') {
-          // this.$http({
-          //   method: 'post',
-          //   url: this.GLOBAL.requestUrls.project + this.$route.params.id + '/reservations/' + this.reservations[this.reservationsIndex].id + '/cancel',
-          //   headers: {
-          //     'Authorization': this.getCookie('token')
-          //   },
-          //   data: {
-          //     remark: this.operateRemark
-          //   }
-          // }).then(res => {
-          //   this.reservations[this.reservationsIndex].state = STATE_MAP['cancelled'];
-          //   this.reservations[this.reservationsIndex].remark = this.operateRemark;
-          //   this.dialogVisible = false;
-          // })
-          this.reservations[this.reservationsIndex].state = STATE_MAP['cancelled'];
+      allow(index, state) {
+        if(state === STATE_MAP['success']) {
+          this.handleAllow(index, '/check', 'checked');
+        } else if(state === STATE_MAP['wait']) {
+          this.handleAllow(index, '/pass', 'success')
+        }
+      },
+      handleAllow(index,urlParam, newState) {
+        this.$http({
+          method: 'post',
+          url: this.GLOBAL.requestUrls.project + this.$route.params.id + '/reservations/' + this.reservations[index].id + urlParam,
+          headers: {
+            'Authorization': this.getCookie('token')
+          }
+        }).then(res => {
+          this.reservations[index].state = STATE_MAP[newState];
+          this.dialogVisible = false;
+        }).catch(err => {
+          if(err.response.status === 401) {
+           this.delCookie('token');
+           this.$router.push(this.GLOBAL.routers.login);
+          }
+        })
+      },
+      handleDismiss(urlParam, newState) {
+        this.$http({
+          method: 'post',
+          url: this.GLOBAL.requestUrls.project + this.$route.params.id + '/reservations/' + this.reservations[this.reservationsIndex].id + urlParam,
+          headers: {
+            'Authorization': this.getCookie('token')
+          },
+          data: {
+            remark: this.operateRemark
+          }
+        }).then(res => {
+          this.reservations[this.reservationsIndex].state = STATE_MAP[newState];
           this.reservations[this.reservationsIndex].remark = this.operateRemark;
           this.dialogVisible = false;
+        }).catch(err => {
+          if(err.response.status === 401) {
+           this.delCookie('token');
+           this.$router.push(this.GLOBAL.routers.login);
+          }
+        })
+      },
+      confirm() {
+        if(this.modalTitle === '取消预约') {
+          this.handleDismiss('/cancel', 'cancelled');
+        } else if(this.modalTitle === '拒绝预约') {
+          this.handleDismiss('/refuse', 'refused');
         }
       }
     }
