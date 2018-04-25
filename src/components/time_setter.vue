@@ -79,11 +79,24 @@
     'Sun': '周日',
     'Holiday': '法定节假日'
   }
+
   const ERROR_TIP = {
     empty: '请填写时间段和重复日期',
     repeat: '已存在相同时间段',
     invalid: '请输入正确的时间段'
   }
+
+  const WEEKDAYS = [
+          {value: 'Mon', label: '周一'},
+          {value: 'Tues', label: '周二'},
+          {value: 'Wed', label: '周三'},
+          {value: 'Thur', label: '周四'},
+          {value: 'Fri', label: '周五'},
+          {value: 'Sat', label: '周六'},
+          {value: 'Sun', label: '周日'},
+          {value: 'Holiday', label: '法定节假日'}
+        ]
+
   export default {
     props: {
       timeState: {
@@ -98,40 +111,7 @@
     },
     data() {
       return {
-        weekdays: [
-          {
-            value: 'Mon',
-            label: '周一'
-          },
-          {
-            value: 'Tues',
-            label: '周二'
-          },
-          {
-            value: 'Wed',
-            label: '周三'
-          },
-          {
-            value: 'Thur',
-            label: '周四'
-          },
-          {
-            value: 'Fri',
-            label: '周五'
-          },
-          {
-            value: 'Sat',
-            label: '周六'
-          },
-          {
-            value: 'Sun',
-            label: '周日'
-          },
-          {
-            value: 'Holiday',
-            label: '法定节假日'
-          }
-        ],
+        weekdays: WEEKDAYS,
         currentTimeState: this.timeState,
         settingDialogVisible: false,
         isShowNormal: true,
