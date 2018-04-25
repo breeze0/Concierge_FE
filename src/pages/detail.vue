@@ -82,6 +82,14 @@
           </span>
         </el-dialog>
       </div>
+      <div class="pagination-wrapper" v-show="reservations.length">
+        <el-pagination
+          @current-change="handleCurrentChange"
+          :page-size="10"
+          layout="prev, pager, next, jumper"
+          :total="totalReservations">
+        </el-pagination>
+      </div>
     </div>
   </div>
 </template>
@@ -112,7 +120,7 @@
     data() {
       return  {
         reservations: [],
-        projectName: '',
+        totalReservations: 0,
         projectState: '',
         reservationsDate: [],
         reservationsTel: '',
@@ -136,11 +144,15 @@
     },
     created() {
       this.$http.get(this.GLOBAL.requestUrls.project + this.$route.params.id + '/reservations',this.getRequestConfig()).then(res => {
-        this.reservations = res.data.reservations
+        this.reservations = res.data.reservations;
+        this.totalReservations = res.data.count;
       })
     },
     methods: {
       search() {
+        this.filter(1);
+      },
+      filter(pageIndex) {
         this.$http({
           method: 'get',
           url: this.GLOBAL.requestUrls.project + this.$route.params.id + '/reservations',
@@ -152,10 +164,11 @@
             date_to: (this.reservationsDate.length)?this.reservationsDate[1]:'',
             date_from: (this.reservationsDate.length)?this.reservationsDate[0]:'',
             state: this.reservationsState,
-            page: 1
+            page: pageIndex
           }
         }).then(res => {
-          this.reservations = res.data.reservations
+          this.reservations = res.data.reservations;
+          this.totalReservations = res.data.count;
         }).catch(err => {
           if(err.response.status === 401) {
            this.delCookie('token');
@@ -175,7 +188,7 @@
           this.handleAllow(index, '/pass', 'success')
         }
       },
-      handleAllow(index,urlParam, newState) {
+      handleAllow(index, urlParam, newState) {
         this.$http({
           method: 'post',
           url: this.GLOBAL.requestUrls.project + this.$route.params.id + '/reservations/' + this.reservations[index].id + urlParam,
@@ -219,6 +232,9 @@
         } else if(this.modalTitle === '拒绝预约') {
           this.handleDismiss('/refuse', 'refused');
         }
+      },
+      handleCurrentChange(pageIndex) {
+        this.filter(pageIndex);
       }
     }
   }
