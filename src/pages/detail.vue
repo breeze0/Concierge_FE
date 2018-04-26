@@ -7,8 +7,19 @@
       <el-switch
         v-model="projectState"
         active-color="#13ce66"
-        inactive-color="#ff4949">
+        inactive-color="#ff4949"
+        @change="changeState">
       </el-switch>
+      <el-dialog
+        title="确认关闭"
+        :visible.sync="stateDialogVisible"
+        width="500px">
+        <span>关闭项目后，该项目下的所有预约都会被自动取消，您确认要关闭么?</span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="stateDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="closeProject">确 定</el-button>
+        </span>
+      </el-dialog>
     </div>
     <div class="reservations-list">
       <div class="reservations-search">
@@ -39,37 +50,39 @@
         <el-button type="primary" class="search-btn" @click="search">查询</el-button>
       </div>
       <div class="reservations-list-body">
-        <div class="table-item table-head">
-          <span class="item">姓名</span>
-          <span class="item">预约状态</span>
-          <span class="item">联系电话</span>
-          <span class="item">预约时间</span>
-          <span class="item">预约时间段</span>
-          <span class="remark item">备注</span>
-          <span class="operate item">操作</span>
-        </div>
-        <div class="table-item"
-             v-for="(item, index) in formatedReservations"
-             :key="item.id">
-          <span class="item">{{ item.name }}</span>
-          <span class="item">{{ item.state }}</span>
-          <span class="item">{{ item.tel }}</span>
-          <span class="item">{{ item.date }}</span>
-          <span class="item">{{ item.time }}</span>
-          <span class="remark item">{{ item.remark }}</span>
-          <span class="operate item" v-if="item.state === '已成功'">
-            <span class="operate-set" @click="allow(index, item.state)">核销</span>
-            <span class="operate-set" @click="dismiss(index,item.state)">取消</span>
-          </span>
-          <span class="operate item" v-else-if="item.state === '待审核'">
-            <span class="operate-set" @click="allow(index, item.state)">通过</span>
-            <span class="operate-set" @click='dismiss(index,item.state)'>拒绝</span>
-          </span>
-          <span class="operate item" v-else>---</span>
+        <div class="list-wrapper">
+          <div class="table-item table-head">
+            <span class="item">姓名</span>
+            <span class="item">预约状态</span>
+            <span class="item">联系电话</span>
+            <span class="item">预约时间</span>
+            <span class="item">预约时间段</span>
+            <span class="remark item">备注</span>
+            <span class="operate item">操作</span>
+          </div>
+          <div class="table-item"
+               v-for="(item, index) in formatedReservations"
+               :key="item.id">
+            <span class="item">{{ item.name }}</span>
+            <span class="item">{{ item.state }}</span>
+            <span class="item">{{ item.tel }}</span>
+            <span class="item">{{ item.date }}</span>
+            <span class="item">{{ item.time }}</span>
+            <span class="remark item">{{ item.remark }}</span>
+            <span class="operate item" v-if="item.state === '已成功'">
+              <span class="operate-set" @click="allow(index, item.state)">核销</span>
+              <span class="operate-set" @click="dismiss(index,item.state)">取消</span>
+            </span>
+            <span class="operate item" v-else-if="item.state === '待审核'">
+              <span class="operate-set" @click="allow(index, item.state)">通过</span>
+              <span class="operate-set" @click='dismiss(index,item.state)'>拒绝</span>
+            </span>
+            <span class="operate item" v-else>---</span>
+          </div>
         </div>
         <el-dialog
           :title="modalTitle"
-          :visible.sync="dialogVisible"
+          :visible.sync="processDialogVisible"
           width="500px">
           <el-input
             class="border-bottom"
@@ -77,18 +90,29 @@
             placeholder="请输入处理意见">  
           </el-input>
           <span slot="footer" class="dialog-footer">
-            <el-button @click="dialogVisible = false">取 消</el-button>
+            <el-button @click="processDialogVisible = false">取 消</el-button>
             <el-button type="primary" @click="confirm">确 定</el-button>
           </span>
         </el-dialog>
-      </div>
-      <div class="pagination-wrapper" v-show="reservations.length">
-        <el-pagination
-          @current-change="handleCurrentChange"
-          :page-size="10"
-          layout="prev, pager, next, jumper"
-          :total="totalReservations">
-        </el-pagination>
+        <div class="reservations-list-bottom">
+          <div class="state-count">
+            <span>总计: {{ stateCountObj.total }}</span>
+            <span>待审核: {{ stateCountObj.wait }}</span>
+            <span>已成功: {{ stateCountObj.success }}</span>
+            <span>已核销: {{ stateCountObj.checked }}</span>
+            <span>已拒绝: {{ stateCountObj.refused }}</span>
+            <span>已取消: {{ stateCountObj.cancelled }}</span>
+            <span>已过期: {{ stateCountObj.overtime }}</span>
+          </div>
+          <div class="pagination-wrapper" v-show="reservations.length">
+            <el-pagination
+              @current-change="handleCurrentChange"
+              :page-size="10"
+              layout="prev, pager, next, jumper"
+              :total="totalReservations">
+            </el-pagination>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -122,13 +146,16 @@
         reservations: [],
         totalReservations: 0,
         projectState: '',
+        currentState: '',
         reservationsDate: [],
         reservationsTel: '',
         reservationsState: '',
         reservationsStateOptions: OPTIONS,
-        dialogVisible: false,
+        processDialogVisible: false,
+        stateDialogVisible: false,
         modalTitle: '',
-        operateRemark: ''
+        operateRemark: '',
+        stateCountObj: {}
       }
     },
     computed: {
@@ -143,10 +170,9 @@
       }
     },
     created() {
-      this.$http.get(this.GLOBAL.requestUrls.project + this.$route.params.id + '/reservations',this.getRequestConfig()).then(res => {
-        this.reservations = res.data.reservations;
-        this.totalReservations = res.data.count;
-      })
+      this.getProjectState();
+      this.getReservations();
+      this.getStateCount();
     },
     methods: {
       search() {
@@ -197,6 +223,7 @@
           }
         }).then(res => {
           this.reservations[index].state = STATE_MAP[newState];
+          this.getStateCount();
           this.dialogVisible = false;
         }).catch(err => {
           if(err.response.status === 401) {
@@ -218,6 +245,7 @@
         }).then(res => {
           this.reservations[this.reservationsIndex].state = STATE_MAP[newState];
           this.reservations[this.reservationsIndex].remark = this.operateRemark;
+          this.getStateCount();
           this.dialogVisible = false;
         }).catch(err => {
           if(err.response.status === 401) {
@@ -235,6 +263,67 @@
       },
       handleCurrentChange(pageIndex) {
         this.filter(pageIndex);
+      },
+      changeState(newState) {
+        if(!newState) {
+          this.projectState = true;
+          this.stateDialogVisible = true;
+        } else {
+          this.openProject();
+        }
+      },
+      closeProject() {
+        this.$http.get(this.GLOBAL.requestUrls.project + this.$route.params.id + '/pause', this.getRequestConfig()).then(res => {
+          this.getReservations();
+          this.getStateCount();
+          this.projectState = false;
+          this.stateDialogVisible = false;
+        }).catch(err => {
+          if(err.response.status === 401) {
+           this.delCookie('token');
+           this.$router.push(this.GLOBAL.routers.login);
+          }
+        });
+      },
+      openProject() {
+        this.$http.get(this.GLOBAL.requestUrls.project + this.$route.params.id + '/open', this.getRequestConfig()).then(res => {
+        }).catch(err => {
+          if(err.response.status === 401) {
+           this.delCookie('token');
+           this.$router.push(this.GLOBAL.routers.login);
+          }
+        });
+
+      },
+      getStateCount() {
+        this.$http.get(this.GLOBAL.requestUrls.project + this.$route.params.id + '/reservations/count', this.getRequestConfig()).then(res => {
+          this.stateCountObj = res.data;
+        }).catch(err => {
+          if(err.response.status === 401) {
+           this.delCookie('token');
+           this.$router.push(this.GLOBAL.routers.login);
+          }
+        });
+      },
+      getReservations() {
+        this.$http.get(this.GLOBAL.requestUrls.project + this.$route.params.id + '/reservations',this.getRequestConfig()).then(res => {
+          this.reservations = res.data.reservations;
+          this.totalReservations = res.data.count;
+        }).catch(err => {
+          if(err.response.status === 401) {
+           this.delCookie('token');
+           this.$router.push(this.GLOBAL.routers.login);
+          }
+        });
+      },
+      getProjectState() {
+        this.$http.get(this.GLOBAL.requestUrls.project + this.$route.params.id, this.getRequestConfig()).then(res => {
+          if(res.data.state === 'open') {
+            this.projectState = true;
+          } else {
+            this.projectState = false;
+          }
+        })
       }
     }
   }

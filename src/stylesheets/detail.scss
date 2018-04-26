@@ -1,8 +1,9 @@
 .detail-com-container {
   margin: 0 10%;
   .return-to-prev {
-    border: 1px solid #f1f1f1;
-    padding: 5px;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    border: 1px solid #ebeef5;
+    padding: 10px;
     border-radius: 4px;
     .project-state {
       margin-left: 10px;
@@ -19,9 +20,6 @@
       padding: 10px 5px;
       border-bottom: 1px solid #f1f1f1;
 
-      .date-picker {
-        width: 300px;
-      }
       .reservations-tel {
         margin-left: 20px;
 
@@ -41,28 +39,29 @@
       }
     }
     .reservations-list-body {
+      .list-wrapper {
         min-height: 385px;
-
-      .table-head {
-        margin-top: 10px;
-        background-color: rgba(242, 242, 242, 1);
-      }
-      .table-item {
-        display: flex;
-        .item {
-          flex: 1;
-          text-align: center;
-          padding: 5px;
-          line-height: 25px;
+        .table-head {
+          margin-top: 10px;
+          background-color: rgba(242, 242, 242, 1);
         }
-        .remark {
-          flex-grow: 3;
-        }
-        .operate {
-          flex-grow: 2;
-          .operate-set {
-            color: $primary;
-            cursor: pointer;
+        .table-item {
+          display: flex;
+          .item {
+            flex: 1;
+            text-align: center;
+            padding: 5px;
+            line-height: 25px;
+          }
+          .remark {
+            flex-grow: 3;
+          }
+          .operate {
+            flex-grow: 2;
+            .operate-set {
+              color: $primary;
+              cursor: pointer;
+            }
           }
         }
       }
@@ -72,6 +71,19 @@
           border-left: none;
           border-right: none;
           border-radius: 0;
+        }
+      }
+      .reservations-list-bottom {
+        display: flex;
+        align-items: center;
+        height: 40px;
+        justify-content: space-between;
+        margin: 10px 15px;
+
+        .state-count {
+          span {
+            margin-right: 5px;
+          }
         }
       }
     }
