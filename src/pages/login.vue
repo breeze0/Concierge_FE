@@ -44,9 +44,10 @@
 </template>
 
 <script>
-  const BUTTON_TEXT = {
+  const TEXT = {
     'default': '获取短信验证码',
-    'counting': '秒后重新获取'
+    'counting': '秒后重新获取',
+    'forbidden': '您输入的手机不是管理员，请到小程序进行注册。'
   }
   export default {
     data () {
@@ -62,9 +63,9 @@
     computed: {
       codeButtonText() {
         if(this.counting) {
-          return `${this.countdownRange}${BUTTON_TEXT.counting}`
+          return `${this.countdownRange}${TEXT.counting}`
         } else {
-          return `${BUTTON_TEXT.default}`
+          return `${TEXT.default}`
         }
       }
     },
@@ -104,13 +105,17 @@
       getCode() {
         this.telError = !this.validate();
         if (this.telError) return;
-        this.countdown();
         var data = {
           tel: this.tel
         }
-        this.$http.post(this.GLOBAL.requestUrls.code, data).catch(error=>{
+        this.$http.post(this.GLOBAL.requestUrls.code, data).then(res => {
+          this.countdown();
+        }).catch(error=>{
           if(error.response.status === 422) {
             this.telError = true;
+          }
+          if(error.response.status === 403) {
+            this.$message.error(TEXT.forbidden);
           }
         })
       },
