@@ -79,7 +79,7 @@
             this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
             setTimeout(()=>{
               loading.close();
-            }, 200)
+            }, 300)
           }).catch(err => {
             if(err.response.status === 401) {
               this.delCookie('token');

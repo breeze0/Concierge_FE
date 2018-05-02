@@ -75,7 +75,7 @@
             </span>
             <span class="operate item" v-else-if="item.state === '待审核'">
               <span class="operate-set" @click="allow(index, item.state)">通过</span>
-              <span class="operate-set" @click='dismiss(index,item.state)'>拒绝</span>
+              <span class="operate-set" @click='dismiss(index,item.state)'>取消</span>
             </span>
             <span class="operate item" v-else>---</span>
           </div>
@@ -83,12 +83,16 @@
         <el-dialog
           :title="modalTitle"
           :visible.sync="processDialogVisible"
-          width="500px">
+          width="500px"
+          ref='modalRef'>
           <el-input
             class="border-bottom"
             v-model="operateRemark"
-            placeholder="请输入处理意见">  
+            placeholder="请输入处理意见"
+            v-if="modalTitle === '取消预约'">
           </el-input>
+          <span v-else-if="modalTitle === '核销预约'">是否核销该预约?</span>
+          <span v-else>是否通过该预约?</span>
           <span slot="footer" class="dialog-footer">
             <el-button @click="processDialogVisible = false">取 消</el-button>
             <el-button type="primary" @click="confirm">确 定</el-button>
@@ -119,34 +123,41 @@
 </template>
 
 <script>
-  const OPTIONS = [
-    {value: '', label: '全部'},
-    {value: 'wait', label: '待审核'},
-    {value: 'success', label: '已成功'},
-    {value: 'refused', label: '已拒绝'},
-    {value: 'cancelled', label: '已取消'},
-    {value: 'checked', label: '已核销'},
-    {value: 'overtime', label: '已过期'}
-  ];
   const STATE_MAP = {
     success: '已成功',
     wait: '待审核',
-    refused: '已拒绝',
     cancelled: '已取消',
     checked: '已核销',
     overtime: '已过期'
   };
-  const MODAL_TITLE = {
-    '已成功': '取消预约',
-    '待审核': '拒绝预约'
+  const OPTIONS = [
+    {value: '', label: '全部'},
+    {value: 'wait', label: STATE_MAP['wait']},
+    {value: 'success', label: STATE_MAP['success']},
+    {value: 'cancelled', label: STATE_MAP['cancelled']},
+    {value: 'checked', label: STATE_MAP['checked']},
+    {value: 'overtime', label: STATE_MAP['overtime']}
+  ];
+  const STRING_MAP = {
+    cancel: '取消预约',
+    check: '核销预约',
+    pass: '通过预约',
+    loading: '拼命加载中'
+  }
+  const DISMISS_MODAL_TITLE = {
+    '已成功': STRING_MAP['cancel'],
+    '待审核': STRING_MAP['cancel']
   };
+  const ALLOW_MODAL_TITLE = {
+    '已成功': STRING_MAP['check'],
+    '待审核': STRING_MAP['pass']
+  }
   export default {
     data() {
       return  {
         reservations: [],
         totalReservations: 0,
         projectState: '',
-        currentState: '',
         reservationsDate: [],
         reservationsTel: '',
         reservationsState: '',
@@ -170,7 +181,13 @@
       }
     },
     created() {
-      this.getProjectState();
+      const loading = this.$loading({
+        text: STRING_MAP.loading,
+        spinner: 'el-icon-loading',
+        background: '#f1f1f1',
+        customClass: 'loading-style'
+      });
+      this.getProjectState(loading);
       this.getReservations();
       this.getStateCount();
     },
@@ -204,27 +221,25 @@
       },
       dismiss(index, state) {
         this.reservationsIndex = index;
-        this.modalTitle = MODAL_TITLE[state];
-        this.dialogVisible = true;
+        this.modalTitle = DISMISS_MODAL_TITLE[state];
+        this.processDialogVisible = true;
       },
       allow(index, state) {
-        if(state === STATE_MAP['success']) {
-          this.handleAllow(index, '/check', 'checked');
-        } else if(state === STATE_MAP['wait']) {
-          this.handleAllow(index, '/pass', 'success')
-        }
+        this.reservationsIndex = index;
+        this.modalTitle = ALLOW_MODAL_TITLE[state];
+        this.processDialogVisible = true;
       },
-      handleAllow(index, urlParam, newState) {
+      handleAllow(urlParam, newState) {
         this.$http({
           method: 'post',
-          url: this.GLOBAL.requestUrls.project + this.$route.params.id + '/reservations/' + this.reservations[index].id + urlParam,
+          url: this.GLOBAL.requestUrls.project + this.$route.params.id + '/reservations/' + this.reservations[this.reservationsIndex].id + urlParam,
           headers: {
             'Authorization': this.getCookie('token')
           }
         }).then(res => {
-          this.reservations[index].state = STATE_MAP[newState];
+          this.reservations[this.reservationsIndex].state = STATE_MAP[newState];
           this.getStateCount();
-          this.dialogVisible = false;
+          this.processDialogVisible = false;
         }).catch(err => {
           if(err.response.status === 401) {
            this.delCookie('token');
@@ -246,7 +261,7 @@
           this.reservations[this.reservationsIndex].state = STATE_MAP[newState];
           this.reservations[this.reservationsIndex].remark = this.operateRemark;
           this.getStateCount();
-          this.dialogVisible = false;
+          this.processDialogVisible = false;
         }).catch(err => {
           if(err.response.status === 401) {
            this.delCookie('token');
@@ -255,10 +270,12 @@
         })
       },
       confirm() {
-        if(this.modalTitle === '取消预约') {
+        if(this.modalTitle === STRING_MAP['cancel']) {
           this.handleDismiss('/cancel', 'cancelled');
-        } else if(this.modalTitle === '拒绝预约') {
-          this.handleDismiss('/refuse', 'refused');
+        } else if(this.modalTitle === STRING_MAP['check']) {
+          this.handleAllow('/check', 'checked');
+        } else if(this.modalTitle === STRING_MAP['pass']) {
+          this.handleAllow('/pass', 'success')
         }
       },
       handleCurrentChange(pageIndex) {
@@ -316,13 +333,14 @@
           }
         });
       },
-      getProjectState() {
+      getProjectState(loading) {
         this.$http.get(this.GLOBAL.requestUrls.project + this.$route.params.id, this.getRequestConfig()).then(res => {
           if(res.data.state === 'open') {
             this.projectState = true;
           } else {
             this.projectState = false;
           }
+          loading.close()
         })
       }
     }
