@@ -111,44 +111,43 @@
           var lng = e.lnglat.getLng();
           var lat = e.lnglat.getLat();
           this.map.remove(this.markers);
-          this.currentLatitude = lat;
-          this.currentLongitude = lng;
-          var marker = new AMap.Marker({
-            position: [lng, lat]
-          });
-          marker.setMap(this.map);
-          this.map.setZoom(14);
-          this.map.setCenter([lng, lat]);
-          this.markers.push(marker);
-          this.geocoder.getAddress([lng, lat], (status, result)=> {
-            if(status === 'complete' && result.info === 'OK') {
-              this.currentAddress = result.regeocode.formattedAddress;
-              this.infoWindow.setContent("<div>"+ result.regeocode.formattedAddress + "</div");
-              this.infoWindow.open(this.map, [lng, lat]);
-              marker.on('click', ()=> {
-                this.infoWindow.open(this.map, [lng, lat]);
-                this.currentLatitude = lat;
-                this.currentLongitude = lng;
-              })
-            }
-          });
+          this.updatePosition(lng, lat);
+          this.setMarker(lng, lat);
           this.placeSearch.clear();
         });
         this.placeSearch.on('listElementClick', (event)=> {
-          var args = {
-            latitude: event.data.location.lat,
-            longitude: event.data.location.lng,
-            address: event.data.cityname + event.data.adname + event.data.address
-          }
-          this.updateValue(args);
+          this.updateValue(this.getPositionInfo(event));
         });
         this.placeSearch.on('markerClick', (event)=> {
-          var args = {
-            latitude: event.data.location.lat,
-            longitude: event.data.location.lng,
-            address: event.data.cityname + event.data.adname + event.data.address
+          this.updateValue(this.getPositionInfo(event));
+        });
+      },
+      getPositionInfo(event) {
+        var args = {
+          latitude: event.data.location.lat,
+          longitude: event.data.location.lng,
+          address: event.data.cityname + event.data.adname + event.data.address
+        }
+        return args;
+      },
+      setMarker(lng, lat) {
+        var marker = new AMap.Marker({
+          position: [lng, lat]
+        });
+        marker.setMap(this.map);
+        this.map.setZoom(14);
+        this.map.setCenter([lng, lat]);
+        this.markers.push(marker);
+        this.geocoder.getAddress([lng, lat], (status, result)=> {
+          if(status === 'complete' && result.info === 'OK') {
+            this.currentAddress = result.regeocode.formattedAddress;
+            this.infoWindow.setContent("<div>"+ result.regeocode.formattedAddress + "</div");
+            this.infoWindow.open(this.map, [lng, lat]);
+            marker.on('click', ()=> {
+              this.infoWindow.open(this.map, [lng, lat]);
+              this.updatePosition(lng, lat);
+            })
           }
-          this.updateValue(args);
         });
       },
       search() {
@@ -166,6 +165,10 @@
         this.currentAddress = args.address;
         this.currentLatitude = args.latitude;
         this.currentLongitude = args.longitude;
+      },
+      updatePosition(lng, lat) {
+        this.currentLatitude = lat;
+        this.currentLongitude = lng;
       },
       getData() {
         var args = {
