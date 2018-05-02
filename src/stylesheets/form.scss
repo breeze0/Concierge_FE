@@ -159,13 +159,20 @@
           align-items: center;
           .fields{
             margin-bottom: 30px;
+            display: flex;
+            align-items: center;
             .text {
               margin-right: 20px;
               display: inline-block;
               width: 60px;
             }
-            .time-input {
-              width: 360px;
+            .el-date-editor {
+              width: 150px;
+            }
+            .middle-text {
+              width: 60px;
+              text-align: center;
+              line-height: 40px;
             }
             .el-select{
               width: 360px;
@@ -182,4 +189,7 @@
     text-align: right;
     margin-right: 20px;
   }
+}
+.el-time-panel {
+  width: 150px;
 }

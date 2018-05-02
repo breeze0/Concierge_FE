@@ -30,15 +30,17 @@
           <div class="fields">
             <span class="text">时间段: </span>
             <el-time-picker
-              is-range
-              v-model="timeValue"
-              range-separator="至"
-              start-placeholder="开始时间"
-              end-placeholder="结束时间"
-              placeholder="选择时间范围"
-              format="HH:mm"
+              v-model='startTime'
+              placeholder="开始时间"
               value-format="HH:mm"
-              class="time-input">
+              format="HH:mm">
+            </el-time-picker>
+            <span class="middle-text">至</span>
+            <el-time-picker
+              v-model='endTime'
+              placeholder="结束时间"
+              value-format="HH:mm"
+              format="HH:mm">
             </el-time-picker>
           </div>
           <div class="fields">
@@ -76,6 +78,11 @@
     'Sat': '周六',
     'Sun': '周日',
     'Holiday': '法定节假日'
+  }
+  const ERROR_TIP = {
+    empty: '请填写时间段和重复日期',
+    repeat: '已存在相同时间段',
+    invalid: '请输入正确的时间段'
   }
   export default {
     props: {
@@ -128,9 +135,10 @@
         currentTimeState: this.timeState,
         settingDialogVisible: false,
         isShowNormal: true,
-        timeValue: '',
         weekdayValue: ['Mon', 'Tues', 'Wed', 'Thur', 'Fri'],
         limitValue: '',
+        startTime: '',
+        endTime: '',
         editStatus: false,
         editIndex: null
       }
@@ -149,14 +157,15 @@
     methods: {
       newItem() {
         this.settingDialogVisible = true;
-        this.timeValue = '';
+        this.startTime = '',
+        this.endTime = '',
         this.weekdayValue = ['Mon', 'Tues', 'Wed', 'Thur', 'Fri'];
         this.limitValue = ' ';
       },
       validateEmpty() {
         this.error = {};
-        if(!(this.timeValue.length && this.weekdayValue.length)) {
-          this.error.empty_tip = '请填写时间段和重复日期';
+        if(!(this.startTime && this.endTime && this.weekdayValue.length)) {
+          this.error.empty_tip = ERROR_TIP.empty;
         }
         return Object.keys(this.error).length == 0
       },
@@ -164,7 +173,7 @@
         this.error = {};
         this.currentTimeState.normal.forEach(item => {
           if(item.time == time) {
-            this.error.new_repeat_tip = '已存在相同时间段';
+            this.error.repeat_tip = ERROR_TIP.repeat;
           }
         });
         return Object.keys(this.error).length == 0
@@ -173,15 +182,22 @@
         this.error = {};
         this.currentTimeState.normal.forEach((item, index) => {
           if(index !== this.editIndex && item.time === time) {
-            this.error.edit_repeat_tip = '已存在相同时间段';
+            this.error.repeat_tip = ERROR_TIP.repeat;
           }
         });
+        return Object.keys(this.error).length == 0
+      },
+      validateTime(start, end) {
+        this.error = {};
+        if(start >= end) {
+          this.error.invalid_tip = ERROR_TIP.invalid;
+        };
         return Object.keys(this.error).length == 0
       },
       compeleteSetting() {
         var new_item = {};
         var limit;
-        var time = this.timeValue[0] + '-' + this.timeValue[1];
+        var time = this.startTime + '-' + this.endTime;
         var weekday = this.weekdayValue;
         if(this.limitValue === ' ' || this.limitValue === '') {
           limit = null
@@ -190,20 +206,25 @@
         }
         if(this.validateEmpty()) {
           new_item = {"time": time, "limit": limit, "weekday": weekday};
-          if(!this.editStatus) {
-            if(this.validateNewTime(time)) {
-              this.currentTimeState.normal.push(new_item);
-              this.settingDialogVisible = false;
+          if(this.validateTime(this.startTime, this.endTime)) {
+            if(!this.editStatus) {
+              if(this.validateNewTime(time)) {
+                this.currentTimeState.normal.push(new_item);
+                this.settingDialogVisible = false;
+              } else {
+                this.$message.error(this.error.repeat_tip);
+              }
             } else {
-              this.$message.error(this.error.new_repeat_tip);
+              if(this.validateEditTime(time)) {
+                this.currentTimeState.normal.splice(this.editIndex,1,new_item);
+                this.settingDialogVisible = false;
+              } else {
+                this.$message.error(this.error.repeat_tip);
+              }
             }
           } else {
-            if(this.validateEditTime(time)) {
-              this.currentTimeState.normal.splice(this.editIndex,1,new_item);
-              this.settingDialogVisible = false;
-            } else {
-              this.$message.error(this.error.edit_repeat_tip);
-            }
+            this.settingDialogVisible = true;
+            this.$message.error(this.error.invalid_tip);
           }
         } else {
           this.settingDialogVisible = true;
@@ -216,7 +237,8 @@
       editItem(index) {
         this.settingDialogVisible = true;
         var item = this.currentTimeState.normal[index];
-        this.timeValue = item.time.split('-');
+        this.startTime = item.time.split('-')[0];
+        this.endTime = item.time.split('-')[1];
         this.weekdayValue = item.weekday;
         this.limitValue = item.limit === null?' ':item.limit;
         this.editStatus = true;
