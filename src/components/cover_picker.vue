@@ -81,10 +81,7 @@
               loading.close();
             }, 300)
           }).catch(err => {
-            if(err.response.status === 401) {
-              this.delCookie('token');
-              this.$router.push(this.GLOBAL.routers.login);
-            }
+            this.handleHttpError(err);
           })
         })
         this.coverModalVisible = false;

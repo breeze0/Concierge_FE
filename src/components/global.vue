@@ -16,10 +16,14 @@
     'covers': server + '/covers',
     'image': server + '/image'
   }
+  const httpStateInfo = {
+    'invalid_token': 'Invalid Token'
+  }
   export default {
     server,
     expire,
     routers,
-    requestUrls
+    requestUrls,
+    httpStateInfo
   }
 </script>

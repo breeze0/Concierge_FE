@@ -4,7 +4,8 @@
       <span class="address-text">详细地址: </span>
       <el-input class="address-input"
                 v-model="currentAddress"
-                @focus="handleFocus">
+                @focus="handleFocus"
+                @keyup.native.enter="search">
         <el-button slot="append"
                    icon="el-icon-search"
                    @click="search"></el-button>

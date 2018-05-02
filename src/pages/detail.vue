@@ -213,10 +213,7 @@
           this.reservations = res.data.reservations;
           this.totalReservations = res.data.count;
         }).catch(err => {
-          if(err.response.status === 401) {
-           this.delCookie('token');
-           this.$router.push(this.GLOBAL.routers.login);
-          }
+          this.handleHttpError(err);
         })
       },
       dismiss(index, state) {
@@ -241,10 +238,7 @@
           this.getStateCount();
           this.processDialogVisible = false;
         }).catch(err => {
-          if(err.response.status === 401) {
-           this.delCookie('token');
-           this.$router.push(this.GLOBAL.routers.login);
-          }
+          this.handleHttpError(err);
         })
       },
       handleDismiss(urlParam, newState) {
@@ -263,10 +257,7 @@
           this.getStateCount();
           this.processDialogVisible = false;
         }).catch(err => {
-          if(err.response.status === 401) {
-           this.delCookie('token');
-           this.$router.push(this.GLOBAL.routers.login);
-          }
+          this.handleHttpError(err);
         })
       },
       confirm() {
@@ -296,19 +287,13 @@
           this.projectState = false;
           this.stateDialogVisible = false;
         }).catch(err => {
-          if(err.response.status === 401) {
-           this.delCookie('token');
-           this.$router.push(this.GLOBAL.routers.login);
-          }
+          this.handleHttpError(err);
         });
       },
       openProject() {
         this.$http.get(this.GLOBAL.requestUrls.project + this.$route.params.id + '/open', this.getRequestConfig()).then(res => {
         }).catch(err => {
-          if(err.response.status === 401) {
-           this.delCookie('token');
-           this.$router.push(this.GLOBAL.routers.login);
-          }
+          this.handleHttpError(err);
         });
 
       },
@@ -316,10 +301,7 @@
         this.$http.get(this.GLOBAL.requestUrls.project + this.$route.params.id + '/reservations/count', this.getRequestConfig()).then(res => {
           this.stateCountObj = res.data;
         }).catch(err => {
-          if(err.response.status === 401) {
-           this.delCookie('token');
-           this.$router.push(this.GLOBAL.routers.login);
-          }
+          this.handleHttpError(err);
         });
       },
       getReservations() {
@@ -327,10 +309,7 @@
           this.reservations = res.data.reservations;
           this.totalReservations = res.data.count;
         }).catch(err => {
-          if(err.response.status === 401) {
-           this.delCookie('token');
-           this.$router.push(this.GLOBAL.routers.login);
-          }
+          this.handleHttpError(err);
         });
       },
       getProjectState(loading) {
@@ -340,7 +319,10 @@
           } else {
             this.projectState = false;
           }
-          loading.close()
+          loading.close();
+        }).catch(err => {
+          loading.close();
+          this.handleHttpError(err);
         })
       }
     }

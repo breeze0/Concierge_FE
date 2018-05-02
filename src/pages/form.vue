@@ -100,10 +100,8 @@
           this.updateProps(this.form);
           loading.close();
         }).catch(err => {
-          if(err.response.status === 401) {
-            this.delCookie('token');
-            this.$router.push(this.GLOBAL.routers.login);
-          }
+          loading.close();
+          this.handleHttpError(err);
         })
       }
     },
@@ -144,21 +142,17 @@
             this.$http.put(this.GLOBAL.requestUrls.project + this.$route.params.id, formData, this.getRequestConfig()).then((res)=> {
               this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
               this.$router.push(this.GLOBAL.routers.projects);
+              this.$message.success('修改' + this.form.name + '预约项目成功')
             }).catch(err => {
-              if(err.response.status === 401) {
-                this.delCookie('token');
-                this.$router.push(this.GLOBAL.routers.login);
-              }
+              this.handleHttpError(err);
             })
           } else {
             this.$http.post(this.GLOBAL.requestUrls.projects, formData, this.getRequestConfig()).then((res)=> {
               this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
               this.$router.push(this.GLOBAL.routers.projects);
+              this.$message.success('添加' + this.form.name + '预约项目成功')
             }).catch(err => {
-              if(err.response.status === 401) {
-                this.delCookie('token');
-                this.$router.push(this.GLOBAL.routers.login);
-              }
+              this.handleHttpError(err);
             })
           }
         } else {
