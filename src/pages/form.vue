@@ -118,7 +118,7 @@
       getComponentsData() {
         this.form.image = this.$refs.coverPickerRef.getData();
         this.form.time_state = this.$refs.timeSetterRef.getData();
-        address_data = this.$refs.addressPickerRef.getData();
+        var address_data = this.$refs.addressPickerRef.getData();
         this.form.address = address_data.address;
         this.form.latitude = address_data.latitude;
         this.form.longitude = address_data.longitude;
@@ -126,14 +126,11 @@
       getFormData() {
         this.getComponentsData();
         var formData = new FormData();
-        formData.append('name',this.form.name);
-        formData.append('description', this.form.description);
-        formData.append('address', this.form.address);
-        formData.append('latitude', this.form.latitude);
-        formData.append('longitude', this.form.longitude);
-        formData.append('time_state', JSON.stringify(this.form.time_state));
-        formData.append('check_mode', this.form.check_mode);
-        formData.append('image', this.form.image);
+        var form_array = ['name', 'description', 'address', 'latitude', 'longitude', 'check_mode', 'image'];
+        form_array.forEach(item => {
+          formData.append(item, this.form[item]);
+        })
+        formData.append('time_state', JSON.stringify(this.form.time_state))
         return formData;
       },
       submitForm() {
