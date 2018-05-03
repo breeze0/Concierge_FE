@@ -3,7 +3,7 @@
     <div class="return-to-prev">
       <router-link to="/admin/projects"><i class="el-icon-back"></i></router-link>
       <span v-if="this.$route.params.id">修改预约项目</span>
-      <span v-else>创建新的预约项目</span>
+      <span v-else>创建预约项目</span>
     </div>
     <div class="form-wrapper">
       <el-form ref="form" :model="form">
@@ -36,6 +36,11 @@
             <span class="check-text">审核模式: </span>
             <el-radio v-model="form.check_mode" label="auto">自动审核</el-radio>
             <el-radio v-model="form.check_mode" label="manual">人工审核</el-radio>
+          </div>
+        </el-form-item>
+        <el-form-item>
+          <div class="form-time-period-select">
+            <span class="select-text">预约时间设置:</span>
           </div>
         </el-form-item>
         <el-form-item>

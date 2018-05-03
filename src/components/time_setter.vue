@@ -1,24 +1,27 @@
 <template>
   <div class="form-settime-wrapper">
-    <div class="form-item-desc">预约时间设置</div>
     <el-radio-group v-model="isShowNormal" class="setting-pattern">
       <el-radio-button :label="true">常规设置</el-radio-button>
       <el-radio-button :label="false">特殊设置</el-radio-button>
     </el-radio-group>
     <div class="normal-setting-wrapper" v-show="isShowNormal">
-      <div class="normal-setting-item"
-           v-for="(item, index) in formatedTimeState">
-        <span>{{ item.time }}</span>
-        <div @click="editItem(index)" class="weekday-container">
-          <span v-for="day in item.weekday" class="weekday">{{ day }}</span>
+      <div class="normal-setting-item-wrapper">
+        <div class="normal-setting-item"
+             v-for="(item, index) in formatedTimeState">
+          <span class="item-left">{{ item.time }}</span>
+          <div class="item-right">
+            <div @click="editItem(index)" class="weekday-container">
+              <span v-for="day in item.weekday" class="weekday">{{ day }}</span>
+            </div>
+            <span class="number" v-if="item.limit === null">名额不限制</span>
+            <span v-else class="number">名额{{ item.limit }}人</span>
+          </div>
+          <span class="operate-btn">
+            <i class="el-icon-circle-plus-outline" @click="newItem"></i>
+            <i class="el-icon-remove-outline" v-show="formatedTimeState.length > 1"
+            @click="deleteItem(index)"></i>
+          </span>
         </div>
-        <span  v-if="item.limit === null">名额不限制</span>
-        <span v-else class="number">名额{{ item.limit }}人</span>
-        <span class="operate-btn">
-          <i class="el-icon-circle-plus-outline" @click="newItem"></i>
-          <i class="el-icon-remove-outline" v-show="formatedTimeState.length > 1"
-          @click="deleteItem(index)"></i>
-        </span>
       </div>
       <el-dialog
         title="预约时间设置"

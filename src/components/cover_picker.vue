@@ -2,7 +2,7 @@
   <div class="img-wrapper">
     <formated-image :originUrl="currentImage" :className="classNames.form_cover"></formated-image>
     <div class="change-cover-btn">
-      <el-button type="primary" size="small" @click="coverModalVisible = true">更换封面</el-button>
+      <el-button type="primary" class="change-cover" @click="coverModalVisible = true">更换封面</el-button>
       <el-dialog title="更换封面"
                  :visible.sync="coverModalVisible"
                  width="800px"

@@ -6,8 +6,8 @@
       <span class="project-state">开启预约</span>
       <el-switch
         v-model="projectState"
-        active-color="#13ce66"
-        inactive-color="#ff4949"
+        active-color="#409EFF"
+        inactive-color="#909997"
         @change="changeState">
       </el-switch>
       <el-dialog
