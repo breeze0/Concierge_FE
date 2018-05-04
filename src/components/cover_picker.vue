@@ -1,6 +1,8 @@
 <template>
   <div class="img-wrapper">
-    <formated-image :originUrl="currentImage" :className="classNames.form_cover"></formated-image>
+    <formated-image :originUrl="currentImage"
+                    :className="classNames.form_cover"
+                    :imageWrapper="classNames.cover_wrapper"></formated-image>
     <div class="change-cover-btn">
       <el-button type="primary" class="change-cover" @click="coverModalVisible = true">更换封面</el-button>
       <el-dialog title="更换封面"
@@ -22,7 +24,10 @@
           <div class="imgs-item"
                v-for="(item,index) in defaultImageList"
                @click="changeCover(index)">
-            <formated-image :originUrl="item" :className="classNames.default_cover"></formated-image>
+            <formated-image :originUrl="item"
+                            :className="classNames.default_cover"
+                            :imageWrapper="classNames.image_wrapper">
+            </formated-image>
           </div>
         </div>
       </el-dialog>
@@ -49,7 +54,9 @@
         defaultImageList: [],
         classNames: {
           form_cover: 'form-cover',
-          default_cover: 'img'
+          default_cover: 'img',
+          image_wrapper: 'item-img-wrapper',
+          cover_wrapper: 'cover-wrapper'
         }
       }
     },

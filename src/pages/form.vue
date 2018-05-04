@@ -1,11 +1,11 @@
 <template>
   <div class="form-com-container">
-    <div class="return-to-prev">
-      <router-link to="/admin/projects"><i class="el-icon-back"></i></router-link>
-      <span v-if="this.$route.params.id">修改预约项目</span>
-      <span v-else>创建预约项目</span>
-    </div>
     <div class="form-wrapper">
+      <div class="return-to-prev">
+        <router-link to="/admin/projects"><i class="el-icon-back"></i></router-link>
+        <span v-if="this.$route.params.id">修改预约项目</span>
+        <span v-else>创建预约项目</span>
+      </div>
       <el-form ref="form" :model="form">
         <el-form-item>
           <cover-picker :image="form.image" ref="coverPickerRef"></cover-picker>

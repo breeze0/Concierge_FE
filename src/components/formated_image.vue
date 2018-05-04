@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :class="imgWrapperClass">
     <img :src="fomatedUrl" :class="imgClass">
   </div>
 </template>
@@ -14,11 +14,16 @@
       className: {
         type: String,
         default: ''
+      },
+      imageWrapper: {
+        type: String,
+        default: ''
       }
     },
     data() {
       return {
-        imgClass: this.className
+        imgClass: this.className,
+        imgWrapperClass: this.imageWrapper
       }
     },
     computed: {
