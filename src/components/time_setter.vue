@@ -140,8 +140,8 @@
     methods: {
       newItem() {
         this.settingDialogVisible = true;
-        this.startTime = '',
-        this.endTime = '',
+        this.startTime = '09:00',
+        this.endTime = '10:00',
         this.weekdayValue = ['Mon', 'Tues', 'Wed', 'Thur', 'Fri'];
         this.limitValue = ' ';
       },

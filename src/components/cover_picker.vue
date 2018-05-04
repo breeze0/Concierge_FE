@@ -2,7 +2,8 @@
   <div class="img-wrapper">
     <formated-image :originUrl="currentImage"
                     :className="classNames.form_cover"
-                    :imageWrapper="classNames.cover_wrapper"></formated-image>
+                    :imageWrapper="classNames.cover_wrapper"
+                    @onLoad="handleImageOnload"></formated-image>
     <div class="change-cover-btn">
       <el-button type="primary" class="change-cover" @click="coverModalVisible = true">更换封面</el-button>
       <el-dialog title="更换封面"
@@ -73,8 +74,11 @@
           }
         })
       },
+      handleImageOnload(loading) {
+        if(this.loading) this.loading.close();
+      },
       handleUpload() {
-        const loading = this.$loading({
+        this.loading = this.$loading({
           target: ".img-wrapper",
           background: "#f1f1f1"
         });
@@ -84,9 +88,6 @@
           this.$http.post(this.GLOBAL.requestUrls.image, formData, this.getRequestConfig()).then(res=> {
             this.currentImage = res.data.image;
             this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
-            setTimeout(()=>{
-              loading.close();
-            }, 300)
           }).catch(err => {
             this.handleHttpError(err);
           })
