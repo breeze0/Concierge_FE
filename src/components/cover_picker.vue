@@ -8,7 +8,7 @@
       <el-button type="primary" class="change-cover" @click="coverModalVisible = true">更换封面</el-button>
       <el-dialog title="更换封面"
                  :visible.sync="coverModalVisible"
-                 width="800px"
+                 width="858px"
                  center>
         <div class="imgs-list">
           <div class="upload imgs-item">

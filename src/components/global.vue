@@ -1,5 +1,5 @@
 <script>
-  const server = 'http://www.axuzz.cn';
+  const server = 'http://192.168.31.208';
   const expire = 1000 * 60 * 60 * 36;
   const routers = {
     'login': '/login',
