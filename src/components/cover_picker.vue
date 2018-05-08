@@ -1,11 +1,14 @@
 <template>
   <div class="img-wrapper">
-    <formated-image :originUrl="currentImage" :className="classNames.form_cover"></formated-image>
+    <formated-image :originUrl="currentImage"
+                    :className="classNames.form_cover"
+                    :imageWrapper="classNames.cover_wrapper"
+                    @onLoad="handleImageOnload"></formated-image>
     <div class="change-cover-btn">
-      <el-button type="primary" size="small" @click="coverModalVisible = true">更换封面</el-button>
+      <el-button type="primary" class="change-cover" @click="coverModalVisible = true">更换封面</el-button>
       <el-dialog title="更换封面"
                  :visible.sync="coverModalVisible"
-                 width="800px"
+                 width="858px"
                  center>
         <div class="imgs-list">
           <div class="upload imgs-item">
@@ -22,7 +25,10 @@
           <div class="imgs-item"
                v-for="(item,index) in defaultImageList"
                @click="changeCover(index)">
-            <formated-image :originUrl="item" :className="classNames.default_cover"></formated-image>
+            <formated-image :originUrl="item"
+                            :className="classNames.default_cover"
+                            :imageWrapper="classNames.image_wrapper">
+            </formated-image>
           </div>
         </div>
       </el-dialog>
@@ -49,7 +55,9 @@
         defaultImageList: [],
         classNames: {
           form_cover: 'form-cover',
-          default_cover: 'img'
+          default_cover: 'img',
+          image_wrapper: 'item-img-wrapper',
+          cover_wrapper: 'cover-wrapper'
         }
       }
     },
@@ -66,8 +74,11 @@
           }
         })
       },
+      handleImageOnload(loading) {
+        if(this.loading) this.loading.close();
+      },
       handleUpload() {
-        const loading = this.$loading({
+        this.loading = this.$loading({
           target: ".img-wrapper",
           background: "#f1f1f1"
         });
@@ -77,14 +88,8 @@
           this.$http.post(this.GLOBAL.requestUrls.image, formData, this.getRequestConfig()).then(res=> {
             this.currentImage = res.data.image;
             this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
-            setTimeout(()=>{
-              loading.close();
-            }, 200)
           }).catch(err => {
-            if(err.response.status === 401) {
-              this.delCookie('token');
-              this.$router.push(this.GLOBAL.routers.login);
-            }
+            this.handleHttpError(err);
           })
         })
         this.coverModalVisible = false;

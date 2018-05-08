@@ -1,11 +1,11 @@
 <template>
   <div class="form-com-container">
-    <div class="return_to_prev">
-      <router-link to="/admin/projects"><i class="el-icon-back"></i></router-link>
-      <span v-if="this.$route.params.id">修改预约项目</span>
-      <span v-else>创建新的预约项目</span>
-    </div>
     <div class="form-wrapper">
+      <div class="return-to-prev">
+        <router-link to="/admin/projects"><i class="el-icon-back"></i></router-link>
+        <span v-if="this.$route.params.id">修改预约项目</span>
+        <span v-else>创建预约项目</span>
+      </div>
       <el-form ref="form" :model="form">
         <el-form-item>
           <cover-picker :image="form.image" ref="coverPickerRef"></cover-picker>
@@ -36,6 +36,11 @@
             <span class="check-text">审核模式: </span>
             <el-radio v-model="form.check_mode" label="auto">自动审核</el-radio>
             <el-radio v-model="form.check_mode" label="manual">人工审核</el-radio>
+          </div>
+        </el-form-item>
+        <el-form-item>
+          <div class="form-time-period-select">
+            <span class="select-text">预约时间设置:</span>
           </div>
         </el-form-item>
         <el-form-item>
@@ -92,18 +97,15 @@
         const loading = this.$loading({
           text: TIP.loading,
           spinner: 'el-icon-loading',
-          background: '#f1f1f1',
           customClass: 'loading-style'
         });
-        this.$http.get(this.GLOBAL.requestUrls.projects_id + this.$route.params.id, this.getRequestConfig()).then(res => {
+        this.$http.get(this.GLOBAL.requestUrls.project + this.$route.params.id, this.getRequestConfig()).then(res => {
           this.form = res.data;
           this.updateProps(this.form);
           loading.close();
         }).catch(err => {
-          if(err.response.status === 401) {
-            this.delCookie('token');
-            this.$router.push(this.GLOBAL.routers.login);
-          }
+          loading.close();
+          this.handleHttpError(err);
         })
       }
     },
@@ -139,24 +141,20 @@
         var formData = this.getFormData();
         if(this.form.name) {
           if(this.$route.params.id) {
-            this.$http.put(this.GLOBAL.requestUrls.projects_id + this.$route.params.id, formData, this.getRequestConfig()).then((res)=> {
+            this.$http.put(this.GLOBAL.requestUrls.project + this.$route.params.id, formData, this.getRequestConfig()).then((res)=> {
               this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
               this.$router.push(this.GLOBAL.routers.projects);
+              this.$message.success('修改' + this.form.name + '预约项目成功')
             }).catch(err => {
-              if(err.response.status === 401) {
-                this.delCookie('token');
-                this.$router.push(this.GLOBAL.routers.login);
-              }
+              this.handleHttpError(err);
             })
           } else {
             this.$http.post(this.GLOBAL.requestUrls.projects, formData, this.getRequestConfig()).then((res)=> {
               this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
               this.$router.push(this.GLOBAL.routers.projects);
+              this.$message.success('添加' + this.form.name + '预约项目成功')
             }).catch(err => {
-              if(err.response.status === 401) {
-                this.delCookie('token');
-                this.$router.push(this.GLOBAL.routers.login);
-              }
+              this.handleHttpError(err);
             })
           }
         } else {

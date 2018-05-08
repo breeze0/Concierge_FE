@@ -4,7 +4,8 @@
       <span class="address-text">详细地址: </span>
       <el-input class="address-input"
                 v-model="currentAddress"
-                @focus="handleFocus">
+                @focus="handleFocus"
+                @keyup.native.enter="search">
         <el-button slot="append"
                    icon="el-icon-search"
                    @click="search"></el-button>
@@ -51,8 +52,12 @@
         if(this.$route.params.id && this.isInitMap) {
           this.mapInit();
           this.isInitMap = false;
+        } else if(this.currentLatitude && this.currentLongitude && this.currentAddress) {
+          this.renderOriginLocation();
         } else if(!this.currentAddress) {
           this.mapInit()
+          this.currentLatitude = 0;
+          this.currentLongitude = 0;
         }
       },
       mapInit() {
@@ -96,7 +101,7 @@
         });
       },
       renderOriginLocation() {
-        if(this.currentLatitude && this.currentLongitude) {
+        if(this.currentLatitude && this.currentLongitude && this.currentAddress) {
           var marker = new AMap.Marker({
             position: [this.currentLongitude,this.currentLatitude]
           });
@@ -104,6 +109,7 @@
           this.map.setZoom(14);
           this.map.setCenter([this.currentLongitude, this.currentLatitude]);
           this.markers.push(marker);
+          this.renderInfoWindow(this.currentLongitude, this.currentLatitude, marker);
         }
       },
       mapClick() {
@@ -138,6 +144,9 @@
         this.map.setZoom(14);
         this.map.setCenter([lng, lat]);
         this.markers.push(marker);
+        this.renderInfoWindow(lng, lat, marker);
+      },
+      renderInfoWindow(lng, lat, marker) {
         this.geocoder.getAddress([lng, lat], (status, result)=> {
           if(status === 'complete' && result.info === 'OK') {
             this.currentAddress = result.regeocode.formattedAddress;
@@ -151,10 +160,12 @@
         });
       },
       search() {
-        this.isShowPanel = true;
-        this.map.remove(this.markers);
-        this.infoWindow.close();
-        this.placeSearch.search(this.currentAddress);
+        if(this.isShowMap) {
+          this.isShowPanel = true;
+          this.map.remove(this.markers);
+          this.infoWindow.close();
+          this.placeSearch.search(this.currentAddress);
+        }
       },
       closeMap() {
         this.isShowPanel = false;

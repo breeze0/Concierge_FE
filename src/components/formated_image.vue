@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <img :src="fomatedUrl" :class="imgClass">
+  <div :class="imgWrapperClass">
+    <img :src="fomatedUrl" :class="imgClass" @load="handleOnload">
   </div>
 </template>
 
@@ -14,11 +14,16 @@
       className: {
         type: String,
         default: ''
+      },
+      imageWrapper: {
+        type: String,
+        default: ''
       }
     },
     data() {
       return {
-        imgClass: this.className
+        imgClass: this.className,
+        imgWrapperClass: this.imageWrapper
       }
     },
     computed: {
@@ -26,7 +31,12 @@
         if(this.originUrl) {
           return this.GLOBAL.server + this.originUrl;
         }
-      } 
+      }
+    },
+    methods: {
+      handleOnload() {
+        this.$emit('onLoad');
+      }
     }
   }
 </script>

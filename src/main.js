@@ -46,9 +46,22 @@ function getRequestConfig() {
   return config;
 }
 
+function handleHttpError(err) {
+  if(err.response.status === 401) {
+    if(err.response.data === global.httpStateInfo.invalid_token) {
+     delCookie('token');
+     router.push(global.routers.login);
+     ElementUI.Message.error('登录已过期，请重新登录。')
+    } else {
+      router.push(global.routers.projects);
+    }
+  }
+}
+
 Vue.prototype.setCookie = setCookie;
 Vue.prototype.getCookie = getCookie;
 Vue.prototype.delCookie = delCookie;
+Vue.prototype.handleHttpError = handleHttpError;
 Vue.prototype.getRequestConfig = getRequestConfig;
 Vue.prototype.GLOBAL = global;
 
