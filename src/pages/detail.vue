@@ -17,7 +17,7 @@
         <span>关闭项目后，该项目下的所有预约都会被自动取消，您确认要关闭么?</span>
         <span slot="footer" class="dialog-footer">
           <el-button @click="stateDialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="closeProject">确 定</el-button>
+          <el-button type="primary" @click="closeProject" :disabled="confirmButtonDisabled">确 定</el-button>
         </span>
       </el-dialog>
     </div>
@@ -95,7 +95,7 @@
           <span v-else>是否通过该预约?</span>
           <span slot="footer" class="dialog-footer">
             <el-button @click="processDialogVisible = false">取 消</el-button>
-            <el-button type="primary" @click="confirm">确 定</el-button>
+            <el-button type="primary" @click="confirm" :disabled="confirmButtonDisabled">确 定</el-button>
           </span>
         </el-dialog>
         <div class="reservations-list-bottom">
@@ -164,6 +164,7 @@
         reservationsStateOptions: OPTIONS,
         processDialogVisible: false,
         stateDialogVisible: false,
+        confirmButtonDisabled: false,
         modalTitle: '',
         operateRemark: '',
         stateCountObj: {}
@@ -184,7 +185,6 @@
       const loading = this.$loading({
         text: STRING_MAP.loading,
         spinner: 'el-icon-loading',
-        background: '#f1f1f1',
         customClass: 'loading-style'
       });
       this.getProjectState(loading);
@@ -227,6 +227,8 @@
         this.processDialogVisible = true;
       },
       handleAllow(urlParam, newState) {
+        if(!this.processDialogVisible) return;
+        this.confirmButtonDisabled = true;
         this.$http({
           method: 'post',
           url: this.GLOBAL.requestUrls.project + this.$route.params.id + '/reservations/' + this.reservations[this.reservationsIndex].id + urlParam,
@@ -237,11 +239,15 @@
           this.reservations[this.reservationsIndex].state = STATE_MAP[newState];
           this.getStateCount();
           this.processDialogVisible = false;
+          this.confirmButtonDisabled = false;
         }).catch(err => {
+          this.confirmButtonDisabled = false;
           this.handleHttpError(err);
         })
       },
       handleDismiss(urlParam, newState) {
+        if(!this.processDialogVisible) return;
+        this.confirmButtonDisabled = true;
         this.$http({
           method: 'post',
           url: this.GLOBAL.requestUrls.project + this.$route.params.id + '/reservations/' + this.reservations[this.reservationsIndex].id + urlParam,
@@ -254,9 +260,12 @@
         }).then(res => {
           this.reservations[this.reservationsIndex].state = STATE_MAP[newState];
           this.reservations[this.reservationsIndex].remark = this.operateRemark;
+          this.operateRemark = '';
           this.getStateCount();
           this.processDialogVisible = false;
+          this.confirmButtonDisabled = false;
         }).catch(err => {
+          this.confirmButtonDisabled = false;
           this.handleHttpError(err);
         })
       },
@@ -281,12 +290,16 @@
         }
       },
       closeProject() {
+        if(!this.stateDialogVisible) return;
+        this.confirmButtonDisabled = true;
         this.$http.get(this.GLOBAL.requestUrls.project + this.$route.params.id + '/pause', this.getRequestConfig()).then(res => {
           this.getReservations();
           this.getStateCount();
           this.projectState = false;
           this.stateDialogVisible = false;
+          this.confirmButtonDisabled = false;
         }).catch(err => {
+          this.confirmButtonDisabled = false;
           this.handleHttpError(err);
         });
       },

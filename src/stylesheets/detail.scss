@@ -56,6 +56,9 @@
           }
           .remark {
             flex-grow: 3;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
           }
           .operate {
             flex-grow: 2;

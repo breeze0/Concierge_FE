@@ -97,7 +97,6 @@
         const loading = this.$loading({
           text: TIP.loading,
           spinner: 'el-icon-loading',
-          background: '#f1f1f1',
           customClass: 'loading-style'
         });
         this.$http.get(this.GLOBAL.requestUrls.project + this.$route.params.id, this.getRequestConfig()).then(res => {
