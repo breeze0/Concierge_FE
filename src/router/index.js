@@ -52,5 +52,6 @@ export default new Router({
         content: detail
       }
     }
-  ]
+  ],
+  mode: 'hash'
 })
