@@ -33,18 +33,40 @@
         </el-form-item>
         <el-form-item>
           <div class="form-check">
-            <span class="check-text">审核模式: </span>
+            <span class="form-item-text">审核模式: </span>
             <el-radio v-model="form.check_mode" label="auto">自动审核</el-radio>
             <el-radio v-model="form.check_mode" label="manual">人工审核</el-radio>
           </div>
         </el-form-item>
         <el-form-item>
           <div class="form-time-period-select">
-            <span class="select-text">预约时间设置:</span>
+            <span class="form-item-text">预约时间设置:</span>
+            <el-radio-group v-model="form.multi_time">
+              <el-radio :label="false">预约单时段</el-radio>
+              <el-radio :label="true">预约多时段</el-radio>
+            </el-radio-group>
           </div>
         </el-form-item>
         <el-form-item>
           <time-setter :timeState="form.time_state" ref="timeSetterRef"></time-setter>
+        </el-form-item>
+        <el-form-item>
+          <div class="form-reservation-limit">
+            <span class="form-item-text">单人预约上限</span>
+            <div class="limit-control">
+              <el-switch
+                v-model="reservationLimit"
+                active-color="#409EFF"
+                inactive-color="#909997">
+              </el-switch>
+              <div class="limit-input" v-if="reservationLimit">
+                <span class="form-item-text">每人可预约</span>
+                <el-input v-model="reservationPerUser">
+                  <template slot="append">次</template>
+                </el-input>
+              </div>
+            </div>
+          </div>
         </el-form-item>
       </el-form>
       <div class="form-btn">
@@ -87,8 +109,13 @@
              {time: '09:00-10:00', limit: 10, weekday: ['Mon','Tues','Wed','Thur','Fri']}
             ],
             special: []
-          }
-        }
+          },
+          multi_time: false,
+          date_display: 7,
+          ahead_time: {date:0, hour: 0, min: 0}
+        },
+        reservationLimit: false,
+        reservationPerUser: 1
       } 
     },
 
@@ -130,11 +157,14 @@
       getFormData() {
         this.getComponentsData();
         var formData = new FormData();
-        var form_array = ['name', 'description', 'address', 'latitude', 'longitude', 'check_mode', 'image'];
+        var form_array = ['name', 'description', 'address', 'latitude', 'longitude', 'check_mode', 'image', 'multi_time'];
         form_array.forEach(item => {
           formData.append(item, this.form[item]);
         })
-        formData.append('time_state', JSON.stringify(this.form.time_state))
+        formData.append('time_state', JSON.stringify(this.form.time_state));
+        if(this.reservationLimit) {
+          formData.append('reservation_per_user', this.reservationPerUser);
+        }
         return formData;
       },
       submitForm() {
