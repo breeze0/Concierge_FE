@@ -68,12 +68,50 @@
             </div>
           </div>
         </el-form-item>
+        <el-form-item>
+          <div class="form-day-display">
+            <span class="form-item-text">
+              <span>预约期限</span>
+              <el-tooltip class="item"
+                          effect="dark"
+                          placement="top-start">
+                <div slot="content">即用户可预约未来多少天内的项目，最大可设置为7天，1天内指的是当天，以此推算。</div>
+                <i class="el-icon-info"></i>
+              </el-tooltip>
+            </span>
+            <el-input v-model="form.date_display"
+                      type="number"
+                      placeholder="请输入1-7之间的整数">
+              <template slot="append">天内</template>
+            </el-input>
+          </div>
+        </el-form-item>
+        <el-form-item>
+          <div class="form-ahead-time">
+            <span class="form-item-text">预约至少提前</span>
+            <el-input v-model="aheadTime"
+                      type="number"
+                      class="ahead-time-input"
+                      placeholder="如不填写则默认可从当天开始预约">
+              <template slot="append">
+                <el-select v-model="timeSelect" class="ahead-time-select">
+                  <el-option
+                    v-for="item in selectOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                  </el-option>
+                </el-select>
+              </template>
+            </el-input>
+          </div>
+        </el-form-item>
       </el-form>
       <div class="form-btn">
         <el-button>
           <router-link to="/admin/projects">取消</router-link>
         </el-button>
-        <el-button type="primary" @click="submitForm">确定</el-button>
+        <el-button type="primary" @click="submitForm" :disabled="submitButtonDisabled">确定</el-button>
       </div>
     </div>
   </div>
@@ -87,6 +125,11 @@
     'loading': '拼命加载中',
     'name_error': '预约项目名称不能为空'
   }
+  const SELECT_OPTIONS = [
+    {value: 'day', label: '天'},
+    {value: 'hour', label: '小时'},
+    {value: 'minute', label: '分钟'}
+  ]
   export default {
     components: {
       "cover-picker": coverPicker,
@@ -112,10 +155,13 @@
           },
           multi_time: false,
           date_display: 7,
-          ahead_time: {date:0, hour: 0, min: 0}
         },
         reservationLimit: false,
-        reservationPerUser: 1
+        reservationPerUser: 1,
+        aheadTime: '',
+        timeSelect: 'day',
+        selectOptions: SELECT_OPTIONS,
+        submitButtonDisabled: false
       } 
     },
 
@@ -129,6 +175,7 @@
         this.$http.get(this.GLOBAL.requestUrls.project + this.$route.params.id, this.getRequestConfig()).then(res => {
           this.form = res.data;
           this.updateProps(this.form);
+          this.updateForm(this.form)
           loading.close();
         }).catch(err => {
           loading.close();
@@ -146,6 +193,14 @@
         this.$refs.addressPickerRef.updateValue(address_picker_args);
         this.$refs.timeSetterRef.updateValue(form.time_state);
       },
+      updateForm(form) {
+        if(form.reservation_per_user) {
+          this.reservationLimit = true;
+          this.reservationPerUser = form.reservation_per_user;
+        }
+        this.timeSelect = Object.keys(form.ahead_time)[0];
+        this.aheadTime = Number(Object.values(form.ahead_time)[0]);
+      },
       getComponentsData() {
         this.form.image = this.$refs.coverPickerRef.getData();
         this.form.time_state = this.$refs.timeSetterRef.getData();
@@ -156,34 +211,52 @@
       },
       getFormData() {
         this.getComponentsData();
-        var formData = new FormData();
-        var form_array = ['name', 'description', 'address', 'latitude', 'longitude', 'check_mode', 'image', 'multi_time'];
+        var form_data = new FormData();
+        var form_array = ['name', 'description', 'address', 'latitude', 'longitude', 'check_mode', 'image', 'multi_time', 'date_display'];
         form_array.forEach(item => {
-          formData.append(item, this.form[item]);
+          form_data.append(item, this.form[item]);
         })
-        formData.append('time_state', JSON.stringify(this.form.time_state));
+        form_data.append('time_state', JSON.stringify(this.form.time_state));
         if(this.reservationLimit) {
-          formData.append('reservation_per_user', this.reservationPerUser);
+          form_data.append('reservation_per_user', this.reservationPerUser);
         }
-        return formData;
+        form_data.append('ahead_time', JSON.stringify(this.getAheadTime()));
+
+        return form_data;
+      },
+      getAheadTime() {
+        var ahead_time = {};
+        if(this.timeSelect === 'day') {
+          ahead_time.day = this.aheadTime;
+        } else if(this.timeSelect === 'hour') {
+          ahead_time.hour = this.aheadTime;
+        } else if(this.timeSelect === 'minute') {
+          ahead_time.minute = this.aheadTime;
+        }
+        return ahead_time;
       },
       submitForm() {
         var formData = this.getFormData();
         if(this.form.name) {
+          this.submitButtonDisabled = true;
           if(this.$route.params.id) {
             this.$http.put(this.GLOBAL.requestUrls.project + this.$route.params.id, formData, this.getRequestConfig()).then((res)=> {
               this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
+              this.submitButtonDisabled = false;
               this.$router.push(this.GLOBAL.routers.projects);
               this.$message.success('修改' + this.form.name + '预约项目成功')
             }).catch(err => {
+              this.submitButtonDisabled = false;
               this.handleHttpError(err);
             })
           } else {
             this.$http.post(this.GLOBAL.requestUrls.projects, formData, this.getRequestConfig()).then((res)=> {
               this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
               this.$router.push(this.GLOBAL.routers.projects);
+              this.submitButtonDisabled = false;
               this.$message.success('添加' + this.form.name + '预约项目成功')
             }).catch(err => {
+              this.submitButtonDisabled = false;
               this.handleHttpError(err);
             })
           }

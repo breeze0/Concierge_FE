@@ -156,6 +156,33 @@
         width: 100px;
       }
     }
+    .form-day-display {
+      margin: 0 30px;
+      display: flex;
+
+      .form-item-text {
+        display: flex;
+        align-items: center;
+        width: 111px;
+        margin-right: 5px;
+
+        span {
+          margin-right: 5px;
+        }
+      }
+      .el-input {
+        width: 420px;
+      }
+    }
+    .form-ahead-time {
+      margin: 0 30px;
+      .ahead-time-input {
+        width: 420px;
+      }
+      .ahead-time-select {
+        width: 100px;
+      }
+    }
     .form-reservation-limit {
       margin: 0 30px;
       display: flex;
