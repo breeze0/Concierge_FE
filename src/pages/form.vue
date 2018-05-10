@@ -55,17 +55,18 @@
             <span class="form-item-text">单人预约上限</span>
             <div class="limit-control">
               <el-switch
-                v-model="reservationLimit"
+                v-model="reservationLimit.reservation_limit"
                 active-color="#409EFF"
                 inactive-color="#909997">
               </el-switch>
-              <div class="limit-input" v-if="reservationLimit">
+              <div class="limit-input" v-if="reservationLimit.reservation_limit">
                 <span class="form-item-text">每人可预约</span>
-                <el-input v-model="reservationPerUser">
+                <el-input v-model="reservationLimit.reservation_per_user">
                   <template slot="append">次</template>
                 </el-input>
               </div>
             </div>
+            <span class="error-tip" v-show="!validateReservationLimit()">请填写大于0的整数</span>
           </div>
         </el-form-item>
         <el-form-item>
@@ -80,21 +81,20 @@
               </el-tooltip>
             </span>
             <el-input v-model="form.date_display"
-                      type="number"
                       placeholder="请输入1-7之间的整数">
               <template slot="append">天内</template>
             </el-input>
+            <span class="error-tip" v-show="!validateDisplayDay()">请填写1-7之间的整数</span>
           </div>
         </el-form-item>
         <el-form-item>
           <div class="form-ahead-time">
             <span class="form-item-text">预约至少提前</span>
-            <el-input v-model="aheadTime"
-                      type="number"
+            <el-input v-model="aheadTime.ahead_time"
                       class="ahead-time-input"
                       placeholder="如不填写则默认可从当天开始预约">
               <template slot="append">
-                <el-select v-model="timeSelect" class="ahead-time-select">
+                <el-select v-model="aheadTime.time_select" class="ahead-time-select">
                   <el-option
                     v-for="item in selectOptions"
                     :key="item.value"
@@ -104,6 +104,7 @@
                 </el-select>
               </template>
             </el-input>
+            <span class="error-tip" v-show="!validateAheadTime()">请填写大于0的整数或不填写</span>
           </div>
         </el-form-item>
       </el-form>
@@ -122,8 +123,9 @@
   import addressPicker from '@/components/map.vue'
   import timeSetter from '@/components/time_setter.vue'
   const TIP = {
-    'loading': '拼命加载中',
-    'name_error': '预约项目名称不能为空'
+    loading: '拼命加载中',
+    name_error: '预约项目名称不能为空',
+    input_error: '请按要求填写规范的数据'
   }
   const SELECT_OPTIONS = [
     {value: 'day', label: '天'},
@@ -156,10 +158,8 @@
           multi_time: false,
           date_display: 7,
         },
-        reservationLimit: false,
-        reservationPerUser: 1,
-        aheadTime: '',
-        timeSelect: 'day',
+        reservationLimit: {reservation_limit: false, reservation_per_user: 1},
+        aheadTime: {ahead_time: '', time_select: 'day'},
         selectOptions: SELECT_OPTIONS,
         submitButtonDisabled: false
       } 
@@ -184,6 +184,25 @@
       }
     },
     methods: {
+      validateReservationLimit() {
+        if(parseFloat(this.reservationLimit.reservation_per_user).toString() === 'NaN') return false;
+        else if(this.reservationLimit.reservation_per_user <= 0) return false;
+        else if(this.reservationLimit.reservation_per_user%1 !== 0) return false;
+        else return true;
+      },
+      validateDisplayDay() {
+        if(parseFloat(this.form.date_display).toString() === 'NaN') return false;
+        else if(this.form.date_display > 7 || this.form.date_display <1) return false;
+        else if(this.form.date_display%1 !== 0) return false;
+        else return true;
+      },
+      validateAheadTime() {
+        if(this.aheadTime.ahead_time === '') return true;
+        else if(parseFloat(this.aheadTime.ahead_time).toString() === 'NaN') return false;
+        else if(this.aheadTime.ahead_time <= 0) return false;
+        else if(this.aheadTime.ahead_time%1 !==0) return false;
+        else return true;
+      },
       updateProps(form) {
         var address_picker_args = {};
         address_picker_args.address = form.address;
@@ -195,11 +214,11 @@
       },
       updateForm(form) {
         if(form.reservation_per_user) {
-          this.reservationLimit = true;
-          this.reservationPerUser = form.reservation_per_user;
+          this.reservationLimit.reservation_limit = true;
+          this.reservationLimit.reservation_per_user = form.reservation_per_user;
         }
-        this.timeSelect = Object.keys(form.ahead_time)[0];
-        this.aheadTime = Number(Object.values(form.ahead_time)[0]);
+        this.aheadTime.time_select = Object.keys(form.ahead_time)[0];
+        this.aheadTime.ahead_time = Object.values(form.ahead_time)[0]?Number(Object.values(form.ahead_time)[0]):'';
       },
       getComponentsData() {
         this.form.image = this.$refs.coverPickerRef.getData();
@@ -217,8 +236,8 @@
           form_data.append(item, this.form[item]);
         })
         form_data.append('time_state', JSON.stringify(this.form.time_state));
-        if(this.reservationLimit) {
-          form_data.append('reservation_per_user', this.reservationPerUser);
+        if(this.reservationLimit.reservation_limit) {
+          form_data.append('reservation_per_user', this.reservationLimit.reservation_per_user);
         }
         form_data.append('ahead_time', JSON.stringify(this.getAheadTime()));
 
@@ -226,39 +245,43 @@
       },
       getAheadTime() {
         var ahead_time = {};
-        if(this.timeSelect === 'day') {
-          ahead_time.day = this.aheadTime;
-        } else if(this.timeSelect === 'hour') {
-          ahead_time.hour = this.aheadTime;
-        } else if(this.timeSelect === 'minute') {
-          ahead_time.minute = this.aheadTime;
+        if(this.aheadTime.time_select === 'day') {
+          ahead_time.day = String(this.aheadTime.ahead_time);
+        } else if(this.aheadTime.time_select === 'hour') {
+          ahead_time.hour = String(this.aheadTime.ahead_time);
+        } else if(this.aheadTime.time_select === 'minute') {
+          ahead_time.minute = String(this.aheadTime.ahead_time);
         }
         return ahead_time;
       },
       submitForm() {
         var formData = this.getFormData();
         if(this.form.name) {
-          this.submitButtonDisabled = true;
-          if(this.$route.params.id) {
-            this.$http.put(this.GLOBAL.requestUrls.project + this.$route.params.id, formData, this.getRequestConfig()).then((res)=> {
-              this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
-              this.submitButtonDisabled = false;
-              this.$router.push(this.GLOBAL.routers.projects);
-              this.$message.success('修改' + this.form.name + '预约项目成功')
-            }).catch(err => {
-              this.submitButtonDisabled = false;
-              this.handleHttpError(err);
-            })
+          if(this.validateReservationLimit() && this.validateAheadTime() && this.validateDisplayDay()) {
+            this.submitButtonDisabled = true;
+            if(this.$route.params.id) {
+              this.$http.put(this.GLOBAL.requestUrls.project + this.$route.params.id, formData, this.getRequestConfig()).then((res)=> {
+                this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
+                this.submitButtonDisabled = false;
+                this.$router.push(this.GLOBAL.routers.projects);
+                this.$message.success('修改' + this.form.name + '预约项目成功')
+              }).catch(err => {
+                this.submitButtonDisabled = false;
+                this.handleHttpError(err);
+              })
+            } else {
+              this.$http.post(this.GLOBAL.requestUrls.projects, formData, this.getRequestConfig()).then((res)=> {
+                this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
+                this.$router.push(this.GLOBAL.routers.projects);
+                this.submitButtonDisabled = false;
+                this.$message.success('添加' + this.form.name + '预约项目成功')
+              }).catch(err => {
+                this.submitButtonDisabled = false;
+                this.handleHttpError(err);
+              })
+            }
           } else {
-            this.$http.post(this.GLOBAL.requestUrls.projects, formData, this.getRequestConfig()).then((res)=> {
-              this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
-              this.$router.push(this.GLOBAL.routers.projects);
-              this.submitButtonDisabled = false;
-              this.$message.success('添加' + this.form.name + '预约项目成功')
-            }).catch(err => {
-              this.submitButtonDisabled = false;
-              this.handleHttpError(err);
-            })
+            this.$message.error(TIP.input_error)
           }
         } else {
           this.$message.error(TIP.name_error)

@@ -15,6 +15,9 @@ html {
         -webkit-appearance: none !important;
         margin: 0;
       }
+      input[type=number] {
+        -moz-appearance:textfield;
+      }
       a {
         text-decoration: none;
         color: #000;
