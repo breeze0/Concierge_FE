@@ -56,7 +56,7 @@
             <span class="item">预约状态</span>
             <span class="item">联系电话</span>
             <span class="item">预约时间</span>
-            <span class="item">预约时间段</span>
+            <span class="time item">预约时间段</span>
             <span class="remark item">备注</span>
             <span class="operate item">操作</span>
           </div>
@@ -67,7 +67,13 @@
             <span class="item">{{ item.state }}</span>
             <span class="item">{{ item.tel }}</span>
             <span class="item">{{ item.date }}</span>
-            <span class="item">{{ item.time }}</span>
+            <el-tooltip effect="dark"
+                        placement="top">
+              <div slot="content"><span v-for="time in item.time">{{ time }}<br/></span></div>
+              <span class="time item">
+               <span class="time-cell" v-for="time in item.time">{{time}}</span>
+              </span>
+            </el-tooltip>
             <span class="remark item">{{ item.remark }}</span>
             <span class="operate item" v-if="item.state === '已成功'">
               <span class="operate-set" @click="allow(index, item.state)">核销</span>

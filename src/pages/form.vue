@@ -66,15 +66,14 @@
                 </el-input>
               </div>
             </div>
-            <span class="error-tip" v-show="!validateReservationLimit()">请填写大于0的整数</span>
+            <span class="error-tip" v-show="!reservationLimitValid">请填写大于0的整数</span>
           </div>
         </el-form-item>
         <el-form-item>
           <div class="form-day-display">
             <span class="form-item-text">
               <span>预约期限</span>
-              <el-tooltip class="item"
-                          effect="dark"
+              <el-tooltip effect="dark"
                           placement="top-start">
                 <div slot="content">即用户可预约未来多少天内的项目，最大可设置为7天，1天内指的是当天，以此推算。</div>
                 <i class="el-icon-info"></i>
@@ -84,7 +83,7 @@
                       placeholder="请输入1-7之间的整数">
               <template slot="append">天内</template>
             </el-input>
-            <span class="error-tip" v-show="!validateDisplayDay()">请填写1-7之间的整数</span>
+            <span class="error-tip" v-show="!displayDayValid">请填写1-7之间的整数</span>
           </div>
         </el-form-item>
         <el-form-item>
@@ -104,7 +103,7 @@
                 </el-select>
               </template>
             </el-input>
-            <span class="error-tip" v-show="!validateAheadTime()">请填写大于0的整数或不填写</span>
+            <span class="error-tip" v-show="!aheadTimeValid">请填写大于0的整数或不填写</span>
           </div>
         </el-form-item>
       </el-form>
@@ -183,26 +182,28 @@
         })
       }
     },
-    methods: {
-      validateReservationLimit() {
+    computed: {
+      reservationLimitValid() {
         if(parseFloat(this.reservationLimit.reservation_per_user).toString() === 'NaN') return false;
         else if(this.reservationLimit.reservation_per_user <= 0) return false;
         else if(this.reservationLimit.reservation_per_user%1 !== 0) return false;
         else return true;
       },
-      validateDisplayDay() {
+      displayDayValid() {
         if(parseFloat(this.form.date_display).toString() === 'NaN') return false;
         else if(this.form.date_display > 7 || this.form.date_display <1) return false;
         else if(this.form.date_display%1 !== 0) return false;
         else return true;
       },
-      validateAheadTime() {
+      aheadTimeValid() {
         if(this.aheadTime.ahead_time === '') return true;
         else if(parseFloat(this.aheadTime.ahead_time).toString() === 'NaN') return false;
         else if(this.aheadTime.ahead_time <= 0) return false;
         else if(this.aheadTime.ahead_time%1 !==0) return false;
         else return true;
-      },
+      }
+    },
+    methods: {
       updateProps(form) {
         var address_picker_args = {};
         address_picker_args.address = form.address;
@@ -257,7 +258,7 @@
       submitForm() {
         var formData = this.getFormData();
         if(this.form.name) {
-          if(this.validateReservationLimit() && this.validateAheadTime() && this.validateDisplayDay()) {
+          if(this.reservationLimitValid && this.aheadTimeValid && this.displayDayValid) {
             this.submitButtonDisabled = true;
             if(this.$route.params.id) {
               this.$http.put(this.GLOBAL.requestUrls.project + this.$route.params.id, formData, this.getRequestConfig()).then((res)=> {

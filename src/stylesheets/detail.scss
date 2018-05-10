@@ -22,14 +22,14 @@
       border-bottom: 1px solid #f1f1f1;
 
       .reservations-tel {
-        margin-left: 20px;
+        margin-left: 10px;
 
         .tel-input {
           width: 150px;
         }
       }
       .reservations-state {
-        margin-left: 20px;
+        margin-left: 10px;
 
         .state-select {
           width: 150px;
@@ -65,6 +65,15 @@
             .operate-set {
               color: $primary;
               cursor: pointer;
+            }
+          }
+          .time {
+            flex-grow: 2;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            .time-cell {
+              margin-right: 3px;
             }
           }
         }
