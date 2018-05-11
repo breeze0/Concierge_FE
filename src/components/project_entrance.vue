@@ -10,8 +10,9 @@
         <span class="el-dropdown-link">
           <i class="el-icon-share oprerate-icon"></i>
         </span>
-        <el-dropdown-menu slot="dropdown">
-          <div>
+        <el-dropdown-menu slot="dropdown" class="dropdown-container">
+          <div class="text">
+            <span class="icon" style="background-image: url('./static/images/wechat.png');"></span>
             <span>微信扫一扫</span>
           </div>
           <div style="height: 50px;"></div>

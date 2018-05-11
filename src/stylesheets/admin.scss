@@ -95,3 +95,18 @@
     }
   }
 }
+.dropdown-container {
+  width: 100px;
+
+  .text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .icon {
+      display: block;
+      width: 16px;
+      height:16px;
+      margin-right: 5px;
+    }
+  }
+}
