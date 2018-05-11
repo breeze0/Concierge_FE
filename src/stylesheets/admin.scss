@@ -5,6 +5,7 @@
   .card-wrapper {
     display: flex;
     flex-wrap: wrap;
+    min-height: 600px;
 
     .card-item {
       flex: 23% 0 0;
@@ -71,8 +72,25 @@
           display: none;
           right: 5%;
           top: 10px;
-          font-size: 25px;
+
+          .oprerate-icon {
+            font-size: 25px;
+            color: #000;
+          }
         }
+        .share-code {
+          width: 100px;
+          height: 150px;
+          box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+          border: 1px solid #ebeef5;
+          position: absolute;
+          top: 35px;
+          background-color: #fff;
+          right: 3px;
+        }
+      }
+      &.add-card {
+        height: 150px;
       }
     }
   }

@@ -15,16 +15,8 @@
               </el-card>
             </div>
             <div class="card-item project"
-                 v-for="(project, index) in projectsList"
-                 @click="showDetail(index)">
-              <formated-image :originUrl="project.image" :className="imageClass" class="image-wrapper"></formated-image>
-              <span class="project-name">{{ project.name }}</span>
-              <span class="project-state" v-if="project.state === 'open'">开启</span>
-              <span class="project-state" v-else>关闭</span>
-              <span class="project-share">
-                <i class="el-icon-edit" @click.stop="editProject(index)"></i>
-                <i class="el-icon-share"></i>
-              </span>
+                 v-for="project in projectsList">
+              <project-entrance :project="project"></project-entrance>
             </div>
           </div>
         </el-tab-pane>
@@ -35,16 +27,15 @@
 </template>
 
 <script>
-  import formatedImage from '@/components/formated_image.vue'
+  import projectEntrance from '@/components/project_entrance.vue'
   export default {
     components: {
-      "formated-image": formatedImage
+      "project-entrance": projectEntrance
     },
     data() {
       return {
         activeName: 'project',
-        projectsList:[],
-        imageClass: 'project-image'
+        projectsList:[]
       };
     },
     methods: {
@@ -53,12 +44,6 @@
       },
       newProject() {
         this.$router.push(this.GLOBAL.routers.projects_new);
-      },
-      editProject(index) {
-        this.$router.push(this.GLOBAL.routers.projects_edit + this.projectsList[index].id);
-      },
-      showDetail(index) {
-        this.$router.push(this.GLOBAL.routers.reservations_details + this.projectsList[index].id + '/' + this.projectsList[index].name)
       }
     },
     mounted() {
