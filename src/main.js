@@ -18,7 +18,7 @@ Vue.use(VueAxios, axios)
 function setCookie(name, value, expiretime) {
   var exp = new Date();
   exp.setTime(exp.getTime() + expiretime);　　
-  document.cookie = name + "=" + escape(value) + ((expiretime == null) ? "" : ";expires=" + exp.toGMTString());
+  document.cookie = name + "=" + value + ((expiretime == null) ? "" : ";expires=" + exp.toGMTString());
 }
 
 function getCookie(name) {
