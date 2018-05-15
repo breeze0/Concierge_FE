@@ -15,11 +15,10 @@
             <span class="icon" style="background-image: url('./static/images/wechat.png');"></span>
             <span>微信扫一扫</span>
           </div>
-          <div style="height: 50px;"></div>
+          <formated-image :originUrl="project.wxcode" :className="codeClass" class="code-wrapper"></formated-image>
         </el-dropdown-menu>
       </el-dropdown>
     </span>
-
   </div>
 </template>
 
@@ -39,7 +38,9 @@
     },
     data() {
       return {
-        imageClass: 'project-image'
+        imageClass: 'project-image',
+        codeClass: 'code',
+
       }
     },
     methods: {

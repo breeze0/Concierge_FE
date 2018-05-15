@@ -109,4 +109,13 @@
       margin-right: 5px;
     }
   }
+  .code-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    .code {
+      width: 100px;
+      height: 100px;
+    }
+  }
 }
