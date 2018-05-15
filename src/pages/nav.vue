@@ -19,9 +19,9 @@
 
 <script>
   export default {
-    data() {
-      return {
-        nickeName: '晨晨'
+    computed: {
+      nickeName() {
+        return this.getCookie('name')
       }
     },
     methods: {

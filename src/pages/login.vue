@@ -83,6 +83,7 @@
           }
           this.$http.post(this.GLOBAL.requestUrls.login, data).then((res)=>{
             this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
+            this.setCookie('name',res.data.name);
             this.$router.push(this.GLOBAL.routers.projects);
           }).catch(error => {
             if(error.response.status === 422) {
