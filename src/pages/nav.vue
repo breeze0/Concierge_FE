@@ -4,7 +4,8 @@
     <div class="drop-wrapper">
       <el-dropdown trigger="click" @command="handleCommand">
         <span class="el-dropdown-link nick-name">
-          {{ nickeName }}<i class="el-icon-arrow-down el-icon--right"></i>
+          {{ nickName }}
+          <i class="el-icon-arrow-down el-icon--right"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item>修改个人消息</el-dropdown-item>
@@ -19,10 +20,13 @@
 
 <script>
   export default {
-    computed: {
-      nickeName() {
-        return this.getCookie('name')
+    data() {
+      return {
+        nickName: '管理员'
       }
+    },
+    created() {
+      this.nickName = this.getCookie('name');
     },
     methods: {
       handleCommand(command) {
