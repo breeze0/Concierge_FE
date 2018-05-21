@@ -1,5 +1,5 @@
 <template>
-  <div @click="showDetail">
+  <div  class="project card-item" @click="showDetail">
     <el-card :body-style="{ padding: '0px' }">
       <formated-image :originUrl="project.image" :className="imageClass" class="image-wrapper"></formated-image>
       <div style="padding: 10px;">

@@ -1,6 +1,7 @@
 .admin-com-container {
   margin: 0 auto;
   width: 920px;
+  min-height: 600px;
 
   .new-project {
     width: 150px;
@@ -20,9 +21,11 @@
   .card-wrapper {
     display: flex;
     flex-wrap: wrap;
+    min-height: 600px;
+    align-content: flex-start;
 
     .card-item {
-      flex: 1;
+      flex: 0 0 23.5%;
       margin-bottom: 2%;
       margin-right: 2%;
       .box-card {
@@ -60,6 +63,8 @@
           overflow: hidden;
           white-space: nowrap;
           text-overflow: ellipsis;
+          height: 24px;
+          line-height: 24px;
         }
 
         .bottom-flex {
@@ -89,8 +94,8 @@
   }
   .pagination-wrapper {
     margin-top: 10px;
-    display: flex;
-    flex-direction: row-reverse;
+    text-align: right;
+    margin-bottom: 20px;
   }
 }
 .dropdown-container {
