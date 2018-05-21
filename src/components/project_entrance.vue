@@ -1,24 +1,30 @@
 <template>
   <div @click="showDetail">
-    <formated-image :originUrl="project.image" :className="imageClass" class="image-wrapper"></formated-image>
-    <span class="project-name">{{ project.name }}</span>
-    <span class="project-state" v-if="project.state === 'open'">开启</span>
-    <span class="project-state" v-else>关闭</span>
-    <span class="project-share" @click.stop="handleStopPropagation">
-      <i class="el-icon-edit oprerate-icon" @click.stop="editProject"></i>
-      <el-dropdown trigger="click">
-        <span class="el-dropdown-link">
-          <i class="el-icon-share oprerate-icon"></i>
-        </span>
-        <el-dropdown-menu slot="dropdown" class="dropdown-container">
-          <div class="text">
-            <span class="icon" style="background-image: url('./static/images/wechat.png');"></span>
-            <span>微信扫一扫</span>
-          </div>
-          <formated-image :originUrl="project.wxcode" :className="codeClass" class="code-wrapper"></formated-image>
-        </el-dropdown-menu>
-      </el-dropdown>
-    </span>
+    <el-card :body-style="{ padding: '0px' }">
+      <formated-image :originUrl="project.image" :className="imageClass" class="image-wrapper"></formated-image>
+      <div style="padding: 10px;">
+        <div class="project-name">{{ project.name }}</div>
+        <div class="bottom bottom-flex">
+          <span class="project-state" v-if="project.state === 'open'">开启</span>
+          <span class="project-state" v-else>关闭</span>
+          <span class="project-share" @click.stop="handleStopPropagation">
+            <i class="el-icon-edit oprerate-icon" @click.stop="editProject"></i>
+            <el-dropdown trigger="click">
+              <span class="el-dropdown-link">
+                <i class="el-icon-share oprerate-icon"></i>
+              </span>
+              <el-dropdown-menu slot="dropdown" class="dropdown-container">
+                <div class="text">
+                  <span class="icon" style="background-image: url('./static/images/wechat.png');"></span>
+                  <span>微信扫一扫</span>
+                </div>
+                <formated-image :originUrl="project.wxcode" :className="codeClass" class="code-wrapper"></formated-image>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </span>
+        </div>
+      </div>
+    </el-card>
   </div>
 </template>
 

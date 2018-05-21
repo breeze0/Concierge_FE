@@ -2,12 +2,27 @@
   margin: 0 auto;
   width: 920px;
 
+  .new-project {
+    width: 150px;
+    background-color: #409eff;
+    color: #fff;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    .new-project-text {
+      margin-left: 5px;
+      cursor: pointer;
+    }
+  }
   .card-wrapper {
     display: flex;
     flex-wrap: wrap;
 
     .card-item {
-      flex: 23% 0 0;
+      flex: 1;
       margin-bottom: 2%;
       margin-right: 2%;
       .box-card {
@@ -32,16 +47,7 @@
         cursor: pointer;
       }
       &.project {
-        position: relative;
-        box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
-        border: 1px solid #ebeef5;
-        height: 150px;
 
-        &:hover{
-          .project-share {
-            display: block;
-          }
-        }
         .image-wrapper {
           height: 150px;
         }
@@ -50,31 +56,22 @@
           height: 100%;
         }
         .project-name {
-          color: #fff;
-          position: absolute;
-          top: 10px;
-          left: 10px;
           font-size: 16px;
-          width:150px;
           overflow: hidden;
           white-space: nowrap;
           text-overflow: ellipsis;
         }
-        .project-state {
-          position: absolute;
-          bottom: 10px;
-          left: 10px;
-          color: #fff;
+
+        .bottom-flex {
+          display: flex;
+          justify-content: space-between;
+          margin-top: 10px;
         }
         .project-share {
-          position: absolute;
-          display: none;
-          right: 5%;
-          top: 10px;
 
           .oprerate-icon {
             font-size: 25px;
-            color: #000;
+            color: $primary;
           }
         }
         .share-code {
@@ -88,10 +85,12 @@
           right: 3px;
         }
       }
-      &.add-card {
-        height: 150px;
-      }
     }
+  }
+  .pagination-wrapper {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: row-reverse;
   }
 }
 .dropdown-container {
