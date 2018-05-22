@@ -97,6 +97,18 @@
     text-align: right;
     margin-bottom: 20px;
   }
+  .projects-wrapper {
+    .projects-checkbox-group {
+      display: flex;
+      flex-direction: column;
+      max-height: 300px;
+      overflow: auto;
+
+      .el-checkbox {
+        margin-left: 0px;
+      }
+    }
+  }
 }
 .dropdown-container {
   width: 100px;

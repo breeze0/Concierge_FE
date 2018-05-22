@@ -1,6 +1,6 @@
 <script>
-  //const server = 'http://192.168.31.208';
-  const server = 'https://concierge.skylarkly.com'
+  const server = 'http://192.168.31.208';
+  //const server = 'https://concierge.skylarkly.com'
   const expire = 1000 * 60 * 60 * 36;
   const routers = {
     'login': '/login',
@@ -15,7 +15,9 @@
     'projects': server + '/projects',
     'project': server + '/projects/',
     'covers': server + '/covers',
-    'image': server + '/image'
+    'image': server + '/image',
+    'all_projects': server + '/all-projects',
+    'groups': server + '/groups'
   }
   const httpStateInfo = {
     'invalid_token': 'Invalid Token'
@@ -27,4 +29,4 @@
     requestUrls,
     httpStateInfo
   }
-</script>
+</script>`
