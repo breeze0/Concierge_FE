@@ -55,6 +55,7 @@
           cursor: pointer;
           display: inline-block;
           height: 20px;
+          line-height: 20px;
 
           &.active {
             color: $primary;

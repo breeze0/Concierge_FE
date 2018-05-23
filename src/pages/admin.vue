@@ -26,11 +26,11 @@
             <i class="el-icon-arrow-right" v-if="!groupShowAll"></i>
             <i class="el-icon-arrow-down" v-else></i>
           </span>
-          <div class="group-item title">分类:</div>
-          <div class="group-item" v-for="(group, index) in groupsList">
+          <div class="group-item title"><span class="group-name">分类:</span></div>
+          <div class="group-item" v-for="(item, index) in groupsList">
             <span :class="[checkedGroupIndex === index ? 'active':'', 'group-name']"
-                  @click="changeClass(index)">{{ group.name }}</span>
-            <span class="group-count">{{ group.count }}</span>
+                  @click="changeGroup(index)">{{ item.name }}</span>
+            <span class="group-count">{{ item.total }}</span>
           </div>
         </div>
         <el-dialog
@@ -48,10 +48,9 @@
               <div class="projects-wrapper">
                 <el-checkbox-group
                   v-model="checkedProjects"
-                  @change="handleCheckedProjectsChange"
                   class="projects-checkbox-group">
                   <el-checkbox
-                    v-for="project in projects"
+                    v-for="project in allProjects"
                     :label="project.id"
                     :key="project.id">{{project.name}}</el-checkbox>
                 </el-checkbox-group>
@@ -78,7 +77,7 @@
           :page-size="pageSize"
           :page-sizes="[4,8,12,16,20]"
           layout="total,sizes,prev, pager, next, jumper"
-          :total="totalProjects">
+          :total="paginationCount">
         </el-pagination>
       </div>
     </div>
@@ -99,25 +98,12 @@
     data() {
       return {
         projectsList:[],
-        projects: [],
-        groupsList: [
-          {name: '全部', count: 10},
-          {name: '成华区图书馆', count: 10},
-          {name: '成华区图书馆', count: 10},
-          {name: '成华区图书馆', count: 10},
-          {name: '成华区图书馆', count: 10},
-          {name: '成华区图书馆', count: 10},
-          {name: '成华区图书馆', count: 10},
-          {name: '成华区图书馆', count: 10},
-          {name: '成华区图书馆', count: 10},
-          {name: '成华区图书馆', count: 10},
-          {name: '成华区图书馆', count: 10},
-          {name: '成华区图书馆', count: 10},
-          {name: '成华区图书馆', count: 10}
-        ],
+        allProjects: [],
+        groupsList: [],
+        checkedGroupId: 0,
         checkedGroupIndex: 0,
         checkedProjects: [],
-        totalProjects: 0,
+        paginationCount: 0,
         pageSize: 12,
         groupDialogVisible: false,
         groupShowAll: false,
@@ -132,7 +118,41 @@
       newProject() {
         this.$router.push(this.GLOBAL.routers.projects_new);
       },
-      goPage(page, size) {
+      handleDropdownCommand(command) {
+        if(command === 'newProject') this.newProject();
+        else if(command === 'newGroup') this.groupDialogVisible = true;
+        else return;
+      },
+      changeGroup(index) {
+        this.checkedGroupIndex = index;
+        this.checkedGroupId = this.groupsList[index].id;
+        this.pageSize = 12;
+        this.$http({
+          method: 'get',
+          url: this.GLOBAL.requestUrls.projects,
+          headers: {
+            'Authorization': this.getCookie('token')
+          },
+          params: {
+            group: this.checkedGroupId === 0?'':this.checkedGroupId
+          }
+        }).then(res => {
+          this.projectsList = res.data.projects;
+          this.paginationCount = res.data.count;
+          this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
+        })
+      },
+      changeDisplay() {
+        this.groupShowAll = !this.groupShowAll;
+      },
+      handleCurrentChange(pageIndex) {
+        this.goPage(pageIndex, this.pageSize, this.checkedGroupId);
+      },
+      handleSizeChange(pageSize) {
+        this.pageSize = pageSize;
+        this.goPage(1,pageSize,this.checkedGroupId);
+      },
+      goPage(page, size, id) {
         this.$http({
           method: 'get',
           url: this.GLOBAL.requestUrls.projects,
@@ -141,7 +161,8 @@
           },
           params: {
             page: page,
-            size: size
+            size: size,
+            group: id === 0?'':id
           }
         }).then(res => {
           this.projectsList = res.data.projects;
@@ -149,27 +170,6 @@
         }).catch(err=>{
         this.handleHttpError(err);
         })
-      },
-      handleDropdownCommand(command) {
-        if(command === 'newProject') this.newProject();
-        else if(command === 'newGroup') this.groupDialogVisible = true;
-        else return;
-      },
-      changeClass(index) {
-        this.checkedGroupIndex = index;
-      },
-      changeDisplay() {
-        this.groupShowAll = !this.groupShowAll;
-      },
-      handleCurrentChange(pageIndex) {
-        this.goPage(pageIndex, this.pageSize);
-      },
-      handleSizeChange(pageSize) {
-        this.pageSize = pageSize;
-        this.goPage(1,pageSize);
-      },
-      handleCheckedProjectsChange() {
-        console.log(this.checkedProjects)
       },
       createGroup() {
         if(this.group.name) {
@@ -185,7 +185,7 @@
                 projects: this.checkedProjects
               }
             }).then(res => {
-              console.log(res)
+              this.requestGroups();
             })
           } else {
             this.$message.error(ERROR_TIP.projects_empty);
@@ -193,20 +193,41 @@
         } else {
           this.$message.error(ERROR_TIP.name_error);
         }
+      },
+      requestProjects() {
+        this.$http.get(this.GLOBAL.requestUrls.projects, this.getRequestConfig()).then((res) => {
+          this.projectsList = res.data.projects;
+          this.paginationCount = res.data.count;
+          this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
+        }).catch(err=>{
+          this.handleHttpError(err);
+        });
+      },
+      requestAllProjects() {
+        this.$http.get(this.GLOBAL.requestUrls.all_projects, this.getRequestConfig()).then(res => {
+          this.groupFirstData = {
+            id: 0,
+            name: '全部',
+            total: res.data.projects.length
+          }
+          this.allProjects = res.data.projects;
+          this.groupsList.push(this.groupFirstData);
+          this.requestGroups();
+          this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
+        })
+      },
+      requestGroups() {
+        this.$http.get(this.GLOBAL.requestUrls.groups,this.getRequestConfig()).then(res => {
+          this.groupsList = [];
+          this.groupsList.push(this.groupFirstData);
+          this.groupsList = this.groupsList.concat(res.data);
+          this.groupDialogVisible = false;
+        })
       }
     },
-    mounted() {
-      this.$http.get(this.GLOBAL.requestUrls.projects, this.getRequestConfig()).then((res) => {
-        this.projectsList = res.data.projects;
-        this.totalProjects = res.data.count;
-        this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
-      }).catch(err=>{
-        this.handleHttpError(err);
-      });
-      this.$http.get(this.GLOBAL.requestUrls.all_projects, this.getRequestConfig()).then(res => {
-        this.projects = res.data.projects;
-        this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
-      })
+    created() {
+      this.requestAllProjects();
+      this.requestProjects();
     }
   }
 </script>
