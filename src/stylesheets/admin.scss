@@ -3,19 +3,68 @@
   width: 920px;
   min-height: 600px;
 
-  .new-project {
-    width: 150px;
-    background-color: #409eff;
-    color: #fff;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    .new-project-text {
-      margin-left: 5px;
-      cursor: pointer;
+  .admin-com-top {
+    box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
+    margin-bottom: 20px;
+
+    .created-search-space-between {
+      padding: 10px 0;
+      border-bottom: 1px solid #f1f1f1;
+      margin: 0 15px;
+      display: flex;
+      justify-content: space-between;
+
+      .search-input {
+        width: 250px;
+      }
+    }
+    .group-display {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0 15px;
+      margin-top: 10px;
+      position: relative;
+      transition: all 0.5s ease;
+
+      &.hidden {
+        height: 30px;
+        overflow: hidden;
+      }
+
+      &.display {
+        height: auto;
+      }
+
+      .control-icon {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        right: 0;
+        background-color: #f1f1f1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+      .group-item {
+        margin-right: 25px;
+        margin-bottom: 10px;
+
+        .group-name {
+          font-size: 14px;
+          cursor: pointer;
+          display: inline-block;
+          height: 20px;
+
+          &.active {
+            color: $primary;
+          }
+        }
+
+        .group-count {
+          color: #999;
+        }
+      }
     }
   }
   .card-wrapper {
