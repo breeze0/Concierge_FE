@@ -68,9 +68,37 @@
         <span class="group-name">{{ checkedGroupName }}</span>
         <span class="group-operate-btn">
           <i class="el-icon-edit" @click="editGroup"></i>
-          <i class="el-icon-share"></i>
-          <i class="el-icon-delete"></i>
+          <el-dropdown trigger="click">
+            <span class="el-dropdown-link">
+              <i class="el-icon-share"></i>
+            </span>
+            <el-dropdown-menu slot="dropdown" class="dropdown-container">
+              <div class="text">
+                <span class="icon" style="background-image: url('./static/images/wechat.png');"></span>
+                <span>微信扫一扫</span>
+              </div>
+              <formated-image
+                :originUrl="checkedGroupWxcode"
+                class="code-wrapper"
+                :className="codeClass">
+              </formated-image>
+            </el-dropdown-menu>
+          </el-dropdown>
+          <i class="el-icon-delete" @click="deleteDialogVisible = true"></i>
         </span>
+        <el-dialog
+          title="删除分类"
+          :visible.sync="deleteDialogVisible"
+          width="600px">
+          <div>您确定要删除"{{ checkedGroupName }}"分类吗?</div>
+          <div>1、删除分类后该分类将不在分类列表中显示。</div>
+          <div>2、添加了该分类的所有预约项目都将搜索不到该分类。</div>
+          <div>请谨慎对待!</div>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="deleteDialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="deleteGroup">确 定</el-button>
+          </span>
+        </el-dialog>
       </div>
       <div class="card-wrapper">
         <project-entrance :project="project"
@@ -93,6 +121,7 @@
 </template>
 
 <script>
+  import formatedImage from '@/components/formated_image.vue'
   import projectEntrance from '@/components/project_entrance.vue'
 
   const ERROR_TIP = {
@@ -101,7 +130,8 @@
   }
   export default {
     components: {
-      "project-entrance": projectEntrance
+      "project-entrance": projectEntrance,
+      "formated-image": formatedImage
     },
     data() {
       return {
@@ -111,11 +141,14 @@
         checkedGroupName: '',
         checkedGroupId: 0,
         checkedGroupIndex: 0,
+        checkedGroupWxcode: '',
         paginationCount: 0,
         pageSize: 12,
         groupDialogVisible: false,
+        deleteDialogVisible: false,
         groupShowAll: false,
         groupEditState: false,
+        codeClass: 'code',
         group: {
           name: '',
           projects: []
@@ -149,7 +182,6 @@
         }).then(res => {
           this.projectsList = res.data.projects;
           this.paginationCount = res.data.count;
-          this.checkedGroupName = this.groupsList[this.checkedGroupIndex].name;
           this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
         })
       },
@@ -163,6 +195,7 @@
         this.checkedGroupIndex = index;
         this.checkedGroupId = this.groupsList[index].id;
         this.checkedGroupName = this.groupsList[index].name;
+        this.checkedGroupWxcode = this.groupsList[index].wxcode;
         this.pageSize = 12;
         this.refreshGroup();
         this.getGroupInfo();
@@ -223,8 +256,9 @@
             projects: this.group.projects
           }
         }).then(res => {
-          this.refreshGroup();
           this.requestGroups();
+          this.refreshGroup();
+          this.getGroupInfo();
         })
       },
       createGroup() {
@@ -248,6 +282,19 @@
         this.group.projects = this.editGroupProjects;
         this.groupDialogVisible = true;
       },
+      deleteGroup() {
+        this.$http({
+          method: 'delete',
+          url: this.GLOBAL.requestUrls.group + this.checkedGroupId,
+          headers: {
+            'Authorization': this.getCookie('token')
+          }
+        }).then(res => {
+          this.requestGroups();
+          this.changeGroup(0);
+          this.deleteDialogVisible = false;
+        })
+      },
       requestProjects() {
         this.$http.get(this.GLOBAL.requestUrls.projects, this.getRequestConfig()).then((res) => {
           this.projectsList = res.data.projects;
@@ -262,7 +309,8 @@
           this.groupFirstData = {
             id: 0,
             name: '全部',
-            total: res.data.projects.length
+            total: res.data.projects.length,
+            wxcode: ''
           }
           this.allProjects = res.data.projects;
           this.groupsList.push(this.groupFirstData);
@@ -275,6 +323,7 @@
           this.groupsList = [];
           this.groupsList.push(this.groupFirstData);
           this.groupsList = this.groupsList.concat(res.data);
+          this.checkedGroupName = this.groupsList[this.checkedGroupIndex].name;
           this.groupDialogVisible = false;
         })
       }

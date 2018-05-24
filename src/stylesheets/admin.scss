@@ -82,6 +82,7 @@
         font-size: 14px;
 
         i {
+          color: $primary;
           margin-right: 5px;
           cursor: pointer;
         }
@@ -181,7 +182,7 @@
   }
 }
 .dropdown-container {
-  width: 100px;
+  width: 200px;
 
   .text {
     display: flex;
@@ -199,8 +200,8 @@
     justify-content: center;
     margin-top: 10px;
     .code {
-      width: 100px;
-      height: 100px;
+      width: 200px;
+      height: 200px;
     }
   }
 }
