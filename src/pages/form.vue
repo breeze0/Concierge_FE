@@ -39,6 +39,19 @@
           </div>
         </el-form-item>
         <el-form-item>
+          <div class="form-authority">
+            <span class="form-item-text">项目公开性: </span>
+            <el-select v-model="form.authority">
+              <el-option
+                v-for="item in authorityOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </div>
+        </el-form-item>
+        <el-form-item>
           <div class="form-time-period-select">
             <span class="form-item-text">预约时间设置:</span>
             <el-radio-group v-model="form.multi_time">
@@ -131,6 +144,10 @@
     {value: 'hour', label: '小时'},
     {value: 'minute', label: '分钟'}
   ]
+  const AUTHORITY_OPTIONS = [
+    {value: 'public', label: '公开项目（任何人可在预约小程序中访问它，仅管理员可以编辑项目）'},
+    {value: 'private', label: '非公开项目（仅可通过微信分享（项目和分类）的二维码查看该项目，仅管理员可以编辑项目）'}
+  ]
   export default {
     components: {
       "cover-picker": coverPicker,
@@ -148,6 +165,7 @@
           latitude: 0,
           longitude: 0,
           check_mode: 'auto',
+          authority: 'public',
           time_state: {
             normal: [
              {time: '09:00-10:00', limit: 10, weekday: ['Mon','Tues','Wed','Thur','Fri']}
@@ -160,6 +178,7 @@
         reservationLimit: {reservation_limit: false, reservation_per_user: 1},
         aheadTime: {ahead_time: '', time_select: 'day'},
         selectOptions: SELECT_OPTIONS,
+        authorityOptions: AUTHORITY_OPTIONS,
         submitButtonDisabled: false
       } 
     },
@@ -232,7 +251,7 @@
       getFormData() {
         this.getComponentsData();
         var form_data = new FormData();
-        var form_array = ['name', 'description', 'address', 'latitude', 'longitude', 'check_mode', 'image', 'multi_time', 'date_display'];
+        var form_array = ['name', 'description', 'address', 'latitude', 'longitude', 'check_mode','authority', 'image', 'multi_time', 'date_display'];
         form_array.forEach(item => {
           form_data.append(item, this.form[item]);
         })

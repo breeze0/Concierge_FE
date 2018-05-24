@@ -162,6 +162,13 @@
         width: 100px;
       }
     }
+    .form-authority {
+      margin: 0 30px;
+      display: flex;
+      .el-select {
+        flex-grow: 1;
+      }
+    }
     .form-day-display {
       margin: 0 30px;
       display: flex;
