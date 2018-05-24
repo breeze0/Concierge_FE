@@ -68,84 +68,104 @@
       }
     }
   }
-  .card-wrapper {
-    display: flex;
-    flex-wrap: wrap;
-    min-height: 600px;
-    align-content: flex-start;
+  .admin-com-bottom {
+    .group-wrapper {
+      display: flex;
+      height: 30px;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
+      padding: 0 15px;
+      margin-bottom: 15px;
 
-    .card-item {
-      flex: 0 0 23.5%;
-      margin-bottom: 2%;
-      margin-right: 2%;
-      .box-card {
-        height: 100%;
-        height: 150px;
-      }
-      .card-content {
-        .card-icon {
-          text-align: center;
-          font-size: 45px;
-        }
-        p {
-          text-align: center;
-        }
-      }
+      .group-operate-btn {
+        font-size: 14px;
 
-      &:nth-child(4n) {
-        margin-right: 0;
-      }
-
-      &:hover {
-        cursor: pointer;
-      }
-      &.project {
-
-        .image-wrapper {
-          height: 150px;
-        }
-        .project-image {
-          width: 100%;
-          height: 100%;
-        }
-        .project-name {
-          font-size: 16px;
-          overflow: hidden;
-          white-space: nowrap;
-          text-overflow: ellipsis;
-          height: 24px;
-          line-height: 24px;
-        }
-
-        .bottom-flex {
-          display: flex;
-          justify-content: space-between;
-          margin-top: 10px;
-        }
-        .project-share {
-
-          .oprerate-icon {
-            font-size: 25px;
-            color: $primary;
-          }
-        }
-        .share-code {
-          width: 100px;
-          height: 150px;
-          box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-          border: 1px solid #ebeef5;
-          position: absolute;
-          top: 35px;
-          background-color: #fff;
-          right: 3px;
+        i {
+          margin-right: 5px;
+          cursor: pointer;
         }
       }
     }
-  }
-  .pagination-wrapper {
-    margin-top: 10px;
-    text-align: right;
-    margin-bottom: 20px;
+    .card-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      min-height: 600px;
+      align-content: flex-start;
+
+      .card-item {
+        flex: 0 0 23.5%;
+        margin-bottom: 2%;
+        margin-right: 2%;
+        .box-card {
+          height: 100%;
+          height: 150px;
+        }
+        .card-content {
+          .card-icon {
+            text-align: center;
+            font-size: 45px;
+          }
+          p {
+            text-align: center;
+          }
+        }
+
+        &:nth-child(4n) {
+          margin-right: 0;
+        }
+
+        &:hover {
+          cursor: pointer;
+        }
+        &.project {
+
+          .image-wrapper {
+            height: 150px;
+          }
+          .project-image {
+            width: 100%;
+            height: 100%;
+          }
+          .project-name {
+            font-size: 16px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            height: 24px;
+            line-height: 24px;
+          }
+
+          .bottom-flex {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+          }
+          .project-share {
+
+            .oprerate-icon {
+              font-size: 25px;
+              color: $primary;
+            }
+          }
+          .share-code {
+            width: 100px;
+            height: 150px;
+            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+            border: 1px solid #ebeef5;
+            position: absolute;
+            top: 35px;
+            background-color: #fff;
+            right: 3px;
+          }
+        }
+      }
+    }
+    .pagination-wrapper {
+      margin-top: 10px;
+      text-align: right;
+      margin-bottom: 20px;
+    }
   }
   .projects-wrapper {
     .projects-checkbox-group {

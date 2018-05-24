@@ -34,7 +34,7 @@
           </div>
         </div>
         <el-dialog
-          title="创建新的分类"
+          :title="groupEditState?'修改分类':'创建新分类'"
           :visible.sync="groupDialogVisible"
           width="600px">
           <el-form>
@@ -47,7 +47,7 @@
             <el-form-item>
               <div class="projects-wrapper">
                 <el-checkbox-group
-                  v-model="checkedProjects"
+                  v-model="group.projects"
                   class="projects-checkbox-group">
                   <el-checkbox
                     v-for="project in allProjects"
@@ -64,6 +64,14 @@
         </el-dialog>
     </div>
     <div class="admin-com-bottom">
+      <div class="group-wrapper" v-show="checkedGroupId !== 0">
+        <span class="group-name">{{ checkedGroupName }}</span>
+        <span class="group-operate-btn">
+          <i class="el-icon-edit" @click="editGroup"></i>
+          <i class="el-icon-share"></i>
+          <i class="el-icon-delete"></i>
+        </span>
+      </div>
       <div class="card-wrapper">
         <project-entrance :project="project"
                           v-for="project in projectsList"
@@ -100,13 +108,14 @@
         projectsList:[],
         allProjects: [],
         groupsList: [],
+        checkedGroupName: '',
         checkedGroupId: 0,
         checkedGroupIndex: 0,
-        checkedProjects: [],
         paginationCount: 0,
         pageSize: 12,
         groupDialogVisible: false,
         groupShowAll: false,
+        groupEditState: false,
         group: {
           name: '',
           projects: []
@@ -120,13 +129,14 @@
       },
       handleDropdownCommand(command) {
         if(command === 'newProject') this.newProject();
-        else if(command === 'newGroup') this.groupDialogVisible = true;
+        else if(command === 'newGroup') {
+          this.group.name = '';
+          this.group.projects = [];
+          this.groupDialogVisible = true;
+        }
         else return;
       },
-      changeGroup(index) {
-        this.checkedGroupIndex = index;
-        this.checkedGroupId = this.groupsList[index].id;
-        this.pageSize = 12;
+      refreshGroup() {
         this.$http({
           method: 'get',
           url: this.GLOBAL.requestUrls.projects,
@@ -139,8 +149,23 @@
         }).then(res => {
           this.projectsList = res.data.projects;
           this.paginationCount = res.data.count;
+          this.checkedGroupName = this.groupsList[this.checkedGroupIndex].name;
           this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
         })
+      },
+      getGroupInfo() {
+        this.$http.get(this.GLOBAL.requestUrls.group + (this.checkedGroupId === 0?'':this.checkedGroupId), this.getRequestConfig()).then(res => {
+          this.editGroupName = res.data.name;
+          this.editGroupProjects = res.data.projects;
+        })
+      },
+      changeGroup(index) {
+        this.checkedGroupIndex = index;
+        this.checkedGroupId = this.groupsList[index].id;
+        this.checkedGroupName = this.groupsList[index].name;
+        this.pageSize = 12;
+        this.refreshGroup();
+        this.getGroupInfo();
       },
       changeDisplay() {
         this.groupShowAll = !this.groupShowAll;
@@ -171,28 +196,57 @@
         this.handleHttpError(err);
         })
       },
+      requestCreateGroup() {
+        this.$http({
+          method: 'post',
+          url: this.GLOBAL.requestUrls.groups,
+          headers: {
+            'Authorization': this.getCookie('token')
+          },
+          data: {
+            name: this.group.name,
+            projects: this.group.projects
+          }
+        }).then(res => {
+          this.requestGroups();
+        })
+      },
+      requestEditGroup() {
+        this.$http({
+          method: 'put',
+          url: this.GLOBAL.requestUrls.group + this.checkedGroupId,
+          headers: {
+            'Authorization': this.getCookie('token')
+          },
+          data: {
+            name: this.group.name,
+            projects: this.group.projects
+          }
+        }).then(res => {
+          this.refreshGroup();
+          this.requestGroups();
+        })
+      },
       createGroup() {
         if(this.group.name) {
-          if(this.checkedProjects.length) {
-            this.$http({
-              method: 'post',
-              url: this.GLOBAL.requestUrls.groups,
-              headers: {
-                'Authorization': this.getCookie('token')
-              },
-              data: {
-                name: this.group.name,
-                projects: this.checkedProjects
-              }
-            }).then(res => {
-              this.requestGroups();
-            })
+          if(this.group.projects.length) {
+            if(this.groupEditState) {
+              this.requestEditGroup();
+            } else {
+              this.requestCreateGroup();
+            }
           } else {
             this.$message.error(ERROR_TIP.projects_empty);
           }
         } else {
           this.$message.error(ERROR_TIP.name_error);
         }
+      },
+      editGroup() {
+        this.groupEditState = true;
+        this.group.name = this.editGroupName;
+        this.group.projects = this.editGroupProjects;
+        this.groupDialogVisible = true;
       },
       requestProjects() {
         this.$http.get(this.GLOBAL.requestUrls.projects, this.getRequestConfig()).then((res) => {
