@@ -26,6 +26,19 @@
   }
 
   .login-content {
+    .el-tabs__header {
+      margin: 0 5% 15px 5%;
+    }
+    .el-tabs__nav {
+      width: 100%;
+      .el-tabs__item {
+        width: 50%;
+        text-align: center;
+      }
+    }
+    .el-tab-pane {
+      height: 200px;
+    }
     .login-input {
       border: none;
       width: 100%;
@@ -83,6 +96,17 @@
     .login-btn {
       margin-left: 5%;
       width: 90%;
+    }
+    .code-img {
+      width: 150px;
+      height: 150px;
+      background-size: cover;
+      margin: 0 auto;
+    }
+    .code-tip {
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
     }
   }
 }
