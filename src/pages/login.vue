@@ -6,38 +6,46 @@
         <span class="title-en">Reservation Management System</span>
       </div>
       <div class="login-content">
-        <div class="input-container">
-          <input type="text"
-                 class="login-input"
-                 placeholder="请输入手机号码"
-                 maxlength="11"
-                 v-model="tel">
-          <div class="error-msg tel-error">
-            <span v-show='telError'>请输入正确的手机号</span>
-          </div>
-        </div>
-        <div class="input-wrapper">
-          <div class="input-msg-container">
-            <input type="number"
-                   class="login-input message-input"
-                   v-model="code"
-                   placeholder="请输入6位短信验证码">
-          </div>
-          <el-button type="text"
-                     @click="getCode"
-                     :disabled="counting">
-            {{ codeButtonText }}
-          </el-button>
-          <div class="error-msg code-error">
-            <span v-show="numError">请输入正确的短信验证码</span>
-          </div>
-        </div>
-        <el-button type="primary"
-                   class="login-btn"
-                   @click="login"
-                   :disabled="tel == '' || code == '' ">
-          登录
-        </el-button>
+        <el-tabs v-model="activeName">
+          <el-tab-pane label="手机号登录" name="phoneLogin">
+            <div class="input-container">
+              <input type="text"
+                    class="login-input"
+                    placeholder="请输入手机号码"
+                    maxlength="11"
+                    v-model="tel">
+              <div class="error-msg tel-error">
+                <span v-show='telError'>请输入正确的手机号</span>
+              </div>
+            </div>
+            <div class="input-wrapper">
+              <div class="input-msg-container">
+                <input type="number"
+                      class="login-input message-input"
+                      v-model="code"
+                      placeholder="请输入6位短信验证码">
+              </div>
+              <el-button type="text"
+                        @click="getCode"
+                        :disabled="counting">
+                {{ codeButtonText }}
+              </el-button>
+              <div class="error-msg code-error">
+                <span v-show="numError">请输入正确的短信验证码</span>
+              </div>
+            </div>
+            <el-button type="primary"
+                      class="login-btn"
+                      @click="login"
+                      :disabled="tel == '' || code == '' ">
+              登录
+            </el-button>
+          </el-tab-pane>
+          <el-tab-pane label="扫码注册" name="codeLogin">
+            <div class="code-img" style="background-image: url('./static/images/register.jpg')"></div>
+            <p class="code-tip">请用微信扫描二维码注册</p>
+          </el-tab-pane>
+        </el-tabs>
       </div>
     </el-card>
   </div>
@@ -57,7 +65,8 @@
         telError: false,
         numError: false,
         countdownRange: 60,
-        counting: false
+        counting: false,
+        activeName:'phoneLogin'
       }
     },
     computed: {
