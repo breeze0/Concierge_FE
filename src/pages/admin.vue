@@ -26,7 +26,7 @@
             <i class="el-icon-arrow-right" v-if="!groupShowAll"></i>
             <i class="el-icon-arrow-down" v-else></i>
           </span>
-          <div class="group-item title"><span class="group-name">分类:</span></div>
+          <div class="title"><span class="group-title">分类:</span></div>
           <div class="group-item" v-for="(item, index) in groupsList">
             <span :class="[checkedGroupIndex === index ? 'active':'', 'group-name']"
                   @click="changeGroup(index)">{{ item.name }}</span>
@@ -177,7 +177,8 @@
             'Authorization': this.getCookie('token')
           },
           params: {
-            group: this.checkedGroupId === 0?'':this.checkedGroupId
+            group: this.checkedGroupId === 0?'':this.checkedGroupId,
+            size: this.pageSize
           }
         }).then(res => {
           this.projectsList = res.data.projects;
@@ -196,7 +197,6 @@
         this.checkedGroupId = this.groupsList[index].id;
         this.checkedGroupName = this.groupsList[index].name;
         this.checkedGroupWxcode = this.groupsList[index].wxcode;
-        this.pageSize = 12;
         this.refreshGroup();
         this.getGroupInfo();
       },

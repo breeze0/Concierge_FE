@@ -18,7 +18,8 @@
     'image': server + '/image',
     'all_projects': server + '/all-projects',
     'groups': server + '/groups',
-    'group': server + '/groups/'
+    'group': server + '/groups/',
+    'authority': server + '/project/authority'
   }
   const httpStateInfo = {
     'invalid_token': 'Invalid Token'

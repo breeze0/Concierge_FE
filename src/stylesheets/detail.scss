@@ -6,8 +6,19 @@
     border: 1px solid #ebeef5;
     padding: 10px;
     border-radius: 4px;
+    display: flex;
+    align-items: center;
+
     .project-state {
       margin-left: 10px;
+      margin-right: 5px;
+    }
+    .reservation-name {
+      margin-left: 10px;
+    }
+    .project-authority {
+      margin-left: 10px;
+      margin-right: 5px;
     }
   }
   .reservations-list {

@@ -10,6 +10,13 @@
         inactive-color="#909997"
         @change="changeState">
       </el-switch>
+      <span class="project-authority">项目公开性</span>
+      <el-switch
+        v-model="projectAuthority"
+        active-color="#409EFF"
+        inactive-color="#909997"
+        @change="changeAuthority">
+      </el-switch>
       <el-dialog
         title="确认关闭"
         :visible.sync="stateDialogVisible"
@@ -164,6 +171,7 @@
         reservations: [],
         totalReservations: 0,
         projectState: '',
+        projectAuthority: '',
         reservationsDate: [],
         reservationsTel: '',
         reservationsState: '',
@@ -294,6 +302,25 @@
         } else {
           this.openProject();
         }
+      },
+      changeAuthority(newState) {
+        if(newState) this.requestChangeAuthority('public');
+        else this.requestChangeAuthority('private');
+      },
+      requestChangeAuthority(authority) {
+        this.$http({
+          method: 'patch',
+          url: this.GLOBAL.requestUrls.authority,
+          headers: {
+            'Authorization': this.getCookie('token')
+          },
+          data: {
+            id: this.$route.params.id,
+            authority: authority
+          }
+        }).then(res => {
+          this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
+        })
       },
       closeProject() {
         if(!this.stateDialogVisible) return;

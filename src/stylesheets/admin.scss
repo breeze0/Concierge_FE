@@ -46,6 +46,17 @@
         justify-content: center;
         cursor: pointer;
       }
+      .title {
+        margin-right: 25px;
+        margin-bottom: 10px;
+
+        .group-title {
+          font-size: 14px;
+          display: inline-block;
+          height: 20px;
+          line-height: 20px;
+        }
+      }
       .group-item {
         margin-right: 25px;
         margin-bottom: 10px;
