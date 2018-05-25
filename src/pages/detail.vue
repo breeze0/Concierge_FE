@@ -62,7 +62,7 @@
             <span class="item">姓名</span>
             <span class="item">预约状态</span>
             <span class="item">联系电话</span>
-            <span class="item">预约时间</span>
+            <span class="date item">预约时间</span>
             <span class="time item">预约时间段</span>
             <span class="remark item">备注</span>
             <span class="operate item">操作</span>
@@ -70,10 +70,10 @@
           <div class="table-item"
                v-for="(item, index) in formatedReservations"
                :key="item.id">
-            <span class="item">{{ item.name }}</span>
+            <span class="name item">{{ item.name }}</span>
             <span class="item">{{ item.state }}</span>
             <span class="item">{{ item.tel }}</span>
-            <span class="item">{{ item.date }}</span>
+            <span class="date item">{{ item.date }}</span>
             <el-tooltip effect="dark"
                         placement="top">
               <div slot="content"><span v-for="time in item.time">{{ time }}<br/></span></div>
@@ -117,7 +117,6 @@
             <span>待审核: {{ stateCountObj.wait }}</span>
             <span>已成功: {{ stateCountObj.success }}</span>
             <span>已核销: {{ stateCountObj.checked }}</span>
-            <span>已拒绝: {{ stateCountObj.refused }}</span>
             <span>已取消: {{ stateCountObj.cancelled }}</span>
             <span>已过期: {{ stateCountObj.overtime }}</span>
           </div>
@@ -360,11 +359,10 @@
       },
       getProjectState(loading) {
         this.$http.get(this.GLOBAL.requestUrls.project + this.$route.params.id, this.getRequestConfig()).then(res => {
-          if(res.data.state === 'open') {
-            this.projectState = true;
-          } else {
-            this.projectState = false;
-          }
+          if(res.data.state === 'open') this.projectState = true;
+          else this.projectState = false;
+          if(res.data.authority === 'private') this.projectAuthority = false;
+          else this.projectAuthority = true;
           loading.close();
         }).catch(err => {
           loading.close();

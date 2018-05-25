@@ -17,6 +17,11 @@
       .search-input {
         width: 250px;
       }
+      .search-result-text {
+        display: block;
+        height: 40px;
+        line-height: 40px;
+      }
     }
     .group-display {
       display: flex;

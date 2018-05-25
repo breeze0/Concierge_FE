@@ -8,9 +8,6 @@
           <i class="el-icon-arrow-down el-icon--right"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item>修改个人消息</el-dropdown-item>
-          <el-dropdown-item>查看回收站</el-dropdown-item>
-          <el-dropdown-item>我的邀请</el-dropdown-item>
           <el-dropdown-item command="logout">退出</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>

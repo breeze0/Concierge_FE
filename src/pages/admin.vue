@@ -7,21 +7,28 @@
             type="primary"
             trigger="click"
             @click="newProject"
-            @command="handleDropdownCommand">
+            @command="handleDropdownCommand"
+            v-if="!searchState">
             <span class="new-project-text">创建新项目</span>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item command="newProject">创建新项目</el-dropdown-item>
               <el-dropdown-item command="newGroup">创建新分类</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
+          <span class="search-result-text" v-else>搜索结果</span>
           <el-input
+            clearable
             placeholder="搜索预约项目名称"
             prefix-icon="el-icon-search"
             v-model="searchContent"
-            class="search-input">
+            class="search-input"
+            @keyup.native.enter="handleSearch"
+            @clear="handleClear">
           </el-input>
         </div>
-        <div class="group-display" :class="{display: groupShowAll, hidden: !groupShowAll}">
+        <div class="group-display"
+             v-show="!searchState"
+             :class="{display: groupShowAll, hidden: !groupShowAll}">
           <span class="control-icon" @click="changeDisplay">
             <i class="el-icon-arrow-right" v-if="!groupShowAll"></i>
             <i class="el-icon-arrow-down" v-else></i>
@@ -110,6 +117,7 @@
         <el-pagination
           @current-change="handleCurrentChange"
           @size-change="handleSizeChange"
+          :current-page.sync="currentPage"
           :page-size="pageSize"
           :page-sizes="[4,8,12,16,20]"
           layout="total,sizes,prev, pager, next, jumper"
@@ -144,10 +152,12 @@
         checkedGroupWxcode: '',
         paginationCount: 0,
         pageSize: 12,
+        currentPage: 1,
         groupDialogVisible: false,
         deleteDialogVisible: false,
         groupShowAll: false,
         groupEditState: false,
+        searchState: false,
         codeClass: 'code',
         group: {
           name: '',
@@ -155,6 +165,10 @@
         },
         searchContent: ''
       };
+    },
+    created() {
+      this.requestAllProjects();
+      this.requestProjects();
     },
     methods: {
       newProject() {
@@ -169,6 +183,22 @@
         }
         else return;
       },
+      handleSearch() {
+        this.checkedGroupId = 0;
+        this.checkedGroupIndex = 0;
+        this.searchState = true;
+        this.searchParam = this.searchContent;
+        if(this.searchContent) {
+          this.goPage(1, this.pageSize, this.checkedGroupId, this.searchParam);
+        } else {
+          this.handleClear();
+        }
+      },
+      handleClear() {
+        this.searchState = false;
+        this.searchParam = this.searchContent;
+        this.changeGroup(0);
+      },
       refreshGroup() {
         this.$http({
           method: 'get',
@@ -178,7 +208,7 @@
           },
           params: {
             group: this.checkedGroupId === 0?'':this.checkedGroupId,
-            size: this.pageSize
+            size: this.pageSize,
           }
         }).then(res => {
           this.projectsList = res.data.projects;
@@ -197,6 +227,7 @@
         this.checkedGroupId = this.groupsList[index].id;
         this.checkedGroupName = this.groupsList[index].name;
         this.checkedGroupWxcode = this.groupsList[index].wxcode;
+        this.currentPage = 1;
         this.refreshGroup();
         this.getGroupInfo();
       },
@@ -204,13 +235,13 @@
         this.groupShowAll = !this.groupShowAll;
       },
       handleCurrentChange(pageIndex) {
-        this.goPage(pageIndex, this.pageSize, this.checkedGroupId);
+        this.goPage(pageIndex, this.pageSize, this.checkedGroupId, this.searchParam);
       },
       handleSizeChange(pageSize) {
         this.pageSize = pageSize;
-        this.goPage(1,pageSize,this.checkedGroupId);
+        this.goPage(1, pageSize, this.checkedGroupId, this.searchParam);
       },
-      goPage(page, size, id) {
+      goPage(page, size, id, search) {
         this.$http({
           method: 'get',
           url: this.GLOBAL.requestUrls.projects,
@@ -220,10 +251,12 @@
           params: {
             page: page,
             size: size,
-            group: id === 0?'':id
+            group: id === 0?'':id,
+            search: search
           }
         }).then(res => {
           this.projectsList = res.data.projects;
+          this.paginationCount = res.data.count;
           this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
         }).catch(err=>{
         this.handleHttpError(err);
@@ -327,10 +360,6 @@
           this.groupDialogVisible = false;
         })
       }
-    },
-    created() {
-      this.requestAllProjects();
-      this.requestProjects();
     }
   }
 </script>

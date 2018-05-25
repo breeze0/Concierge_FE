@@ -65,6 +65,11 @@
             padding: 5px;
             line-height: 25px;
           }
+          .name {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+          }
           .remark {
             flex-grow: 3;
             overflow: hidden;
@@ -86,6 +91,9 @@
             .time-cell {
               margin-right: 3px;
             }
+          }
+          .date {
+            flex-grow: 2;
           }
         }
       }
