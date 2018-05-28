@@ -91,21 +91,22 @@
               </formated-image>
             </el-dropdown-menu>
           </el-dropdown>
-          <i class="el-icon-delete" @click="deleteDialogVisible = true"></i>
+          <el-dropdown trigger="click">
+            <span class="el-dropdown-link">
+              <i class="el-icon-delete"></i>
+            </span>
+            <el-dropdown-menu slot="dropdown" class="dropdown-delete-container">
+              <div class="title">删除分类</div>
+              <div class="content-item">您确定要删除"{{ checkedGroupName }}"分类吗?</div>
+              <div class="content-item">1、删除分类后该分类将不在分类列表中显示。</div>
+              <div class="content-item">2、添加了该分类的所有预约项目都将搜索不到该分类。</div>
+              <div class="content-item">请谨慎对待!</div>
+             <el-dropdown-item>
+              <el-button type="primary" @click="deleteGroup">确 定</el-button>
+             </el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </span>
-        <el-dialog
-          title="删除分类"
-          :visible.sync="deleteDialogVisible"
-          width="600px">
-          <div>您确定要删除"{{ checkedGroupName }}"分类吗?</div>
-          <div>1、删除分类后该分类将不在分类列表中显示。</div>
-          <div>2、添加了该分类的所有预约项目都将搜索不到该分类。</div>
-          <div>请谨慎对待!</div>
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="deleteDialogVisible = false">取 消</el-button>
-            <el-button type="primary" @click="deleteGroup">确 定</el-button>
-          </span>
-        </el-dialog>
       </div>
       <div class="card-wrapper">
         <project-entrance :project="project"
@@ -154,7 +155,6 @@
         pageSize: 12,
         currentPage: 1,
         groupDialogVisible: false,
-        deleteDialogVisible: false,
         groupShowAll: false,
         groupEditState: false,
         searchState: false,

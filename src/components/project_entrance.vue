@@ -2,7 +2,7 @@
   <div  class="project card-item" @click="showDetail">
     <el-card :body-style="{ padding: '0px' }">
       <formated-image :originUrl="project.image" :className="imageClass" class="image-wrapper"></formated-image>
-      <div style="padding: 10px;">
+      <div style="padding: 14px 12px;">
         <div class="project-name">{{ project.name }}</div>
         <div class="bottom bottom-flex">
           <span class="project-state" v-if="project.state === 'open'">开启</span>
