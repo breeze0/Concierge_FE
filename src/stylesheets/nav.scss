@@ -1,8 +1,9 @@
 .nav-com-container {
   background-color: $primary;
-  height: 50px;
+  height: 6%;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 0 3%;
   .nav-title {
     color: #fff;

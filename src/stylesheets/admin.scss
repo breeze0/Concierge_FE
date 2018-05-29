@@ -1,16 +1,20 @@
 .admin-com-container {
   margin: 0 auto;
   width: 920px;
-  min-height: 600px;
+  height: 94%;
+  
+  .admin-com-container-wrapper {
+    padding: 0 36px;
+    box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
+    height: 100%;
+    position: relative;
+  }
 
   .admin-com-top {
-    box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
     margin-bottom: 20px;
 
     .created-search-space-between {
-      padding: 12px 0;
-      border-bottom: 1px solid #f1f1f1;
-      margin: 0 15px;
+      padding: 24px 0;
       display: flex;
       justify-content: space-between;
 
@@ -21,18 +25,20 @@
         display: block;
         height: 40px;
         line-height: 40px;
+        font-size: 18px;
       }
     }
     .group-display {
       display: flex;
       flex-wrap: wrap;
-      margin: 0 15px;
-      margin-top: 10px;
       position: relative;
       transition: all 0.5s ease;
+      border: 1px solid #dcdfe6;
+      padding-left: 12px;
+      border-radius: 4px;
 
       &.hidden {
-        max-height: 30px;
+        max-height: 40px;
         overflow: hidden;
       }
 
@@ -44,16 +50,22 @@
         position: absolute;
         width: 20px;
         height: 20px;
-        right: 0;
-        background-color: #f1f1f1;
+        right: 5px;
+        top: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
+
+        .icon-container {
+          height: 16px;
+          width: 16px;
+          background-size: 100% 100%;
+        }
       }
       .title {
-        margin-right: 25px;
-        margin-bottom: 10px;
+        margin-right: 10px;
+        padding: 10px 0;
 
         .group-title {
           font-size: 14px;
@@ -63,9 +75,9 @@
         }
       }
       .group-item {
-        margin-right: 25px;
-        margin-bottom: 12px;
+        margin-right: 40px;
         display: flex;
+        padding: 10px 0;
 
         .group-name {
           font-size: 14px;
@@ -93,6 +105,7 @@
     }
   }
   .admin-com-bottom {
+
     .group-wrapper {
       display: flex;
       height: 30px;
@@ -112,10 +125,25 @@
         }
       }
     }
+    .no-project-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 120px;
+
+      .no-project-icon {
+        width: 170px;
+        height: 120px;
+      }
+      .no-project-text {
+        font-size: 18px;
+        color: #999;
+        margin-top: 24px;
+      }
+    }
     .card-wrapper {
       display: flex;
       flex-wrap: wrap;
-      min-height: 600px;
       align-content: flex-start;
 
       .card-item {
@@ -147,8 +175,13 @@
         }
         &.project {
 
+          &:hover {
+            .project-share {
+              display: block;
+            }
+          }
           .image-wrapper {
-            height: 150px;
+            height: 110px;
           }
           .project-image {
             width: 100%;
@@ -161,16 +194,28 @@
             text-overflow: ellipsis;
             height: 24px;
             line-height: 24px;
-            width: 190px;
+            width: 170px;
           }
 
           .bottom-flex {
             display: flex;
             justify-content: space-between;
-            margin-top: 12px;
+            margin-top: 6px;
             align-items: center;
+
+            .bottom-left {
+              .state-icon {
+                height: 16px;
+                width: 16px;
+                display: inline-block;
+              }
+              .project-state {
+                font-size: 12px;
+              }
+            }
           }
           .project-share {
+            display: none;
 
             .oprerate-icon {
               font-size: 16px;
@@ -191,8 +236,10 @@
       }
     }
     .pagination-wrapper {
-      text-align: right;
-      margin: 24px 0;
+      position: absolute;
+      bottom: 0;
+      right: 36px;
+      padding: 24px 0;
     }
   }
   .projects-wrapper {
@@ -234,6 +281,7 @@
 }
 .dropdown-delete-container {
   width: 300px;
+  padding: 10px 15px;
 
   .title {
     text-align: center;
@@ -243,5 +291,8 @@
   }
   .el-dropdown-menu__item {
     padding: 0;
+    .el-button {
+      width: 100%;
+    }
   }
 }

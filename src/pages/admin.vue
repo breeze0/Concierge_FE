@@ -1,129 +1,143 @@
 <template>
   <div class="admin-com-container">
-    <div class="admin-com-top">
-        <div class="created-search-space-between">
-          <el-dropdown
-            split-button
-            type="primary"
-            trigger="click"
-            @click="newProject"
-            @command="handleDropdownCommand"
-            v-if="!searchState">
-            <span class="new-project-text">创建新项目</span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item command="newProject">创建新项目</el-dropdown-item>
-              <el-dropdown-item command="newGroup">创建新分类</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-          <span class="search-result-text" v-else>搜索结果</span>
-          <el-input
-            clearable
-            placeholder="搜索预约项目名称"
-            prefix-icon="el-icon-search"
-            v-model="searchContent"
-            class="search-input"
-            @keyup.native.enter="handleSearch"
-            @clear="handleClear">
-          </el-input>
-        </div>
-        <div class="group-display"
-             v-show="!searchState"
-             :class="{display: groupShowAll, hidden: !groupShowAll}">
-          <span class="control-icon" @click="changeDisplay">
-            <i class="el-icon-arrow-right" v-if="!groupShowAll"></i>
-            <i class="el-icon-arrow-down" v-else></i>
-          </span>
-          <div class="title"><span class="group-title">分类:</span></div>
-          <div class="group-item" v-for="(item, index) in groupsList">
-            <span :class="[checkedGroupIndex === index ? 'active':'', 'group-name']"
-                  @click="changeGroup(index)">{{ item.name }}</span>
-            <span class="group-count">{{ item.total }}</span>
+    <div class="admin-com-container-wrapper">
+      <div class="admin-com-top">
+          <div class="created-search-space-between">
+            <el-dropdown
+              split-button
+              type="primary"
+              trigger="click"
+              @click="newProject"
+              @command="handleDropdownCommand"
+              v-if="!searchState">
+              <span class="new-project-text">创建新项目</span>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item command="newProject">创建新项目</el-dropdown-item>
+                <el-dropdown-item command="newGroup">创建新分类</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+            <span class="search-result-text" v-else>搜索结果</span>
+            <el-input
+              clearable
+              placeholder="搜索预约项目名称"
+              prefix-icon="el-icon-search"
+              v-model="searchContent"
+              class="search-input"
+              @keyup.native.enter="handleSearch"
+              @clear="handleClear">
+            </el-input>
           </div>
-        </div>
-        <el-dialog
-          :title="groupEditState?'修改分类':'创建新分类'"
-          :visible.sync="groupDialogVisible"
-          width="600px">
-          <el-form>
-            <el-form-item>
-              <el-input
-                placeholder="请输入分类名称"
-                v-model="group.name">
-              </el-input>
-            </el-form-item>
-            <el-form-item>
-              <div class="projects-wrapper">
-                <el-checkbox-group
-                  v-model="group.projects"
-                  class="projects-checkbox-group">
-                  <el-checkbox
-                    v-for="project in allProjects"
-                    :label="project.id"
-                    :key="project.id">{{project.name}}</el-checkbox>
-                </el-checkbox-group>
-              </div>
-            </el-form-item>
-          </el-form>
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="groupDialogVisible = false">取 消</el-button>
-            <el-button type="primary" @click="createGroup">确 定</el-button>
+          <div class="group-display"
+               v-show="!searchState"
+               :class="{display: groupShowAll, hidden: !groupShowAll}">
+            <span class="control-icon" @click="changeDisplay">
+              <span class="icon-container"
+                    style="background-image: url('./static/images/down.jpg');"
+                    v-if="!groupShowAll"></span>
+              <span class="icon-container"
+                    style="background-image: url('./static/images/up.jpg');"
+                    v-else></span>
+            </span>
+            <div class="title"><span class="group-title">分类:</span></div>
+            <div class="group-item" v-for="(item, index) in groupsList">
+              <span :class="[checkedGroupIndex === index ? 'active':'', 'group-name']"
+                    @click="changeGroup(index)">{{ item.name }}</span>
+              <span class="group-count">{{ item.total }}</span>
+            </div>
+          </div>
+          <el-dialog
+            :title="groupEditState?'修改分类':'创建新分类'"
+            :visible.sync="groupDialogVisible"
+            width="500px">
+            <el-form>
+              <el-form-item>
+                <el-input
+                  placeholder="请输入分类名称"
+                  v-model="group.name">
+                </el-input>
+              </el-form-item>
+              <el-form-item>
+                <div class="projects-wrapper">
+                  <el-checkbox-group
+                    v-model="group.projects"
+                    class="projects-checkbox-group">
+                    <el-checkbox
+                      v-for="project in allProjects"
+                      :label="project.id"
+                      :key="project.id">{{project.name}}</el-checkbox>
+                  </el-checkbox-group>
+                </div>
+              </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+              <el-button @click="groupDialogVisible = false">取 消</el-button>
+              <el-button type="primary" @click="createGroup">确 定</el-button>
+            </span>
+          </el-dialog>
+      </div>
+      <div class="admin-com-bottom">
+        <div class="group-wrapper" v-show="checkedGroupId !== 0">
+          <span class="group-name">{{ checkedGroupName }}</span>
+          <span class="group-operate-btn">
+            <i class="el-icon-edit" @click="editGroup"></i>
+            <el-dropdown trigger="click">
+              <span class="el-dropdown-link">
+                <i class="el-icon-share"></i>
+              </span>
+              <el-dropdown-menu slot="dropdown" class="dropdown-container">
+                <div class="text">
+                  <span class="icon" style="background-image: url('./static/images/wechat.png');"></span>
+                  <span>微信扫一扫</span>
+                </div>
+                <formated-image
+                  :originUrl="checkedGroupWxcode"
+                  class="code-wrapper"
+                  :className="codeClass">
+                </formated-image>
+              </el-dropdown-menu>
+            </el-dropdown>
+            <el-dropdown trigger="click">
+              <span class="el-dropdown-link">
+                <i class="el-icon-delete"></i>
+              </span>
+              <el-dropdown-menu slot="dropdown" class="dropdown-delete-container">
+                <div class="title">删除分类</div>
+                <div class="content-item">您确定要删除"{{ checkedGroupName }}"分类吗?</div>
+                <div class="content-item">1、删除分类后该分类将不在分类列表中显示。</div>
+                <div class="content-item">2、添加了该分类的所有预约项目都将搜索不到该分类。</div>
+                <div class="content-item">请谨慎对待!</div>
+               <el-dropdown-item>
+                <el-button type="primary" @click="deleteGroup">确 定</el-button>
+               </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
           </span>
-        </el-dialog>
-    </div>
-    <div class="admin-com-bottom">
-      <div class="group-wrapper" v-show="checkedGroupId !== 0">
-        <span class="group-name">{{ checkedGroupName }}</span>
-        <span class="group-operate-btn">
-          <i class="el-icon-edit" @click="editGroup"></i>
-          <el-dropdown trigger="click">
-            <span class="el-dropdown-link">
-              <i class="el-icon-share"></i>
-            </span>
-            <el-dropdown-menu slot="dropdown" class="dropdown-container">
-              <div class="text">
-                <span class="icon" style="background-image: url('./static/images/wechat.png');"></span>
-                <span>微信扫一扫</span>
-              </div>
-              <formated-image
-                :originUrl="checkedGroupWxcode"
-                class="code-wrapper"
-                :className="codeClass">
-              </formated-image>
-            </el-dropdown-menu>
-          </el-dropdown>
-          <el-dropdown trigger="click">
-            <span class="el-dropdown-link">
-              <i class="el-icon-delete"></i>
-            </span>
-            <el-dropdown-menu slot="dropdown" class="dropdown-delete-container">
-              <div class="title">删除分类</div>
-              <div class="content-item">您确定要删除"{{ checkedGroupName }}"分类吗?</div>
-              <div class="content-item">1、删除分类后该分类将不在分类列表中显示。</div>
-              <div class="content-item">2、添加了该分类的所有预约项目都将搜索不到该分类。</div>
-              <div class="content-item">请谨慎对待!</div>
-             <el-dropdown-item>
-              <el-button type="primary" @click="deleteGroup">确 定</el-button>
-             </el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-        </span>
-      </div>
-      <div class="card-wrapper">
-        <project-entrance :project="project"
-                          v-for="project in projectsList"
-                          :key="project.id">
-        </project-entrance>
-      </div>
-      <div class="pagination-wrapper" v-show="projectsList.length">
-        <el-pagination
-          @current-change="handleCurrentChange"
-          @size-change="handleSizeChange"
-          :current-page.sync="currentPage"
-          :page-size="pageSize"
-          :page-sizes="[4,8,12,16,20]"
-          layout="total,sizes,prev, pager, next, jumper"
-          :total="paginationCount">
-        </el-pagination>
+        </div>
+        <div class="card-wrapper" v-if="hasProjects">
+          <project-entrance :project="project"
+                            v-for="project in projectsList"
+                            :key="project.id">
+          </project-entrance>
+        </div>
+        <div class="no-project-container" v-else-if="searchState">
+          <span class="no-project-icon" style="background-image: url('./static/images/no-search-result.jpg');"></span>
+          <span class="no-project-text">暂无搜索结果</span>
+        </div>
+        <div class="no-project-container" v-else>
+          <span class="no-project-icon" style="background-image: url('./static/images/no-project.jpg');"></span>
+          <span class="no-project-text">暂无预约项目</span>
+        </div>
+        <div class="pagination-wrapper" v-show="projectsList.length">
+          <el-pagination
+            @current-change="handleCurrentChange"
+            @size-change="handleSizeChange"
+            :current-page.sync="currentPage"
+            :page-size="pageSize"
+            :page-sizes="[4,8,12,16]"
+            layout="total,sizes,prev, pager, next, jumper"
+            :total="paginationCount">
+          </el-pagination>
+        </div>
       </div>
     </div>
   </div>
@@ -133,9 +147,10 @@
   import formatedImage from '@/components/formated_image.vue'
   import projectEntrance from '@/components/project_entrance.vue'
 
-  const ERROR_TIP = {
+  const TIP = {
     name_error: '请输入分类名称',
-    projects_empty: '请选择预约项目'
+    projects_empty: '请选择预约项目',
+    loading: '拼命加载中'
   }
   export default {
     components: {
@@ -158,6 +173,7 @@
         groupShowAll: false,
         groupEditState: false,
         searchState: false,
+        hasProjects: true,
         codeClass: 'code',
         group: {
           name: '',
@@ -167,8 +183,19 @@
       };
     },
     created() {
+      const loading = this.$loading({
+        text: TIP.loading,
+        spinner: 'el-icon-loading',
+        background: '#fff'
+      });
       this.requestAllProjects();
-      this.requestProjects();
+      this.requestProjects(loading);
+    },
+    watch: {
+      projectsList(arr) {
+        if (arr.length) this.hasProjects = true;
+        else this.hasProjects = false;
+      }
     },
     methods: {
       newProject() {
@@ -303,10 +330,10 @@
               this.requestCreateGroup();
             }
           } else {
-            this.$message.error(ERROR_TIP.projects_empty);
+            this.$message.error(TIP.projects_empty);
           }
         } else {
-          this.$message.error(ERROR_TIP.name_error);
+          this.$message.error(TIP.name_error);
         }
       },
       editGroup() {
@@ -328,12 +355,14 @@
           this.deleteDialogVisible = false;
         })
       },
-      requestProjects() {
+      requestProjects(loading) {
         this.$http.get(this.GLOBAL.requestUrls.projects, this.getRequestConfig()).then((res) => {
           this.projectsList = res.data.projects;
           this.paginationCount = res.data.count;
           this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
-        }).catch(err=>{
+          loading.close()
+        }).catch(err => {
+          loading.close();
           this.handleHttpError(err);
         });
       },

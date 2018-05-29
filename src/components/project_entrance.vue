@@ -5,8 +5,14 @@
       <div style="padding: 14px 12px;">
         <div class="project-name">{{ project.name }}</div>
         <div class="bottom bottom-flex">
-          <span class="project-state" v-if="project.state === 'open'">开启</span>
-          <span class="project-state" v-else>关闭</span>
+          <div class="bottom-left" v-if="project.state === 'open'">
+            <span class="state-icon" style="background-image: url('./static/images/open.jpg');"></span>
+            <span class="project-state">开启</span>
+          </div>
+          <div class="bottom-left" v-else>
+            <span class="state-icon" style="background-image: url('./static/images/close.jpg');"></span>
+            <span class="project-state">关闭</span>
+          </div>
           <span class="project-share" @click.stop="handleStopPropagation">
             <i class="el-icon-edit oprerate-icon" @click.stop="editProject"></i>
             <el-dropdown trigger="click">
