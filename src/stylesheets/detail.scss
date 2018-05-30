@@ -1,37 +1,56 @@
 .detail-com-container {
   margin: 0 auto;
   width: 920px;
-  .return-to-prev {
-    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-    border: 1px solid #ebeef5;
-    padding: 10px;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  min-height: 94%;
+  position: relative;
 
-    .project-state {
-      margin-left: 10px;
-      margin-right: 5px;
-    }
-    .reservation-name {
-      margin-left: 10px;
-    }
-    .project-authority {
-      margin-left: 10px;
-      margin-right: 5px;
+  .return-to-prev-wrapper {
+    padding-top: 24px;
+    display: flex;
+
+    .return-to-prev {
+      margin: 0 36px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      height: 40px;
+      padding-left: 10px;
+      padding-right: 40px;
+      border: 1px solid #dcdfe6;
+
+      .router-link-active {
+        height: 20px;
+        display: flex;
+        align-items: center;
+      }
+      .el-icon-back {
+        color: $primary;
+      }
+      .project-state {
+        margin-left: 40px;
+        margin-right: 10px;
+      }
+      .reservation-name {
+        margin-left: 10px;
+      }
+
+      .project-authority {
+        margin-left: 40px;
+        margin-right: 10px;
+      }
     }
   }
   .reservations-list {
-    margin-top: 15px;
-    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-    border: 1px solid #ebeef5;
     min-height: 500px;
 
     .reservations-search {
       display: flex;
-      padding: 10px 5px;
-      border-bottom: 1px solid #f1f1f1;
+      padding: 24px 36px;
 
+      .date-picker {
+        width: 300px;
+      }
       .reservations-tel {
         margin-left: 10px;
 
@@ -43,7 +62,7 @@
         margin-left: 10px;
 
         .state-select {
-          width: 150px;
+          width: 100px;
         }
       }
       .search-btn {
@@ -52,17 +71,19 @@
     }
     .reservations-list-body {
       .list-wrapper {
-        min-height: 385px;
+        min-height: 440px;
+        margin: 0 36px;
+        border: 1px solid #dcdfe6;
+
         .table-head {
-          margin-top: 10px;
-          background-color: rgba(242, 242, 242, 1);
+          background-color: #dcdfe6;
         }
         .table-item {
           display: flex;
           .item {
             flex: 1;
             text-align: center;
-            padding: 5px;
+            padding: 7.5px 5px;
             line-height: 25px;
           }
           .name {
@@ -71,29 +92,29 @@
             text-overflow: ellipsis;
           }
           .remark {
-            flex-grow: 3;
+            flex-grow: 2;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
           }
           .operate {
-            flex-grow: 2;
+            flex-grow: 1.5;
             .operate-set {
               color: $primary;
               cursor: pointer;
             }
           }
           .time {
-            flex-grow: 2;
+            flex-grow: 2.5;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
             .time-cell {
-              margin-right: 3px;
+              margin-right: 5px;
             }
           }
           .date {
-            flex-grow: 2;
+            flex-grow: 1.5;
           }
         }
       }
@@ -110,10 +131,14 @@
         align-items: center;
         height: 40px;
         justify-content: space-between;
-        margin: 10px 15px;
+        margin: 24px 36px;
+        position: absolute;
+        width: 848px;
+        bottom: 0;
 
         .state-count {
-          span {
+          .state-number {
+            color: #999;
             margin-right: 5px;
           }
         }

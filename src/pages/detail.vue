@@ -1,32 +1,34 @@
 <template>
   <div class="detail-com-container">
-    <div class="return-to-prev">
-      <router-link to="/admin/projects"><i class="el-icon-back"></i></router-link>
-      <span class="reservation-name">{{ this.$route.params.projectName }}预约记录</span>
-      <span class="project-state">开启预约</span>
-      <el-switch
-        v-model="projectState"
-        active-color="#409EFF"
-        inactive-color="#909997"
-        @change="changeState">
-      </el-switch>
-      <span class="project-authority">项目公开性</span>
-      <el-switch
-        v-model="projectAuthority"
-        active-color="#409EFF"
-        inactive-color="#909997"
-        @change="changeAuthority">
-      </el-switch>
-      <el-dialog
-        title="确认关闭"
-        :visible.sync="stateDialogVisible"
-        width="500px">
-        <span>关闭项目后，该项目下的所有预约都会被自动取消，您确认要关闭么?</span>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="stateDialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="closeProject" :disabled="confirmButtonDisabled">确 定</el-button>
-        </span>
-      </el-dialog>
+    <div class="return-to-prev-wrapper">
+      <div class="return-to-prev">
+        <router-link to="/admin/projects"><i class="el-icon-back"></i></router-link>
+        <span class="reservation-name">{{ this.$route.params.projectName }}预约记录</span>
+        <span class="project-state">开启预约</span>
+        <el-switch
+          v-model="projectState"
+          active-color="#409EFF"
+          inactive-color="#909997"
+          @change="changeState">
+        </el-switch>
+        <span class="project-authority">项目公开性</span>
+        <el-switch
+          v-model="projectAuthority"
+          active-color="#409EFF"
+          inactive-color="#909997"
+          @change="changeAuthority">
+        </el-switch>
+        <el-dialog
+          title="确认关闭"
+          :visible.sync="stateDialogVisible"
+          width="500px">
+          <span>关闭项目后，该项目下的所有预约都会被自动取消，您确认要关闭么?</span>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="stateDialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="closeProject" :disabled="confirmButtonDisabled">确 定</el-button>
+          </span>
+        </el-dialog>
+      </div>
     </div>
     <div class="reservations-list">
       <div class="reservations-search">
@@ -113,12 +115,12 @@
         </el-dialog>
         <div class="reservations-list-bottom">
           <div class="state-count">
-            <span>总计: {{ stateCountObj.total }}</span>
-            <span>待审核: {{ stateCountObj.wait }}</span>
-            <span>已成功: {{ stateCountObj.success }}</span>
-            <span>已核销: {{ stateCountObj.checked }}</span>
-            <span>已取消: {{ stateCountObj.cancelled }}</span>
-            <span>已过期: {{ stateCountObj.overtime }}</span>
+            <span>总计: <span class="state-number">{{ stateCountObj.total }}</span></span>
+            <span>待审核: <span class="state-number">{{ stateCountObj.wait }}</span></span>
+            <span>已成功: <span class="state-number">{{ stateCountObj.success }}</span></span>
+            <span>已核销: <span class="state-number">{{ stateCountObj.checked }}</span></span>
+            <span>已取消: <span class="state-number">{{ stateCountObj.cancelled }}</span></span>
+            <span>已过期: <span class="state-number">{{ stateCountObj.overtime }}</span></span>
           </div>
           <div class="pagination-wrapper" v-show="reservations.length">
             <el-pagination

@@ -71,7 +71,7 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
               <el-button @click="groupDialogVisible = false">取 消</el-button>
-              <el-button type="primary" @click="createGroup">确 定</el-button>
+              <el-button type="primary" :disabled="confirmButtonDisabled" @click="createGroup">确 定</el-button>
             </span>
           </el-dialog>
       </div>
@@ -120,7 +120,7 @@
           </project-entrance>
         </div>
         <div class="no-project-container" v-else-if="searchState">
-          <span class="no-project-icon" style="background-image: url('./static/images/no-search-result.jpg');"></span>
+          <span class="no-project-icon" style="background-image: url('./static/images/no-project.jpg');"></span>
           <span class="no-project-text">暂无搜索结果</span>
         </div>
         <div class="no-project-container" v-else>
@@ -174,6 +174,7 @@
         groupEditState: false,
         searchState: false,
         hasProjects: true,
+        confirmButtonDisabled: false,
         codeClass: 'code',
         group: {
           name: '',
@@ -325,8 +326,12 @@
         if(this.group.name) {
           if(this.group.projects.length) {
             if(this.groupEditState) {
+              if(!this.groupDialogVisible) return;
+              this.confirmButtonDisabled = true;
               this.requestEditGroup();
             } else {
+              if(!this.groupDialogVisible) return;
+              this.confirmButtonDisabled = true;
               this.requestCreateGroup();
             }
           } else {
@@ -387,6 +392,7 @@
           this.groupsList = this.groupsList.concat(res.data);
           this.checkedGroupName = this.groupsList[this.checkedGroupIndex].name;
           this.groupDialogVisible = false;
+          this.confirmButtonDisabled = false;
         })
       }
     }
