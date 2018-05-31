@@ -90,6 +90,18 @@
           }).catch(err => {
             this.handleHttpError(err);
           })
+        }).catch(error => {
+          var formData = new FormData();
+          formData.append('image', this.$refs.uploadImageRef.files[0]);
+          if(this.$refs.uploadImageRef.files[0].size < 5*1024*1024) {
+            this.$http.post(this.GLOBAL.requestUrls.image, formData, this.getRequestConfig()).then(res=> {
+              this.currentImage = res.data.image;
+              this.setCookie('token',res.headers.authorization,this.GLOBAL.expire);
+            })
+          } else {
+            this.$message.error('上传图片过大');
+            this.loading.close();
+          }
         })
         this.coverModalVisible = false;
       },

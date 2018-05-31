@@ -42,20 +42,19 @@
     }
   }
   .reservations-list {
-    min-height: 500px;
 
     .reservations-search {
       display: flex;
       padding: 24px 36px;
 
       .date-picker {
-        width: 300px;
+        width: 270px;
       }
       .reservations-tel {
         margin-left: 10px;
 
         .tel-input {
-          width: 150px;
+          width: 120px;
         }
       }
       .reservations-state {
@@ -66,12 +65,18 @@
         }
       }
       .search-btn {
-        margin-left: 20px;
+        margin-left: 10px;
+        height: 40px;
+
+        .el-icon-loading {
+          font-size: 14px!important;
+        }
       }
     }
     .reservations-list-body {
+      padding-bottom: 88px;
+
       .list-wrapper {
-        min-height: 440px;
         margin: 0 36px;
         border: 1px solid #dcdfe6;
 
@@ -116,6 +121,22 @@
           .date {
             flex-grow: 1.5;
           }
+        }
+      }
+      .no-reservation-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 160px;
+
+        .no-reservation-icon {
+          width: 170px;
+          height: 120px;
+        }
+        .no-reservation-text {
+          font-size: 18px;
+          color: #999;
+          margin-top: 24px;
         }
       }
       .border-bottom {

@@ -368,7 +368,10 @@
           loading.close()
         }).catch(err => {
           loading.close();
-          this.handleHttpError(err);
+          if(err.response.status === 401) {
+            this.delCookie('token');
+            this.$router.push(this.GLOBAL.routers.login);
+          }
         });
       },
       requestAllProjects() {

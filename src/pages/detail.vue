@@ -57,33 +57,42 @@
           </el-select>
         </div>
         <el-button type="primary" class="search-btn" @click="search">查询</el-button>
+        <el-button type="primary"
+                   class="search-btn"
+                   :loading="generatingState"
+                   @click="exportReservations">
+            {{ exportButtonText }}
+        </el-button>
       </div>
       <div class="reservations-list-body">
-        <div class="list-wrapper">
+        <div class="list-wrapper" v-show="hasReservations">
           <div class="table-item table-head">
             <span class="item">姓名</span>
             <span class="item">预约状态</span>
             <span class="item">联系电话</span>
-            <span class="date item">预约时间</span>
+            <span class="date item">预约日期</span>
             <span class="time item">预约时间段</span>
             <span class="remark item">备注</span>
             <span class="operate item">操作</span>
           </div>
           <div class="table-item"
                v-for="(item, index) in formatedReservations"
-               :key="item.id">
+               :key="item.id"
+               v-show="hasReservations">
             <span class="name item">{{ item.name }}</span>
             <span class="item">{{ item.state }}</span>
             <span class="item">{{ item.tel }}</span>
             <span class="date item">{{ item.date }}</span>
-            <el-tooltip effect="dark"
-                        placement="top">
+            <el-tooltip effect="dark" placement="top">
               <div slot="content"><span v-for="time in item.time">{{ time }}<br/></span></div>
               <span class="time item">
                <span class="time-cell" v-for="time in item.time">{{time}}</span>
               </span>
             </el-tooltip>
-            <span class="remark item">{{ item.remark }}</span>
+            <el-tooltip effect="dark" placement="top">
+              <div slot="content">{{ item.remark }}</div>
+              <span class="remark item">{{ item.remark }}</span>
+            </el-tooltip>
             <span class="operate item" v-if="item.state === '已成功'">
               <span class="operate-set" @click="allow(index, item.state)">核销</span>
               <span class="operate-set" @click="dismiss(index,item.state)">取消</span>
@@ -94,6 +103,10 @@
             </span>
             <span class="operate item" v-else>---</span>
           </div>
+        </div>
+        <div class="no-reservation-container" v-show="!hasReservations">
+          <span class="no-reservation-icon" style="background-image: url('./static/images/no-project.jpg');"></span>
+          <span class="no-reservation-text">暂无预约记录</span>
         </div>
         <el-dialog
           :title="modalTitle"
@@ -113,7 +126,7 @@
             <el-button type="primary" @click="confirm" :disabled="confirmButtonDisabled">确 定</el-button>
           </span>
         </el-dialog>
-        <div class="reservations-list-bottom">
+        <div class="reservations-list-bottom" v-show="reservations.length">
           <div class="state-count">
             <span>总计: <span class="state-number">{{ stateCountObj.total }}</span></span>
             <span>待审核: <span class="state-number">{{ stateCountObj.wait }}</span></span>
@@ -122,10 +135,10 @@
             <span>已取消: <span class="state-number">{{ stateCountObj.cancelled }}</span></span>
             <span>已过期: <span class="state-number">{{ stateCountObj.overtime }}</span></span>
           </div>
-          <div class="pagination-wrapper" v-show="reservations.length">
+          <div class="pagination-wrapper">
             <el-pagination
               @current-change="handleCurrentChange"
-              :page-size="10"
+              :page-size="20"
               layout="prev, pager, next, jumper"
               :total="totalReservations">
             </el-pagination>
@@ -156,7 +169,9 @@
     cancel: '取消预约',
     check: '核销预约',
     pass: '通过预约',
-    loading: '拼命加载中'
+    loading: '拼命加载中',
+    generating: '生成记录',
+    completed: '导出记录'
   }
   const DISMISS_MODAL_TITLE = {
     '已成功': STRING_MAP['cancel'],
@@ -177,9 +192,12 @@
         reservationsTel: '',
         reservationsState: '',
         reservationsStateOptions: OPTIONS,
+        exportButtonText: STRING_MAP.completed,
         processDialogVisible: false,
         stateDialogVisible: false,
         confirmButtonDisabled: false,
+        generatingState: false,
+        hasReservations: true,
         modalTitle: '',
         operateRemark: '',
         stateCountObj: {}
@@ -194,6 +212,12 @@
           return item;
         });
         return new_reservations;
+      }
+    },
+    watch: {
+      reservations(arr) {
+        if (arr.length) this.hasReservations = true;
+        else this.hasReservations = false;
       }
     },
     created() {
@@ -219,8 +243,8 @@
           },
           params: {
             tel: this.reservationsTel,
-            date_to: (this.reservationsDate.length)?this.reservationsDate[1]:'',
-            date_from: (this.reservationsDate.length)?this.reservationsDate[0]:'',
+            date_to: (this.reservationsDate)?this.reservationsDate[1]:'',
+            date_from: (this.reservationsDate)?this.reservationsDate[0]:'',
             state: this.reservationsState,
             page: pageIndex
           }
@@ -229,6 +253,27 @@
           this.totalReservations = res.data.count;
         }).catch(err => {
           this.handleHttpError(err);
+        })
+      },
+      exportReservations() {
+        this.generatingState = true;
+        this.exportButtonText = STRING_MAP.generating;
+        this.$http({
+          method: 'get',
+          url: this.GLOBAL.requestUrls.project + this.$route.params.id + '/reservations/export',
+          headers: {
+            'Authorization': this.getCookie('token')
+          },
+          params: {
+            tel: this.reservationsTel,
+            date_to: (this.reservationsDate)?this.reservationsDate[1]:'',
+            date_from: (this.reservationsDate)?this.reservationsDate[0]:'',
+            state: this.reservationsState
+          }
+        }).then(res => {
+          this.generatingState = false;
+          this.exportButtonText = STRING_MAP.completed;
+          window.location = this.GLOBAL.server + res.data;
         })
       },
       dismiss(index, state) {
