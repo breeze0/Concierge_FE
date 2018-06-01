@@ -1,6 +1,7 @@
 <script>
   const server = 'http://192.168.31.208';
   //const server = 'https://concierge.skylarkly.com'
+  //const server = '';
   const expire = 1000 * 60 * 60 * 36;
   const routers = {
     'login': '/login',
